@@ -1,0 +1,365 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7753C0F5-7C46-42CC-A19B-017650CD778B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AuxStructureLib</RootNamespace>
+    <AssemblyName>AuxStructureLib</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\AuxStructureLib.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\AuxStructureLib.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AlgDijkstra.cs" />
+    <Compile Include="BufferOperator.cs" />
+    <Compile Include="CG\NearestDisBtwConvexNull.cs" />
+    <Compile Include="CG\CalNearDis.cs" />
+    <Compile Include="ClusterbyProxiGraph.cs" />
+    <Compile Include="ComFunLib.cs" />
+    <Compile Include="ConflictLib\ConflictBase.cs" />
+    <Compile Include="ConflictLib\ConflictDetector.cs" />
+    <Compile Include="ConflictLib\Conflict_L.cs" />
+    <Compile Include="ConflictLib\Conflict_R.cs" />
+    <Compile Include="ConsDelaunayTin.cs" />
+    <Compile Include="ConvexNull.cs" />
+    <Compile Include="DelaunayTin.cs" />
+    <Compile Include="DelimitPartition4Polylines.cs" />
+    <Compile Include="ESRITin.cs" />
+    <Compile Include="GroupGraph.cs" />
+    <Compile Include="GroupofMapObject.cs" />
+    <Compile Include="Interpretation.cs" />
+    <Compile Include="IO\ArcGISIO\AEIO.cs" />
+    <Compile Include="IO\ArcGISIO\ArcGISDataSource.cs" />
+    <Compile Include="IO\TestIO.cs" />
+    <Compile Include="IO\TXTHelper.cs" />
+    <Compile Include="IO\XMLHelper.cs" />
+    <Compile Include="MapObject.cs" />
+    <Compile Include="ProximityMartix.cs" />
+    <Compile Include="SimDtaStr\Conflict.cs" />
+    <Compile Include="SimDtaStr\ConflictDetection.cs" />
+    <Compile Include="SimDtaStr\ISDS_MapObject.cs" />
+    <Compile Include="SimDtaStr\SDS.cs" />
+    <Compile Include="SimDtaStr\SDS_Edge.cs" />
+    <Compile Include="SimDtaStr\SDS_Node.cs" />
+    <Compile Include="SimDtaStr\SDS_PointObj.cs" />
+    <Compile Include="SimDtaStr\SDS_Polygon.cs" />
+    <Compile Include="SimDtaStr\SDS_PolygonF.cs" />
+    <Compile Include="SimDtaStr\SDS_PolygonO.cs" />
+    <Compile Include="SimDtaStr\SDS_PolylineObj.cs" />
+    <Compile Include="SimDtaStr\SDS_Triangle.cs" />
+    <Compile Include="SMBR.cs" />
+    <Compile Include="MSTGraph.cs" />
+    <Compile Include="NearestEdge.cs" />
+    <Compile Include="NearestPoint.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="BorderPolygon.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProxiEdge.cs" />
+    <Compile Include="ProxiGraph.cs" />
+    <Compile Include="ProxiNode.cs" />
+    <Compile Include="Skeleton.cs" />
+    <Compile Include="Skeleton_Arc.cs" />
+    <Compile Include="SMap.cs" />
+    <Compile Include="Symbol.cs" />
+    <Compile Include="TrialPosition.cs" />
+    <Compile Include="Triangle.cs" />
+    <Compile Include="TriEdge.cs" />
+    <Compile Include="TriNode.cs" />
+    <Compile Include="VoronoiDiagram.cs" />
+    <Compile Include="VoronoiPolygon.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="esri3DAnalyst">
+      <Guid>{639FE90A-CC9A-48C6-AC1D-105FE50915B5}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriAnimation">
+      <Guid>{643D491A-D5BD-4788-B610-A0F53CBA0940}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriCarto">
+      <Guid>{45AC68FF-DEFF-4884-B3A9-7D882EDCAEF1}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriControls">
+      <Guid>{033364CA-47F9-4251-98A5-C88CD8D3C808}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriDataSourcesFile">
+      <Guid>{1CE6AC65-43F5-4529-8FC0-D7ED298E4F1A}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriDataSourcesGDB">
+      <Guid>{4A037613-879A-484D-AF82-0802947C627B}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriDataSourcesNetCDF">
+      <Guid>{28ED84CD-FB06-41A0-9A55-E196441D169A}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriDataSourcesRaster">
+      <Guid>{8F0541A3-D5BE-4B3F-A8D9-062D5579E19B}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriDisplay">
+      <Guid>{59FCCD31-434C-4017-BDEF-DB4B7EDC9CE0}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriGeoAnalyst">
+      <Guid>{5C54042B-B2ED-4889-8C40-2D89C19DB41D}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriGeoDatabase">
+      <Guid>{0475BDB1-E5B2-4CA2-9127-B4B1683E70C2}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriGeoDatabaseDistributed">
+      <Guid>{A7C74158-1062-4664-B404-8694D490FCD1}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriGeoDatabaseExtensions">
+      <Guid>{7BA654FE-F55E-4EE5-8CF2-FAEFFBC04A61}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriGeometry">
+      <Guid>{C4B094C2-FF32-4FA1-ABCB-7820F8D6FB68}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriGeoprocessing">
+      <Guid>{C031A050-82C6-4F8F-8836-5692631CFFE6}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriGISClient">
+      <Guid>{746F6817-89BB-4490-9829-83CA25FD505A}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriGlobeCore">
+      <Guid>{00B329B5-265E-11D6-B2B4-00508BCDDE28}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriNetworkAnalyst">
+      <Guid>{9B4F73F7-90C0-11D5-A6C3-0008C7DF88AB}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriOutput">
+      <Guid>{7DB92CEC-CB65-420A-8737-FCD0722FD436}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriServer">
+      <Guid>{18F2FC71-6B30-45B9-B101-037A8B868B66}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriSpatialAnalyst">
+      <Guid>{62922975-992A-4C4F-BD20-F7F7113A9299}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriSystem">
+      <Guid>{5E1F7BC3-67C5-4AEE-8EC6-C4B73AAC42ED}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="esriSystemUI">
+      <Guid>{4ECCA6E2-B16B-4ACA-BD17-E74CAE4C150A}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

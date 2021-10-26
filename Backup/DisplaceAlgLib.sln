@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplaceAlgLib", "DisplaceAlgLib\DisplaceAlgLib.csproj", "{7CFC4A84-5AB4-4229-AFBB-38D9DD1B8EBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CartoGener", "CartoGener\CartoGener.csproj", "{F6B21AB0-DD51-4961-9480-C5A4B35E18D1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7CFC4A84-5AB4-4229-AFBB-38D9DD1B8EBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CFC4A84-5AB4-4229-AFBB-38D9DD1B8EBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CFC4A84-5AB4-4229-AFBB-38D9DD1B8EBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CFC4A84-5AB4-4229-AFBB-38D9DD1B8EBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6B21AB0-DD51-4961-9480-C5A4B35E18D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6B21AB0-DD51-4961-9480-C5A4B35E18D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6B21AB0-DD51-4961-9480-C5A4B35E18D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6B21AB0-DD51-4961-9480-C5A4B35E18D1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

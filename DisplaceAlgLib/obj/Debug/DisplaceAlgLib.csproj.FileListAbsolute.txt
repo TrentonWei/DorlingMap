@@ -1,0 +1,105 @@
+E:\project\自主科研-道路移位\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\project\自主科研-道路移位\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\移位\2013-4-29\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\移位\2013-4-29\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\移位\2013-4-29\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\移位\2013-4-29\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\移位\2013-4-29\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\DisplaceAlgLib -地图坐标\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\DisplaceAlgLib -地图坐标\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\DisplaceAlgLib -地图坐标\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\project\自主科研-道路移位\DisplaceAlgLib -地图坐标\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\DisplaceAlgLib -地图坐标\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+D:\ZX8-20\DisplaceAlgLib -地图坐标\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+D:\ZX8-20\DisplaceAlgLib -地图坐标\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+D:\ZX8-20\DisplaceAlgLib -地图坐标\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+D:\ZX8-20\DisplaceAlgLib -地图坐标\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+D:\ZX8-20\DisplaceAlgLib -地图坐标\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\project\自主科研-道路移位\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\2013-10\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\2013-10\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\2013-10\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\project\自主科研-道路移位\2013-10\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\2013-10\DisplaceAlgLib -骨架线-96\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\2013-10-new\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\2013-10-new\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\project\自主科研-道路移位\2013-10-new\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\project\自主科研-道路移位\2013-10-new\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\project\自主科研-道路移位\2013-10-new\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\2013-10-28\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\2013-10-28\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\2013-10-28\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\2013-10-28\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\2013-10-28\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+G:\First\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+G:\First\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+G:\First\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+G:\First\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+G:\First\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\2013-12-6\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\2013-12-6\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\2013-12-6\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\2013-12-6\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\2013-12-6\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\Displacement\2013-12-30-BeamsBuildings\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\Displacement\2013-12-30-BeamsBuildings\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\Displacement\2013-12-30-BeamsBuildings\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+E:\Displacement\2013-12-30-BeamsBuildings\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\Displacement\2013-12-30-BeamsBuildings\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+K:\4-10\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+K:\4-10\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+K:\4-10\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+K:\4-10\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+K:\4-10\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+K:\4-18\4-14\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+K:\4-18\4-14\DisplaceAlgLib\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+K:\4-18\4-14\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+K:\4-18\4-14\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+K:\4-18\4-14\DisplaceAlgLib\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Carto.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Geodatabase.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Geometry.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.System.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Display.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.DataSourcesRaster.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.SystemUI.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Output.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Server.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.GISClient.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.GeoDatabaseExtensions.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.DataSourcesFile.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.GeoDatabaseDistributed.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Carto.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Geodatabase.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Geometry.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.System.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Display.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.DataSourcesRaster.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.SystemUI.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Output.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.Server.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.GISClient.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.GeoDatabaseExtensions.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.DataSourcesFile.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\ESRI.ArcGIS.GeoDatabaseDistributed.xml
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+E:\Displacement\7-18\DisplaceAlgLib-CSA\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+F:\2014-9-14补做实验\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+F:\2014-9-14补做实验\DisplaceAlgLib-CSA\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+F:\2014-9-14补做实验\DisplaceAlgLib-CSA\DisplaceAlgLib\obj\Debug\ResolveAssemblyReference.cache
+F:\2014-9-14补做实验\DisplaceAlgLib-CSA\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+F:\2014-9-14补做实验\DisplaceAlgLib-CSA\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.pdb
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.csprojResolveAssemblyReference.cache
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.dll
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\DisplaceAlgLib\obj\Debug\DisplaceAlgLib.pdb

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="AlgIterative.AlgSGD">
+    <Position X="1" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAIACAAAgAEAAQAACQAAAAAAAAEABAAAABBACIAA=</HashCode>
+      <FileName>AlgSGD.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AlgIterative.AlgSimu_Annealing_Jones">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAIACAgAgAAAAQAACQBBAAAAACEABAAAAHBAYYAE=</HashCode>
+      <FileName>AlgSimu_Annealing_Jones.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AlgIterative.TrialPosiDisGroup">
+    <Position X="1" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAIAAAIA=</HashCode>
+      <FileName>DispVectorTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AlgIterative.TrialPosition">
+    <Position X="8.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAgAgAAAAAAAAAAAAAAABAAEAAAAAAAAA=</HashCode>
+      <FileName>DispVectorTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AlgIterative.TrialPosiAngleGroup">
+    <Position X="8.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAACAA=</HashCode>
+      <FileName>DispVectorTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AlgIterative.DispVectorTemplate">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAABAAAAIgAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DispVectorTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AlgIterative.State">
+    <Position X="6.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAAAAQAAAABAAAAIAAAAAFAAAARA=</HashCode>
+      <FileName>State.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="微软雅黑" Size="9" />
+</ClassDiagram>

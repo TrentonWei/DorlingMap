@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="AuxStructureLib.ComFunLib">
+    <Position X="9.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAIFDAQAAAQAAAAAAAAAAAAAAAQQIAAAEAAAgAAEAA=</HashCode>
+      <FileName>ComFunLib.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.ConsDelaunayTin">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAgARIAAAAAAAAAAAAAAIAAAAAAQCAAAAEAAA=</HashCode>
+      <FileName>ConsDelaunayTin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.ConvexNull">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAACRAAAAAAAAAAABAAAAg=</HashCode>
+      <FileName>ConvexNull.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.DelaunayTin">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAgAAEAQAAABAAAEAAAAIAAIAAAQAAABQBAQA=</HashCode>
+      <FileName>DelaunayTin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.Interpretation">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAABAAAAAQAAAAAAQAEAAAAAAQAAAA=</HashCode>
+      <FileName>Interpretation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.PointObject">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAQAAQAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MapObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.PolylineObject">
+    <Position X="3.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACAAAQAAQAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>MapObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.ConNode">
+    <Position X="11.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgQAAAAAAAAAAQAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>MapObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.PolygonObject">
+    <Position X="7.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAEAACAAAQAAQAEAAAAAAAAAAQAAAAE=</HashCode>
+      <FileName>MapObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.Triangle">
+    <Position X="13" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIACCAAAACgRBAhAAgAIJAFAARACAAQABDgDEAAAA=</HashCode>
+      <FileName>Triangle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.TriEdge">
+    <Position X="5.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AICAiAAIAAAAgRBAEEAhABBAwAAGCBAAAAAAABIAAgA=</HashCode>
+      <FileName>TriEdge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.TriNode">
+    <Position X="11" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAACAAAAAEIAAAAABAUQgAAAAAAAAEAAQgAAA=</HashCode>
+      <FileName>TriNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.VoronoiDiagram">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAgAAAIAAAACAIAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>VoronoiDiagram.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.VoronoiPolygon">
+    <Position X="14.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAoAAAAAAIAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>VoronoiPolygon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AuxStructureLib.SDS">
+    <Position X="5.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAggAAAABAgACAhAAIAAAAAWAAAAQAAAABAAQAAAAA=</HashCode>
+      <FileName>SimDtaStr\SDS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="AuxStructureLib.AlgDelaunayType">
+    <Position X="2" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAABAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DelaunayTin.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="微软雅黑" Size="9" />
+</ClassDiagram>

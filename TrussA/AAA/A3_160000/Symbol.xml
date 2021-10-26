@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding ="gb2312" standalone="yes"?>
+<NewDataSet>
+  <Symbol>
+    <ID>1</ID>
+    <symbolID>20140304</symbolID>
+    <LayerName>Boundary3</LayerName>
+    <Size>1.2</Size>
+    <BorderColor>Black</BorderColor>
+    <FillColor>Red</FillColor>
+  </Symbol>
+  <Symbol>
+    <ID>1</ID>
+    <symbolID>20140304</symbolID>
+    <LayerName>Building3</LayerName>
+    <Size>0.1</Size>
+    <BorderColor>Black</BorderColor>
+    <FillColor>Red</FillColor>
+  </Symbol>
+</NewDataSet>

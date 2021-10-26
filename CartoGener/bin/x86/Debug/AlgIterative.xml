@@ -1,0 +1,2061 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AlgIterative</name>
+    </assembly>
+    <members>
+        <member name="T:AlgIterative.AlgGA.ImprMapFitnessFunction">
+            <summary>
+            适应度函数,对应改进后的算法
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapFitnessFunction.#ctor(AuxStructureLib.SDS,AlgIterative.DispVectorTemplate,AuxStructureLib.ConflictDetection,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapFitnessFunction.Evaluate(AForge.Genetic.IChromosome)">
+            <summary>
+            计算chromosome的适应值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapFitnessFunction.ConflictCost(AForge.Genetic.IChromosome)">
+            <summary>
+            计算冲突评价值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapFitnessFunction.MoveObjects(System.UInt16[])">
+            <summary>
+            移动到一个新的状态
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapFitnessFunction.MoveObjects(System.UInt16[],AuxStructureLib.SMap,AuxStructureLib.SMap)">
+            <summary>
+            移动到一个新的状态
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapFitnessFunction.ReturnObject(System.UInt16[])">
+            <summary>
+            返回原来的位置
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapFitnessFunction.HasTriangleInverted(System.UInt16[])">
+            <summary>
+            检查是否有三角形穿越现象(拓扑检查)
+            </summary>
+            <returns>是否有拓扑错误</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapFitnessFunction.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.UInt16[])">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="T:AlgIterative.Move">
+            <summary>
+            移动
+            </summary>
+        </member>
+        <member name="M:AlgIterative.Move.SortMoves(System.Collections.Generic.List{AlgIterative.Move})">
+            <summary>
+            按Cost的大小排序
+            </summary>
+        </member>
+        <member name="M:AlgIterative.Move.Compare(AlgIterative.Move,AlgIterative.Move)">
+            <summary>
+            比较函数
+            </summary>
+            <param name="i1"></param>
+            <param name="i2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.Move.GetMove(System.Collections.Generic.List{AlgIterative.Move})">
+            <summary>
+            查找并获取一个Move对象
+            </summary>
+            <param name="moves">move</param>
+            <returns></returns>
+        </member>
+        <member name="T:AlgIterative.AlgIA.AntibodyBase">
+            <summary>
+            抗体
+            </summary>
+        </member>
+        <member name="T:AlgIterative.AlgIA.IAntibody">
+            <summary>
+            抗体
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.IAntibody.Generate">
+            <summary>
+            Generate Antibody value.
+            </summary>
+            
+            <remarks><para>Regenerates Antibody's value using random number generator or other methods.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.IAntibody.CreateNew">
+            <summary>
+            Create new random chromosome with same parameters (factory method).
+            </summary>
+            
+            <remarks><para>The method creates new chromosome of the same type, but randomly
+            initialized. The method is useful as factory method for those classes, which work
+            with chromosome's interface, but not with particular chromosome class.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.IAntibody.Clone">
+            <summary>
+            Clone the IAntibody.
+            </summary>
+            
+            <remarks><para>The method clones the chromosome returning the exact copy of it.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.IAntibody.Mutate">
+            <summary>
+            Mutation operator.
+            </summary>
+            
+            <remarks><para>The method performs chromosome's mutation, changing its part randomly.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.IAntibody.Evaluate(AlgIterative.AlgIA.IAffinityFunction)">
+            <summary>
+            Evaluate Affinity with specified IAntibody function.
+            </summary>
+            
+            <param name="function">Affinity function to use for evaluation of the IAntibody.</param>
+            
+            <remarks><para>Calculates IAntibody's Affinity using the specifed Affinity function.</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.IAntibody.Affinity">
+            <summary>
+            Antibody's Affinity value.
+            </summary>
+            
+            <remarks><para>The Affinity value represents Antibody's usefulness - the greater the
+            value, the more useful it.</para></remarks>
+            
+        </member>
+        <member name="F:AlgIterative.AlgIA.AntibodyBase.affinity">
+            <summary>
+            Antibody's affinity value.
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyBase.Generate">
+            <summary>
+            Generate random Antibody value.
+            </summary>
+            
+            <remarks><para>Regenerates Antibody's value using random number generator.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyBase.CreateNew">
+            <summary>
+            Create new random Antibody with same parameters (factory method).
+            </summary>
+            
+            <remarks><para>The method creates new Antibody of the same type, but randomly
+            initialized. The method is useful as factory method for those classes, which work
+            with Antibody's interface, but not with particular Antibody class.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyBase.Clone">
+            <summary>
+            Clone the Antibody.
+            </summary>
+            
+            <remarks><para>The method clones the Antibody returning the exact copy of it.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyBase.Mutate">
+            <summary>
+            Mutation operator.
+            </summary>
+            
+            <remarks><para>The method performs Antibody's mutation, changing its part randomly.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyBase.Evaluate(AlgIterative.AlgIA.IAffinityFunction)">
+             <summary>
+             Evaluate chromosome with specified fitness function.
+             </summary>
+             
+             <param name="function">Affinity function to use for evaluation of the Antibody.</param>
+             
+             <remarks><para>Calculates Antibody's Affinity using the specifed Affinity function.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyBase.CompareTo(System.Object)">
+            <summary>
+            Compare two Antibody.
+            </summary>
+            
+            <param name="o">Binary Antibody to compare to.</param>
+            
+            <returns>Returns comparison result, which equals to 0 if Affinity values
+            of both Antibodies are equal, 1 if Affinity value of this Antibody
+            is less than Affinity value of the specified Affinity, -1 otherwise.</returns>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.AntibodyBase.Affinity">
+            <summary>
+            Antibody's affinity value.
+            </summary>
+            
+            <remarks><para>affinity value (usefulness) of the Antibody calculate by calling
+            <see cref="M:AlgIterative.AlgIA.AntibodyBase.Evaluate(AlgIterative.AlgIA.IAffinityFunction)"/> method. The greater the value, the more useful the Antibody.
+            </para></remarks>
+            
+        </member>
+        <member name="T:AlgIterative.AlgGA.AlgGA">
+            <summary>
+            Genentic Algorithm
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgGA.#ctor(AuxStructureLib.SDS,System.Int32,System.Int32,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <param name="dstancetol">距离阈值</param>
+            <param name="pLCost">线-面冲突权值</param>
+            <param name="pPCost">面-面冲突权值</param>
+            <param name="dispCost">移动距离权值</param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgGA.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-32方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgGA.InitDispTemplate(System.Int32)">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgGA.DoGA(System.String)">
+            <summary>
+            执行算法
+            </summary>
+        </member>
+        <member name="T:AlgIterative.TrialPosiDisGroup">
+            <summary>
+            里原始位置同样距离的一层位置的表达
+            是一个（距离、起始角度、间隔角度）的三元组
+            </summary>
+        </member>
+        <member name="M:AlgIterative.TrialPosiDisGroup.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="Distantce">距离</param>
+            <param name="StartAngle">起始角度</param>
+            <param name="IntervalofAngle">间隔角度</param>
+        </member>
+        <member name="T:AlgIterative.TrialPosiAngleGroup">
+            <summary>
+            同一角度上的位置组成的列表
+            </summary>
+        </member>
+        <member name="M:AlgIterative.TrialPosiAngleGroup.#ctor(System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="Distantce">距离</param>
+            <param name="StartAngle">起始角度</param>
+            <param name="IntervalofAngle">间隔角度</param>
+        </member>
+        <member name="T:AlgIterative.DispVectorTemplate">
+            <summary>
+            移位模版-定义所有的移位试探位置（Displaced state trial positions）
+            </summary>
+        </member>
+        <member name="M:AlgIterative.DispVectorTemplate.#ctor(System.Collections.Generic.List{AlgIterative.TrialPosiDisGroup})">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="M:AlgIterative.DispVectorTemplate.CalTriPosition">
+            <summary>
+            根据TrialPosiGroup计算出一组位置
+            </summary>
+            <param name="tg">TrialPosiGroup对象</param>
+            <param name="startID">起始ID</param>
+            <returns>位置列表</returns>
+        </member>
+        <member name="M:AlgIterative.DispVectorTemplate.GetAngleGroup(System.Double)">
+            <summary>
+            获取角度为angle的分组，如果没有则创建并加入列表中
+            </summary>
+            <param name="angle">角度</param>
+            <returns>返回角度组</returns>
+        </member>
+        <member name="M:AlgIterative.DispVectorTemplate.CreateIsTriableList(AuxStructureLib.VoronoiDiagram)">
+            <summary>
+            创建可否试探bool标识列表
+            </summary>
+            <param name="vd"></param>
+        </member>
+        <member name="M:AlgIterative.DispVectorTemplate.CreateIsTriableList1(AuxStructureLib.VoronoiDiagram,AuxStructureLib.SMap,System.Double)">
+            <summary>
+            创建可否试探bool标识列表
+            </summary>
+            <param name="vd"></param>
+        </member>
+        <member name="T:AlgIterative.AlgIA.AntibodyPopulation">
+            <summary>
+            抗体群
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.#ctor(System.Int32,AlgIterative.AlgIA.IAntibody,AlgIterative.AlgIA.IAffinityFunction)">
+             <summary>
+             Initializes a new instance of the <see cref="!:Population"/> class.
+             </summary>
+             
+             <param name="size">Initial size of population.</param>
+             <param name="ancestor">Ancestor Antibody to use for population creatioin.</param>
+             <param name="AffinityFunction">"Affinity function to use for calculating
+             Antibody's fitness values.</param>
+             <param name="CloneMethod">Selection algorithm to use for selection
+             Antibody's to new generation.</param>
+             
+             <remarks>Creates new population of specified size. The specified ancestor
+             becomes first member of the population and is used to create other members
+             with same parameters, which were used for ancestor's creation.</remarks>
+             
+             <exception cref="T:System.ArgumentException">Too small population's size was specified. The
+             exception is thrown in the case if <paramref name="size"/> is smaller than 2.</exception>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.Regenerate">
+            <summary>
+            Regenerate population.
+            </summary>
+            
+            <remarks>The method regenerates population filling it with random chromosomes.</remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.EvluateAntibodyPopulation">
+            <summary>
+            按照亲和度排序，并计算各统计信息（最大、最小、平均、求和、最优抗体）
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.Select_Clone(System.Int32,System.Double)">
+            <summary>
+            选择+克隆扩增
+            </summary>
+            <param name="n">选择的数目</param>
+            <returns>克隆后的抗体群</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.Select_Clone(System.Int32)">
+            <summary>
+            根据亲和度确定克隆规模
+            </summary>
+            <param name="n">被克隆的抗体数目</param>
+            <returns>克隆后的抗体群</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.Gens_Affi_Exp_ActiveMutationRatio(System.Int32,System.Double)">
+            <summary>
+            高频变异
+            </summary>
+            <param name="genNum">迭代次数</param>
+            <returns>变异后的抗体群</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.Affi_Linear_ActiveMutationRatio">
+            <summary>
+            高频变异
+            </summary>
+            <param name="genNum">迭代次数</param>
+            <returns>变异后的抗体群</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.Gens_Linear_ActiveMutationRatio(System.Double,System.Int32,System.Int32,System.Double)">
+            <summary>
+            高频变异
+            </summary>
+            <param name="genNum">迭代次数</param>
+            <returns>变异后的抗体群</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.Gens_Exp_ActiveMutationRatio(System.Double,System.Int32,System.Int32,System.Double)">
+            <summary>
+            高频变异
+            </summary>
+            <param name="genNum">迭代次数</param>
+            <returns>变异后的抗体群</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.HyperMutation(System.Double)">
+            <summary>
+            高频变异
+            </summary>
+            <param name="genNum">迭代次数</param>
+            <returns>变异后的抗体群</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.SelectAfterClone(AlgIterative.AlgIA.AntibodyPopulation,AlgIterative.AlgIA.AntibodyPopulation,System.Int32)">
+            <summary>
+            从克隆变异后的抗体群中选择n个最优的
+            </summary>
+            <param name="CloneP"></param>
+            <param name="OldP"></param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AntibodyPopulation.Diversity(System.Double)">
+            <summary>
+            抗体增补
+            </summary>
+            <param name="diversityRate">增补率</param>
+        </member>
+        <member name="P:AlgIterative.AlgIA.AntibodyPopulation.AffinityFunction">
+            <summary>
+            Fitness function to apply to the population.
+            </summary>
+            
+            <remarks><para>The property sets fitness function, which is used to evaluate
+            usefulness of population's chromosomes. Setting new fitness function causes recalculation
+            of fitness values for all population's members and new best member will be found.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.AntibodyPopulation.AffinityMax">
+            <summary>
+            Maximum  affinity of the population.
+            </summary>
+            
+            <remarks><para>The property keeps maximum  affinity of Antibody currently existing
+            in the population.</para>
+            
+            <para><note>The property is recalculate only after <see cref="!:Selection">selection</see>
+            or <see cref="!:Migrate">migration</see> was done.</note></para>
+            </remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.AntibodyPopulation.AffinitySum">
+             <summary>
+             Summary  Affinity of the population.
+             </summary>
+            
+             <remarks><para>The property keeps summary  Affinity of all chromosome existing in the
+             population.</para>
+             
+             <para><note>The property is recalculate only after <see cref="!:Selection">selection</see>
+             or <see cref="!:Migrate">migration</see> was done.</note></para>
+             </remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.AntibodyPopulation.AffinityAvg">
+             <summary>
+             Average  Affinity of the population.
+             </summary>
+             
+             <remarks><para>The property keeps average  Affinity of all chromosome existing in the
+             population.</para>
+             
+             <para><note>The property is recalculate only after <see cref="!:Selection">selection</see>
+             or <see cref="!:Migrate">migration</see> was done.</note></para>
+             </remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.AntibodyPopulation.BestAntibody">
+            <summary>
+            Best Antibody of the population.
+            </summary>
+            
+            <remarks><para>The property keeps the best Antibody existing in the population
+            or <see langword="null"/> if all Antibody have 0 fitness.</para>
+            
+            <para><note>The property is recalculate only after <see cref="!:Selection">selection</see>
+            or <see cref="!:Migrate">migration</see> was done.</note></para>
+            </remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.AntibodyPopulation.Size">
+            <summary>
+            Size of the population.
+            </summary>
+            
+            <remarks>The property keeps initial (minimal) size of population.
+            Population always returns to this size after selection operator was applied,
+            which happens after <see cref="!:Selection"/> or <see cref="!:RunEpoch"/> methods
+            call.</remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.AntibodyPopulation.Item(System.Int32)">
+            <summary>
+            Get Antibody with specified index.
+            </summary>
+            
+            <param name="index">Chromosome's index to retrieve.</param>
+            
+            <remarks>Allows to access individuals of the population.</remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunctionDouble.#ctor(AuxStructureLib.SDS,AlgIterative.AlgGA.ContinuousDVT,AuxStructureLib.ConflictDetection,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunctionDouble.Evaluate(AForge.Genetic.IChromosome)">
+            <summary>
+            计算chromosome的适应值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunctionDouble.ConflictCost(AForge.Genetic.IChromosome)">
+            <summary>
+            计算冲突评价值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunctionDouble.CalDeltaX_Y(System.Double[],System.Double@)">
+            <summary>
+            计算DX与DY
+            </summary>
+            <param name="diaplaceV">移位向量（直角坐标和极坐标两种）</param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunctionDouble.MoveObjects(System.Double[])">
+            <summary>
+            移动到一个新的状态
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunctionDouble.ReturnObject(System.Double[])">
+            <summary>
+            返回原来的位置
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunctionDouble.HasTriangleInverted(System.UInt16[])">
+            <summary>
+            检查是否有三角形穿越现象(拓扑检查)
+            </summary>
+            <returns>是否有拓扑错误</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunctionDouble.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.Double)">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="F:AlgIterative.AlgGA.MapChromosomeDouble.MaxLength">
+            <summary>
+            Chromosome's maximum length.
+            </summary>
+            
+            <remarks><para>Maxim chromosome's length in array elements.</para></remarks>
+            
+        </member>
+        <member name="F:AlgIterative.AlgGA.MapChromosomeDouble.chromosomeGenerator1">
+            <summary>
+            Chromosome generator1.
+            </summary>
+            
+            <remarks><para>This random number generator is used to initialize chromosome's genes,
+            which is done by calling <see cref="M:AlgIterative.AlgGA.MapChromosomeDouble.Generate"/> method.</para></remarks>
+            
+        </member>
+        <member name="F:AlgIterative.AlgGA.MapChromosomeDouble.chromosomeGenerator2">
+            <summary>
+            Chromosome generator2.
+            </summary>
+            
+            <remarks><para>This random number generator is used to initialize chromosome's genes,
+            which is done by calling <see cref="M:AlgIterative.AlgGA.MapChromosomeDouble.Generate"/> method.</para></remarks>
+            
+        </member>
+        <member name="F:AlgIterative.AlgGA.MapChromosomeDouble.rand">
+            <summary>
+            Random number generator for crossover and mutation points selection.
+            </summary>
+            
+            <remarks><para>This random number generator is used to select crossover
+            and mutation points.</para></remarks>
+            
+        </member>
+        <member name="F:AlgIterative.AlgGA.MapChromosomeDouble.length">
+            <summary>
+            Chromosome's length in number of elements.
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgGA.MapChromosomeDouble.val">
+            <summary>
+            Chromosome's value.
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.#ctor(AuxStructureLib.SDS,AlgIterative.AlgGA.ContinuousDVT)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Genetic.DoubleArrayChromosome"/> class.
+            </summary>
+            
+            <param name="chromosomeGenerator">Chromosome generator - random number generator, which is 
+            used to initialize chromosome's genes, which is done by calling <see cref="M:AlgIterative.AlgGA.MapChromosomeDouble.Generate"/> method
+            or in class constructor.</param>
+            <param name="mutationMultiplierGenerator">Mutation multiplier generator - random number
+            generator, which is used to generate random multiplier values, which are used to
+            multiply chromosome's genes during mutation.</param>
+            <param name="mutationAdditionGenerator">Mutation addition generator - random number
+            generator, which is used to generate random addition values, which are used to
+            add to chromosome's genes during mutation.</param>
+            <param name="length">Chromosome's length in array elements, [2, <see cref="F:AlgIterative.AlgGA.MapChromosomeDouble.MaxLength"/>].</param>
+            
+            <remarks><para>The constructor initializes the new chromosome randomly by calling
+            <see cref="M:AlgIterative.AlgGA.MapChromosomeDouble.Generate"/> method.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.#ctor(AuxStructureLib.SDS,AlgIterative.AlgGA.ContinuousDVT,AForge.Math.Random.IRandomNumberGenerator,AForge.Math.Random.IRandomNumberGenerator,System.Double[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Genetic.DoubleArrayChromosome"/> class.
+            </summary>
+            
+            <param name="chromosomeGenerator">Chromosome generator - random number generator, which is 
+            used to initialize chromosome's genes, which is done by calling <see cref="M:AlgIterative.AlgGA.MapChromosomeDouble.Generate"/> method
+            or in class constructor.</param>
+            <param name="mutationMultiplierGenerator">Mutation multiplier generator - random number
+            generator, which is used to generate random multiplier values, which are used to
+            multiply chromosome's genes during mutation.</param>
+            <param name="mutationAdditionGenerator">Mutation addition generator - random number
+            generator, which is used to generate random addition values, which are used to
+            add to chromosome's genes during mutation.</param>
+            <param name="values">Values used to initialize the chromosome.</param>
+            
+            <remarks><para>The constructor initializes the new chromosome with specified <paramref name="values">values</paramref>.
+            </para></remarks>
+            
+            <exception cref="T:System.ArgumentOutOfRangeException">Invalid length of values array.</exception>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.#ctor(AlgIterative.AlgGA.MapChromosomeDouble)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Genetic.DoubleArrayChromosome"/> class.
+            </summary>
+            
+            <param name="source">Source chromosome to copy.</param>
+            
+            <remarks><para>This is a copy constructor, which creates the exact copy
+            of specified chromosome.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.ToString">
+            <summary>
+            Get string representation of the chromosome.
+            </summary>
+            
+            <returns>Returns string representation of the chromosome.</returns>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.Generate">
+             <summary>
+             Generate random chromosome value.
+             </summary>
+             
+             <remarks><para>Regenerates chromosome's value using random number generator.</para>
+             </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.CreateNew">
+             <summary>
+             Create new random chromosome with same parameters (factory method).
+             </summary>
+             
+             <remarks><para>The method creates new chromosome of the same type, but randomly
+             initialized. The method is useful as factory method for those classes, which work
+             with chromosome's interface, but not with particular chromosome type.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.Clone">
+             <summary>
+             Clone the chromosome.
+             </summary>
+             
+             <returns>Return's clone of the chromosome.</returns>
+             
+             <remarks><para>The method clones the chromosome returning the exact copy of it.</para>
+             </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.Mutate">
+            <summary>
+            Mutation operator.
+            </summary>
+            
+            <remarks><para>The method performs chromosome's mutation, adding random number
+            to chromosome's gene or multiplying the gene by random number. These random
+            numbers are generated with help of <see cref="!:mutationMultiplierGenerator">mutation
+            multiplier</see> and <see cref="!:mutationAdditionGenerator">mutation
+            addition</see> generators.</para>
+            
+            <para>The exact type of mutation applied to the particular gene
+            is selected randomly each time and depends on <see cref="P:AlgIterative.AlgGA.MapChromosomeDouble.MutationBalancer"/>.
+            Before mutation is done a random number is generated in [0, 1] range - if the
+            random number is smaller than <see cref="P:AlgIterative.AlgGA.MapChromosomeDouble.MutationBalancer"/>, then multiplication
+            mutation is done, otherwise addition mutation.
+            </para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosomeDouble.Crossover(AForge.Genetic.IChromosome)">
+             <summary>
+             Crossover operator.
+             </summary>
+             
+             <param name="pair">Pair chromosome to crossover with.</param>
+             
+             <remarks><para>The method performs crossover between two chromosomes, selecting
+             randomly the exact type of crossover to perform, which depends on <see cref="P:AlgIterative.AlgGA.MapChromosomeDouble.CrossoverBalancer"/>.
+             Before crossover is done a random number is generated in [0, 1] range - if the
+             random number is smaller than <see cref="P:AlgIterative.AlgGA.MapChromosomeDouble.CrossoverBalancer"/>, then the first crossover
+             type is used, otherwise second type is used.</para>
+             
+             <para>The <b>first crossover type</b> is based on interchanging
+             range of genes (array elements) between these chromosomes and is known
+             as one point crossover. A crossover point is selected randomly and chromosomes
+             interchange genes, which start from the selected point.</para>
+             
+             <para>The <b>second crossover type</b> is aimed to produce one child, which genes'
+             values are between corresponding genes of parents, and another child, which genes'
+             values are outside of the range formed by corresponding genes of parents. 
+             Let take, for example, two genes with 1.0 and 3.0 value?(of course chromosomes have
+             more genes, but for simplicity lets think about one). First of all we randomly choose
+             a factor in the [0, 1] range, let's take 0.4. Then, for each pair of genes (we have
+             one pair) we calculate difference value, which is 2.0 in our case. In the result we抣l
+             have two children ?one between and one outside of the range formed by parents genes' values.
+             We may have 1.8 and 3.8 children, or we may have 0.2 and 2.2 children. As we can see
+             we add/subtract (chosen randomly) <i>difference * factor</i>. So, this gives us exploration
+             in between and in near outside. The randomly chosen factor is applied to all genes
+             of the chromosomes participating in crossover.</para>
+             </remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgGA.MapChromosomeDouble.Length">
+             <summary>
+             Chromosome's length.
+             </summary>
+             
+             <remarks><para>Length of the chromosome in array elements.</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgGA.MapChromosomeDouble.Value">
+             <summary>
+             Chromosome's value.
+             </summary>
+             
+             <remarks><para>Current value of the chromosome.</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgGA.MapChromosomeDouble.MutationBalancer">
+            <summary>
+            Mutation balancer to control mutation type, [0, 1].
+            </summary>
+            
+            <remarks><para>The property controls type of mutation, which is used more
+            frequently. A radnom number is generated each time before doing mutation -
+            if the random number is smaller than the specified balance value, then one
+            mutation type is used, otherwse another. See <see cref="M:AlgIterative.AlgGA.MapChromosomeDouble.Mutate"/> method
+            for more information.</para>
+            
+            <para>Default value is set to <b>0.5</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgGA.MapChromosomeDouble.CrossoverBalancer">
+            <summary>
+            Crossover balancer to control crossover type, [0, 1].
+            </summary>
+            
+            <remarks><para>The property controls type of crossover, which is used more
+            frequently. A radnom number is generated each time before doing crossover -
+            if the random number is smaller than the specified balance value, then one
+            crossover type is used, otherwse another. See <see cref="M:AlgIterative.AlgGA.MapChromosomeDouble.Crossover(AForge.Genetic.IChromosome)"/> method
+            for more information.</para>
+            
+            <para>Default value is set to <b>0.5</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="T:AlgIterative.AlgImprovedTS">
+            <summary>
+            改进的禁忌搜索算法
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgImprovedTS.State">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.#ctor(AuxStructureLib.SDS,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Int32,System.Int32,System.Int32,System.Int32,AuxStructureLib.VoronoiDiagram,AuxStructureLib.SMap,AuxStructureLib.SMap,AuxStructureLib.SMap)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+            <param name="plcost">线面冲突权值</param>
+            <param name="ppcost">面面冲突权值</param>
+            <param name="dcost">移位权重</param>
+            <param name="dtol">移位距离阈值</param>
+            <param name="pltol">面线距离阈值</param>
+            <param name="pptol">面面距离阈值</param>
+            <param name="c1">待定系数1</param>
+            <param name="c2">待定系数2</param>
+            <param name="c">待定系数</param>
+            <param name="i">迭代次数</param>
+            <param name="vd">V图</param>
+            <param name="omap">原始地图对象</param>
+            <param name="smap">地图对象</param>
+            <param name="smap1">加密后的地图对象，用于生成V图</param>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.GenerateCandidateList(AlgIterative.State)">
+            <summary>
+            创建候选表-按冲突排序
+            </summary>
+            <param name="state">状态</param>
+            <returns>候选表</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.HasTriangleInverted(AuxStructureLib.SDS_PolygonO)">
+            <summary>
+            判断是否存在三角形的穿越
+            </summary>
+            <param name="Polygon">多边i型你</param>
+            <returns></returns>
+            
+        </member>
+        <!-- 对于成员“M:AlgIterative.AlgImprovedTS.Evaluate_NewState(AlgIterative.State,AuxStructureLib.SDS_PolygonO,System.Int32,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Int32@,System.Double@,System.Double@,System.Double@,System.Double@)”忽略有格式错误的 XML 注释 -->
+        <!-- 对于成员“M:AlgIterative.AlgImprovedTS.Update_NewState(AlgIterative.State,System.Int32,System.Int32)”忽略有格式错误的 XML 注释 -->
+        <member name="M:AlgIterative.AlgImprovedTS.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.Evaluate_InitState">
+            <summary>
+            计算初始目标值
+            思路：找出所有冲突，然后移位
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.CostFunction(AlgIterative.State)">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.CostFunction(AuxStructureLib.ISDS_MapObject,System.Collections.Generic.List{AuxStructureLib.Conflict},System.Int32)">
+            <summary>
+            计算单个对象的状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.DoTS">
+            <summary>
+            执行禁忌搜索
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.DoTS(System.String,System.Int32@,System.Double@)">
+            <summary>
+            执行禁忌搜索
+            </summary>
+            <param name="curPath">当前存储路径</param>
+            <param name="Init_No">冲突个数</param>
+            <param name="Init_Cost">冲突值</param>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.IsMove_Tabued(AlgIterative.Move,System.Int32)">
+            <summary>
+            判断移动是否被禁忌
+            </summary>
+            <param name="move"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedTS.IsState_Tabued(AlgIterative.State)">
+            <summary>
+            状态是否被禁忌
+            </summary>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ContinuousDVT.#ctor(System.Double,System.Double,System.Boolean)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="x_r">X或极径r</param>
+            <param name="y_a">Y或方位角a</param>
+            <param name="IsPolarCoors">是否极坐标</param>
+        </member>
+        <member name="T:AlgIterative.AlgIA.AlgImprovedCSA">
+             <summary>
+             利用V图改进后的克隆选择算法
+             Clonal Selection Algorithm
+             (1)  Generate a set (P) of candidate solutions, composed
+            of the subset of memory cells (M) added to the remaining (Pr) population (P = Pr+ M);
+            (2)  Determine (Select) the n best individuals of the
+            population (Pn), based on an affinity measure;
+             (3)  Reproduce (Clone) these n best individuals of the
+            population, giving rise to a temporary population of
+            clones (C). The clone size is an increasing function
+            of the affinity with the antigen;
+            (4)  Submit the population of clones to a hypermutation
+            scheme, where the hypermutation is proportional to
+            the affinity of the antibody with the antigen. A
+            maturated antibody population is generated ( C*);
+            (5)  Re-select the improved individuals from  C* to
+            compose the memory set M. Some members of P can
+            be replaced by other improved members of  C*;
+            (6)  Replace d antibodies by novel ones (diversity
+            introduction). The lower affinity cells have higher
+            probabilities of being replaced
+             </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AlgImprovedCSA.#ctor(AuxStructureLib.SDS,AuxStructureLib.SMap,AuxStructureLib.SMap,AuxStructureLib.SMap,System.Int32,System.Int32,System.Int32,System.Double,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,AlgIterative.AlgIA.MutationType,System.Double,AuxStructureLib.VoronoiDiagram)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">SDS地图对象</param>
+            <param name="map1">加密后的SMap地图对象用于计算移位值</param>
+            <param name="oMap">SMap原始地图对象</param>
+            <param name="nmap">SMap地图</param>
+            <param name="populationSize">种群大小</param>
+            <param name="iterations">迭代次数</param>
+            <param name="selectSize">克隆选择数目</param>
+            <param name="diversityRatio">抗体补充比例</param>
+            <param name="circleNum">圆环数</param>
+            <param name="dstancetol">距离阈值</param>
+            <param name="PLDtol">线-面冲突权值</param>
+            <param name="PPDtol">面-面冲突权值</param>
+            <param name="pLCost">线-面冲突代价值</param>
+            <param name="pPCost">面-面冲突代价值</param>
+            <param name="dispCost">移动距离代价值</param>
+            <param name="MutationFactor">变异系数</param>
+            <param name="MutationType">变异类型</param>
+            <param name="MutationFactor1">??</param>
+            <param name="vd">//V图</param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AlgImprovedCSA.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-32方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AlgImprovedCSA.InitDispTemplate(System.Int32)">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AlgImprovedCSA.DoCSA(System.String)">
+            <summary>
+            执行算法
+            </summary>
+        </member>
+        <member name="T:AlgIterative.AlgSGD">
+            <summary>
+            最陡坡降法
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgSGD.#ctor(AuxStructureLib.SDS,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+            <param name="plcost">线面冲突权值</param>
+            <param name="ppcost">面面冲突权值</param>
+            <param name="dcost">移位权重</param>
+            <param name="dtol">距离阈值</param>
+        </member>
+        <member name="M:AlgIterative.AlgSGD.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgSGD.Evaluate_InitState">
+            <summary>
+            计算初始目标值
+            思路：找出所有冲突，然后移位
+            </summary>
+            <returns></returns>
+        </member>
+        <!-- 对于成员“M:AlgIterative.AlgSGD.Evaluate_NewState(AlgIterative.State,AuxStructureLib.SDS_PolygonO,System.Int32,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Int32@,System.Double@,System.Double@,System.Double@,System.Double@)”忽略有格式错误的 XML 注释 -->
+        <member name="M:AlgIterative.AlgSGD.HasTriangleInverted(AuxStructureLib.SDS_PolygonO)">
+            <summary>
+            判断是否存在三角形的穿越
+            </summary>
+            <param name="Polygon">多边i型你</param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:AlgIterative.AlgSGD.CostFunction(AlgIterative.State)">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgSGD.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.Int32)">
+            <summary>
+            计算单个对象的状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgSGD.DoAlgSGD(System.Int32@,System.IO.StreamWriter)">
+            <summary>
+            执行最陡坡降算法
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgSGD.WriteConflictTxt(System.IO.StreamWriter,System.Collections.Generic.List{AuxStructureLib.Conflict})">
+            <summary>
+            写文本文件
+            </summary>
+            <param name="sw"></param>
+            <param name="cl"></param>
+        </member>
+        <member name="T:AlgIterative.AlgIA.ShortArrayAntibody">
+            <summary>
+            Short array Antibody.
+            </summary>
+            
+            <remarks><para>Short array Antibody represents array of unsigned short values.
+            Array length is in the range of [2, 65536].
+            </para></remarks>
+        </member>
+        <member name="F:AlgIterative.AlgIA.ShortArrayAntibody.MaxLength">
+            <summary>
+            Antibody's maximum length.
+            </summary>
+            
+            <remarks><para>Maxim Antibody's length in array elements.</para></remarks>
+            
+        </member>
+        <member name="F:AlgIterative.AlgIA.ShortArrayAntibody.length">
+            <summary>
+            Antibody's length in number of elements.
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgIA.ShortArrayAntibody.maxValue">
+            <summary>
+            Maximum value of Antibody's gene (element).
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgIA.ShortArrayAntibody.val">
+            <summary>
+            Antibody's value.
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgIA.ShortArrayAntibody.rand">
+            <summary>
+            Random number generator for Antibody generation, crossover, mutation, etc.
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ShortArrayAntibody.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlgIterative.AlgIA.ShortArrayAntibody"/> class.
+            </summary>
+            
+            <param name="length">Antibody's length in array elements, [2, <see cref="F:AlgIterative.AlgIA.ShortArrayAntibody.MaxLength"/>].</param>
+            
+            <remarks>This constructor initializes Antibody setting genes' maximum value to
+            maximum posible value of <see langword="ushort"/> type.</remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.ShortArrayAntibody.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="!:ShortArrayChromosome"/> class.
+            </summary>
+            
+            <param name="length">Antibody's length in array elements, [2, <see cref="F:AlgIterative.AlgIA.ShortArrayAntibody.MaxLength"/>].</param>
+            <param name="maxValue">Maximum value of Antibody's gene (array element).</param>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.ShortArrayAntibody.#ctor(AlgIterative.AlgIA.ShortArrayAntibody)">
+            <summary>
+            Initializes a new instance of the <see cref="!:ShortArrayChromosome"/> class.
+            </summary>
+            
+            <param name="source">Source Antibody to copy.</param>
+            
+            <remarks><para>This is a copy constructor, which creates the exact copy
+            of specified Antibody.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.ShortArrayAntibody.ToString">
+             <summary>
+             Get string representation of the Antibody.
+             </summary>
+             
+             <returns>Returns string representation of the Antibody.</returns>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.ShortArrayAntibody.Generate">
+            <summary>
+            Generate random chromosome value.
+            </summary>
+            
+            <remarks><para>Regenerates chromosome's value using random number generator.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.ShortArrayAntibody.CreateNew">
+             <summary>
+             Create new random chromosome with same parameters (factory method).
+             </summary>
+             
+             <remarks><para>The method creates new chromosome of the same type, but randomly
+             initialized. The method is useful as factory method for those classes, which work
+             with chromosome's interface, but not with particular chromosome type.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.ShortArrayAntibody.Clone">
+             <summary>
+             Clone the chromosome.
+             </summary>
+             
+             <returns>Return's clone of the chromosome.</returns>
+             
+             <remarks><para>The method clones the chromosome returning the exact copy of it.</para>
+             </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.ShortArrayAntibody.Mutate">
+            <summary>
+            Mutation operator.
+            </summary>
+            
+            <remarks><para>The method performs chromosome's mutation, changing randomly
+            one of its genes (array elements).</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.ShortArrayAntibody.Length">
+             <summary>
+             Antibody's length.
+             </summary>
+             
+             <remarks><para>Length of the Antibody in array elements.</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.ShortArrayAntibody.Value">
+             <summary>
+             Antibody's value.
+             </summary>
+             
+             <remarks><para>Current value of the Antibody.</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.ShortArrayAntibody.MaxValue">
+            <summary>
+            Max possible value of single Antibody element - gene.
+            </summary>
+            
+            <remarks><para>Maximum possible numerical value, which may be represented
+            by single Antibody's gene (array element).</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgGADouble.#ctor(AuxStructureLib.SDS,System.Int32,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Boolean)">
+            <param name="dstancetol">距离阈值</param>
+            <param name="pLCost">线-面冲突权值</param>
+            <param name="pPCost">面-面冲突权值</param>
+            <param name="dispCost">移动距离权值</param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgGADouble.DoGA(System.String,System.Int32)">
+            <summary>
+            执行算法
+            </summary>
+        </member>
+        <member name="T:AlgIterative.AlgImprovedSGD">
+            <summary>
+            改进的最优梯度下降法
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedSGD.#ctor(AuxStructureLib.SDS,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,AuxStructureLib.VoronoiDiagram,AuxStructureLib.SMap,AuxStructureLib.SMap,AuxStructureLib.SMap)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+            <param name="plcost">线面冲突权值</param>
+            <param name="ppcost">面面冲突权值</param>
+            <param name="dcost">移位权重</param>
+            <param name="dtol">移位距离阈值</param>
+            <param name="pltol">面线距离阈值</param>
+            <param name="pptol">面面距离阈值</param>
+            <param name="i">迭代次数</param>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedSGD.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedSGD.Evaluate_InitState">
+            <summary>
+            计算初始目标值
+            思路：找出所有冲突，然后移位
+            </summary>
+            <returns></returns>
+        </member>
+        <!-- 对于成员“M:AlgIterative.AlgImprovedSGD.Evaluate_NewState(AlgIterative.State,AuxStructureLib.SDS_PolygonO,System.Int32,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Int32@,System.Double@,System.Double@,System.Double@,System.Double@)”忽略有格式错误的 XML 注释 -->
+        <member name="M:AlgIterative.AlgImprovedSGD.CostFunction(AlgIterative.State)">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedSGD.CostFunction(AuxStructureLib.ISDS_MapObject,System.Collections.Generic.List{AuxStructureLib.Conflict},System.Int32)">
+            <summary>
+            计算单个对象的状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedSGD.DoAlgSGD(System.String,System.Int32@,System.Double@)">
+            <summary>
+            执行最陡坡降算法
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgImprovedSGD.WriteConflictTxt(System.IO.StreamWriter,System.Collections.Generic.List{AuxStructureLib.Conflict})">
+            <summary>
+            写文本文件
+            </summary>
+            <param name="sw"></param>
+            <param name="cl"></param>
+        </member>
+        <member name="T:AlgIterative.AlgIA.ImprMapShortAntibody">
+            <summary>
+            地图解决方案抗体
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgIA.ImprMapShortAntibody.MaxLength">
+            <summary>
+            Antibody's maximum length.
+            </summary>
+            
+            <remarks><para>Maxim Antibody's length in array elements.</para></remarks>
+            
+        </member>
+        <member name="F:AlgIterative.AlgIA.ImprMapShortAntibody.length">
+            <summary>
+            Antibody's length in number of elements.
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgIA.ImprMapShortAntibody.val">
+            <summary>
+            Antibody's value.
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgIA.ImprMapShortAntibody.rand">
+            <summary>
+            Random number generator for Antibody generation, crossover, mutation, etc.
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapShortAntibody.#ctor(AlgIterative.AlgIA.ImprMapShortAntibody)">
+            <summary>
+            Copy Constructor
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapShortAntibody.CreateNew">
+            <summary>
+            Create new random Antibody (factory method)
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapShortAntibody.Clone">
+            <summary>
+            Clone the Antibody
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapShortAntibody.Generate">
+            <summary>
+            生成抗体
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapShortAntibody.Mutate">
+            <summary>
+            变异
+            </summary>
+        </member>
+        <member name="P:AlgIterative.AlgIA.ImprMapShortAntibody.Length">
+             <summary>
+             Antibody's length.
+             </summary>
+             
+             <remarks><para>Length of the Antibody in array elements.</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgIA.ImprMapShortAntibody.Value">
+             <summary>
+             Antibody's value.
+             </summary>
+             
+             <remarks><para>Current value of the Antibody.</para></remarks>
+            
+        </member>
+        <member name="T:AlgIterative.State">
+            <summary>
+            状态表
+            </summary>
+            
+        </member>
+        <member name="M:AlgIterative.State.#ctor">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="M:AlgIterative.State.IsEqual(AlgIterative.State)">
+            <summary>
+            两个状态是否相同
+            </summary>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.State.GetObjectConflict(AuxStructureLib.SDS_PolygonO)">
+            <summary>
+            获取与某个对象相关的冲突
+            </summary>
+            <param name="Obj">对象</param>
+            <returns>冲突列表</returns>
+        </member>
+        <member name="M:AlgIterative.State.UpdateState(System.Int32,AuxStructureLib.SDS_PolygonO,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Collections.Generic.List{AuxStructureLib.Conflict},System.Collections.Generic.List{AuxStructureLib.Conflict},System.Double)">
+            <summary>
+            更新状态（通用模版）
+            </summary>
+            <param name="indexofO"></param>
+            <param name="move_Obj"></param>
+            <param name="move_Pos"></param>
+            <param name="dx"></param>
+            <param name="dy"></param>
+            <param name="dx0"></param>
+            <param name="dy0"></param>
+            <param name="oNewConflicts"></param>
+            <param name="oCurConflicts"></param>
+            <param name="newCost"></param>
+        </member>
+        <member name="M:AlgIterative.State.UpdateState(System.Int32,AuxStructureLib.SDS_PolygonO,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Collections.Generic.List{AuxStructureLib.Conflict},System.Collections.Generic.List{AuxStructureLib.Conflict},System.Double,AuxStructureLib.SMap,AuxStructureLib.SMap)">
+            <summary>
+            更新状态（V图优化后模版）
+            </summary>
+            <param name="indexofO"></param>
+            <param name="move_Obj"></param>
+            <param name="move_Pos"></param>
+            <param name="dx"></param>
+            <param name="dy"></param>
+            <param name="dx0"></param>
+            <param name="dy0"></param>
+            <param name="oNewConflicts"></param>
+            <param name="oCurConflicts"></param>
+            <param name="newCost"></param>
+        </member>
+        <member name="M:AlgIterative.State.WriteConflict2File(System.String,System.String,AuxStructureLib.SMap,AuxStructureLib.ProxiGraph,ESRI.ArcGIS.Geometry.esriSRProjCS4Type)">
+            <summary>
+            输出冲突邻近图
+            </summary>
+            <param name="filePath"></param>
+            <param name="fileName"></param>
+            <param name="map"></param>
+            <param name="pg"></param>
+            <param name="prj"></param>
+        </member>
+        <member name="M:AlgIterative.State.Copy">
+            <summary>
+            复制状态
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.State.ChangeNewState(AlgIterative.Move)">
+            <summary>
+            复制并改变状态（仅改变位置数组）
+            </summary>
+            <param name="move"></param>
+            <returns></returns>
+        </member>
+        <member name="P:AlgIterative.State.State_Cost">
+            <summary>
+            状态值
+            </summary>
+        </member>
+        <member name="T:AlgIterative.AlgSimu_Annealing_Jones">
+            <summary>
+            Jones模拟退火
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.#ctor(AuxStructureLib.SDS,System.Double,System.Double,System.Int32,System.Int32,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map"></param>
+            <param name="v">初始温度</param>
+            <param name="x">降温比例</param>
+            <param name="w">最大试探数</param>
+            <param name="y">最大成功试探数</param>
+            <param name="z">降温次数</param>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.#ctor(AuxStructureLib.SDS,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+            <param name="plcost">线面冲突权值</param>
+            <param name="ppcost">面面冲突权值</param>
+            <param name="dcost">移位权重</param>
+            <param name="dtol">距离阈值</param>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.#ctor(AuxStructureLib.SDS,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Int32,System.Int32,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+            <param name="plcost">线面冲突权值</param>
+            <param name="ppcost">面面冲突权值</param>
+            <param name="dcost">移位权重</param>
+            <param name="dtol">距离阈值</param>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.Evaluate_InitState">
+            <summary>
+            计算初始目标值
+            思路：找出所有冲突，然后移位
+            </summary>
+            <returns></returns>
+        </member>
+        <!-- 对于成员“M:AlgIterative.AlgSimu_Annealing_Jones.Evaluate_NewState(AlgIterative.State,AuxStructureLib.SDS_PolygonO,System.Int32,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Int32@,System.Double@,System.Double@,System.Double@,System.Double@,System.Boolean@)”忽略有格式错误的 XML 注释 -->
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.HasTriangleInverted(AuxStructureLib.SDS_PolygonO)">
+            <summary>
+            判断是否存在三角形的穿越
+            </summary>
+            <param name="Polygon">多边i型你</param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.CostFunction(AlgIterative.State)">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.Int32)">
+            <summary>
+            计算单个对象的状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.DoAlgSimu_Annealing_Jones(System.Int32@,System.Int32@)">
+            <summary>
+            执行算法
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.DoAlgSimu_Annealing_JonesI(System.Int32@,System.Int32@)">
+            <summary>
+            执行算法
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.GenerateRandomNumber(System.Int32)">
+            <summary>
+            产生小于oNo的随机整数
+            </summary>
+            <param name="fromNo">最小数</param>
+            <param name="toNo">最大数</param>
+            <returns>一个整数</returns>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.GenerateRandomFoat">
+            <summary>
+            产生0-1之间的随机数
+            </summary>
+            <returns>0-1之间的随机数</returns>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.Reture2OriginalPos(AuxStructureLib.SDS_PolygonO,AlgIterative.State)">
+            <summary>
+            回到原来的位置
+            </summary>
+            <param name="move_Obj"></param>
+            <param name="cur_Pos"></param>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.CalInitT(System.Int32)">
+            <summary>
+            自动计算初始温度
+            </summary>
+            <param name="n"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgSimu_Annealing_Jones.AutoTDoDoAlgSimu_Annealing_Jones(System.Int32@)">
+            <summary>
+            自动设置初始温度
+            </summary>
+            <param name="InitCN"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgImproved_SA.#ctor(AuxStructureLib.SDS,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Int32,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="map">地图对象</param>
+            <param name="plCost">线-面冲突权重</param>
+            <param name="ppCost">面-面冲突权重</param>
+            <param name="dispCost">移位距离权重</param>
+            <param name="dtol">最小间距阈值</param>
+            <param name="T0">初始温度</param>
+            <param name="X">温度降温速率</param>
+            <param name="M">抽样终止条件</param>
+            <param name="N">迭代终止条件</param>
+        </member>
+        <member name="M:AlgIterative.AlgImproved_SA.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <!-- 对于成员“M:AlgIterative.AlgImproved_SA.DoSampling(System.Double,AlgIterative.State@,AlgIterative.State@,System.Int32)”忽略有格式错误的 XML 注释 -->
+        <!-- 对于成员“M:AlgIterative.AlgImproved_SA.Evaluate_NewState(AlgIterative.State,AuxStructureLib.SDS_PolygonO,System.Int32,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Int32@,System.Double@,System.Double@,System.Double@,System.Double@,System.Boolean@)”忽略有格式错误的 XML 注释 -->
+        <!-- 对于成员“M:AlgIterative.AlgImproved_SA.DoSA(System.Int32@)”忽略有格式错误的 XML 注释 -->
+        <member name="M:AlgIterative.AlgImproved_SA.Evaluate_InitState(AlgIterative.State)">
+            <summary>
+            初始化状态并检查和评价冲突情况
+            </summary>
+            <param name="state">状态</param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgImproved_SA.GenerateRandomNumber(System.Int32)">
+            <summary>
+            产生小于oNo的随机整数
+            </summary>
+            <param name="fromNo">最小数</param>
+            <param name="toNo">最大数</param>
+            <returns>一个整数</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImproved_SA.Generate_New_State(AlgIterative.State,System.Int32@,AuxStructureLib.SDS_PolygonO@,System.Int32@)">
+            <summary>
+            产生一个新的状态
+            </summary>
+            <param name="state">原有状态</param>
+            <returns>新的状态</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImproved_SA.CostFunction(AlgIterative.State)">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImproved_SA.HasTriangleInverted(AuxStructureLib.SDS_PolygonO)">
+            <summary>
+            判断是否存在三角形的穿越
+            </summary>
+            <param name="Polygon">多边i型你</param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:AlgIterative.AlgImproved_SA.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.Int32)">
+            <summary>
+            计算单个对象的状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgImproved_SA.GenerateRandomFoat">
+            <summary>
+            产生0-1之间的随机数
+            </summary>
+            <returns>0-1之间的随机数</returns>
+        </member>
+        <member name="T:AlgIterative.AlgIA.MapShortAntibody">
+            <summary>
+            地图解决方案抗体
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapShortAntibody.#ctor(AuxStructureLib.SDS,AlgIterative.DispVectorTemplate)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapShortAntibody.#ctor(AlgIterative.AlgIA.MapShortAntibody)">
+            <summary>
+            Copy Constructor
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapShortAntibody.CreateNew">
+            <summary>
+            Create new random Antibody (factory method)
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapShortAntibody.Clone">
+            <summary>
+            Clone the Antibody
+            </summary>
+        </member>
+        <member name="T:AlgIterative.AlgIA.IAffinityFunction">
+            <summary>
+            IAffinity function interface.
+            </summary>
+            
+            <remarks>The interface should be implemented by all Affinity function
+            classes, which are supposed to be used for calculation of Antibodies
+            IAffinity values. All IAffinity functions should return positive (<b>greater
+            then zero</b>) value, which indicates how good is the evaluated Antibody - 
+            the greater the value, the better the Antibody.
+            </remarks>
+        </member>
+        <member name="M:AlgIterative.AlgIA.IAffinityFunction.Evaluate(AlgIterative.AlgIA.IAntibody)">
+             <summary>
+             Evaluates Antibody.
+             </summary>
+             
+             <param name="Antibody">Antibody to evaluate.</param>
+             
+             <returns>Returns Antibody's Affinity value.</returns>
+            
+             <remarks>The method calculates Affinity value of the specified
+             Antibody.</remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapAffinityFunction.#ctor(AuxStructureLib.SDS,AlgIterative.DispVectorTemplate,AuxStructureLib.ConflictDetection,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapAffinityFunction.Evaluate(AlgIterative.AlgIA.IAntibody)">
+            <summary>
+            计算antibody的适应值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapAffinityFunction.ConflictCost(AlgIterative.AlgIA.IAntibody)">
+            <summary>
+            计算冲突评价值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapAffinityFunction.MoveObjects(System.UInt16[])">
+            <summary>
+            移动到一个新的状态
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapAffinityFunction.ReturnObject(System.UInt16[])">
+            <summary>
+            返回原来的位置
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapAffinityFunction.HasTriangleInverted(System.UInt16[])">
+            <summary>
+            检查是否有三角形穿越现象(拓扑检查)
+            </summary>
+            <returns>是否有拓扑错误</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.MapAffinityFunction.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.UInt16[])">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="T:AlgIterative.AlgTS">
+            <summary>
+            禁忌搜索算法
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgTS.State">
+            <summary>
+            状态
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgTS.#ctor(AuxStructureLib.SDS,System.Double,System.Double,System.Double,System.Double,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+            <param name="plcost">线面冲突权值</param>
+            <param name="ppcost">面面冲突权值</param>
+            <param name="dcost">移位权重</param>
+            <param name="dtol">距离阈值</param>
+        </member>
+        <member name="M:AlgIterative.AlgTS.GenerateCandidateList(AlgIterative.State)">
+            <summary>
+            创建候选表
+            </summary>
+            <param name="state">状态</param>
+            <returns>候选表</returns>
+        </member>
+        <member name="M:AlgIterative.AlgTS.HasTriangleInverted(AuxStructureLib.SDS_PolygonO)">
+            <summary>
+            判断是否存在三角形的穿越
+            </summary>
+            <param name="Polygon">多边i型你</param>
+            <returns></returns>
+            
+        </member>
+        <!-- 对于成员“M:AlgIterative.AlgTS.Evaluate_NewState(AlgIterative.State,AuxStructureLib.SDS_PolygonO,System.Int32,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Collections.Generic.List{AuxStructureLib.Conflict}@,System.Int32@,System.Double@,System.Double@,System.Double@,System.Double@)”忽略有格式错误的 XML 注释 -->
+        <!-- 对于成员“M:AlgIterative.AlgTS.Update_NewState(AlgIterative.State,System.Int32,System.Int32)”忽略有格式错误的 XML 注释 -->
+        <member name="M:AlgIterative.AlgTS.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgTS.Evaluate_InitState">
+            <summary>
+            计算初始目标值
+            思路：找出所有冲突，然后移位
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgTS.CostFunction(AlgIterative.State)">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgTS.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.Int32)">
+            <summary>
+            计算单个对象的状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgTS.DoTS">
+            <summary>
+            执行禁忌搜索
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgTS.IsMove_Tabued(AlgIterative.Move,System.Int32)">
+            <summary>
+            判断移动是否被禁忌
+            </summary>
+            <param name="move"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlgIterative.AlgTS.IsState_Tabued(AlgIterative.State)">
+            <summary>
+            状态是否被禁忌
+            </summary>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AlgIterative.AlgGA.ImprMapChromosome">
+            <summary>
+            染色体，对应改进后的算法
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgGA.ImprMapChromosome.MaxLength">
+            <summary>
+            Chromosome's maximum length.
+            </summary>
+            
+            <remarks><para>Maxim chromosome's length in array elements.</para></remarks>
+            
+        </member>
+        <member name="F:AlgIterative.AlgGA.ImprMapChromosome.length">
+            <summary>
+            Chromosome's length in number of elements.
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgGA.ImprMapChromosome.val">
+            <summary>
+            Chromosome's value.
+            </summary>
+        </member>
+        <member name="F:AlgIterative.AlgGA.ImprMapChromosome.rand">
+            <summary>
+            Random number generator for chromosoms generation, crossover, mutation, etc.
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapChromosome.#ctor(AuxStructureLib.SDS)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Genetic.ShortArrayChromosome"/> class.
+            </summary>
+            
+            <param name="length">Chromosome's length in array elements, [2, <see cref="F:AlgIterative.AlgGA.ImprMapChromosome.MaxLength"/>].</param>
+            <param name="maxValue">Maximum value of chromosome's gene (array element).</param>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapChromosome.#ctor(AlgIterative.AlgGA.ImprMapChromosome)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Genetic.ShortArrayChromosome"/> class.
+            </summary>
+            
+            <param name="source">Source chromosome to copy.</param>
+            
+            <remarks><para>This is a copy constructor, which creates the exact copy
+            of specified chromosome.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapChromosome.ToString">
+             <summary>
+             Get string representation of the chromosome.
+             </summary>
+             
+             <returns>Returns string representation of the chromosome.</returns>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapChromosome.Generate">
+            <summary>
+            Generate random chromosome value.
+            </summary>
+            
+            <remarks><para>Regenerates chromosome's value using random number generator.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapChromosome.CreateNew">
+             <summary>
+             Create new random chromosome with same parameters (factory method).
+             </summary>
+             
+             <remarks><para>The method creates new chromosome of the same type, but randomly
+             initialized. The method is useful as factory method for those classes, which work
+             with chromosome's interface, but not with particular chromosome type.</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapChromosome.Clone">
+             <summary>
+             Clone the chromosome.
+             </summary>
+             
+             <returns>Return's clone of the chromosome.</returns>
+             
+             <remarks><para>The method clones the chromosome returning the exact copy of it.</para>
+             </remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapChromosome.Mutate">
+            <summary>
+            Mutation operator.
+            </summary>
+            
+            <remarks><para>The method performs chromosome's mutation, changing randomly
+            one of its genes (array elements).</para></remarks>
+            
+        </member>
+        <member name="M:AlgIterative.AlgGA.ImprMapChromosome.Crossover(AForge.Genetic.IChromosome)">
+             <summary>
+             Crossover operator.
+             </summary>
+             
+             <param name="pair">Pair chromosome to crossover with.</param>
+             
+             <remarks><para>The method performs crossover between two chromosomes ?interchanging
+             range of genes (array elements) between these chromosomes.</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgGA.ImprMapChromosome.Length">
+             <summary>
+             Chromosome's length.
+             </summary>
+             
+             <remarks><para>Length of the chromosome in array elements.</para></remarks>
+            
+        </member>
+        <member name="P:AlgIterative.AlgGA.ImprMapChromosome.Value">
+             <summary>
+             Chromosome's value.
+             </summary>
+             
+             <remarks><para>Current value of the chromosome.</para></remarks>
+            
+        </member>
+        <member name="T:AlgIterative.AlgIA.AlgCSA">
+             <summary>
+             克隆选择算法
+             Clonal Selection Algorithm
+             (1)  Generate a set (P) of candidate solutions, composed
+            of the subset of memory cells (M) added to the remaining (Pr) population (P = Pr+ M);
+            (2)  Determine (Select) the n best individuals of the
+            population (Pn), based on an affinity measure;
+             (3)  Reproduce (Clone) these n best individuals of the
+            population, giving rise to a temporary population of
+            clones (C). The clone size is an increasing function
+            of the affinity with the antigen;
+            (4)  Submit the population of clones to a hypermutation
+            scheme, where the hypermutation is proportional to
+            the affinity of the antibody with the antigen. A
+            maturated antibody population is generated ( C*);
+            (5)  Re-select the improved individuals from  C* to
+            compose the memory set M. Some members of P can
+            be replaced by other improved members of  C*;
+            (6)  Replace d antibodies by novel ones (diversity
+            introduction). The lower affinity cells have higher
+            probabilities of being replaced
+             </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AlgCSA.#ctor(AuxStructureLib.SDS,System.Int32,System.Int32,System.Int32,System.Double,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,AlgIterative.AlgIA.MutationType,System.Double)">
+            <param name="dstancetol">距离阈值</param>
+            <param name="pLCost">线-面冲突权值</param>
+            <param name="pPCost">面-面冲突权值</param>
+            <param name="dispCost">移动距离权值</param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AlgCSA.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-32方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AlgCSA.InitDispTemplate(System.Int32)">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.AlgCSA.DoCSA(System.String)">
+            <summary>
+            执行算法
+            </summary>
+        </member>
+        <member name="T:AlgIterative.AlgGA.MapChromosome">
+            <summary>
+            染色体
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosome.#ctor(AuxStructureLib.SDS,AlgIterative.DispVectorTemplate)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosome.#ctor(AlgIterative.AlgGA.MapChromosome)">
+            <summary>
+            Copy Constructor
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosome.CreateNew">
+            <summary>
+            Create new random chromosome (factory method)
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapChromosome.Clone">
+            <summary>
+            Clone the chromosome
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapAffinityFunction.#ctor(AuxStructureLib.SDS,AlgIterative.DispVectorTemplate,AuxStructureLib.ConflictDetection,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapAffinityFunction.Evaluate(AlgIterative.AlgIA.IAntibody)">
+            <summary>
+            计算antibody的适应值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapAffinityFunction.ConflictCost(AlgIterative.AlgIA.IAntibody)">
+            <summary>
+            计算冲突评价值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapAffinityFunction.MoveObjects(System.UInt16[])">
+            <summary>
+            移动到一个新的状态
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapAffinityFunction.MoveObjects(System.UInt16[],AuxStructureLib.SMap,AuxStructureLib.SMap)">
+            <summary>
+            移动到一个新的状态
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapAffinityFunction.ReturnObject(System.UInt16[])">
+            <summary>
+            返回原来的位置
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapAffinityFunction.HasTriangleInverted(System.UInt16[])">
+            <summary>
+            检查是否有三角形穿越现象(拓扑检查)
+            </summary>
+            <returns>是否有拓扑错误</returns>
+        </member>
+        <member name="M:AlgIterative.AlgIA.ImprMapAffinityFunction.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.UInt16[])">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="T:AlgIterative.AlgGA.MapFitnessFunction">
+            <summary>
+            适应度函数
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunction.#ctor(AuxStructureLib.SDS,AlgIterative.DispVectorTemplate,AuxStructureLib.ConflictDetection,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="map">地图对象</param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunction.Evaluate(AForge.Genetic.IChromosome)">
+            <summary>
+            计算chromosome的适应值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunction.ConflictCost(AForge.Genetic.IChromosome)">
+            <summary>
+            计算冲突评价值
+            </summary>
+            <param name="chromosome">1个个体</param>
+            <returns>适应值</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunction.MoveObjects(System.UInt16[])">
+            <summary>
+            移动到一个新的状态
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunction.ReturnObject(System.UInt16[])">
+            <summary>
+            返回原来的位置
+            </summary>
+            <param name="state"></param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunction.HasTriangleInverted(System.UInt16[])">
+            <summary>
+            检查是否有三角形穿越现象(拓扑检查)
+            </summary>
+            <returns>是否有拓扑错误</returns>
+        </member>
+        <member name="M:AlgIterative.AlgGA.MapFitnessFunction.CostFunction(System.Collections.Generic.List{AuxStructureLib.Conflict},System.UInt16[])">
+            <summary>
+            计算总状态值
+            </summary>
+            <returns>状态值</returns>
+        </member>
+        <member name="T:AlgIterative.AlgGA.AlgImprovedGA">
+            <summary>
+            用V图改进后的遗传算法
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgImprovedGA.#ctor(AuxStructureLib.SDS,AuxStructureLib.SMap,AuxStructureLib.SMap,AuxStructureLib.SMap,System.Int32,System.Int32,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,AuxStructureLib.VoronoiDiagram)">
+            <param name="dstancetol">距离阈值</param>
+            <param name="pLCost">线-面冲突权值</param>
+            <param name="pPCost">面-面冲突权值</param>
+            <param name="dispCost">移动距离权值</param>
+            <param name="map">SDS地图对象</param>
+            <param name="map1">SMap加密地图对象</param>
+            <param name="oMap">SMap原始地图对象</param>
+            <param name="nmap">SMap地图对象</param>
+            <param name="populationSize">种群大小</param>
+            <param name="iterations">迭代次数</param>
+            <param name="circleNum">模版圆环数</param>
+            <param name="PLDtol">线-面冲突阈值</param>
+            <param name="PPDtol">面-面冲突阈值</param>
+            <param name="dstancetol">移位距离阈值</param>
+            <param name="pLCost">线-面冲突代价值</param>
+            <param name="pPCost">面-面冲突代价值</param>
+            <param name="dispCost">移位距离代价值</param>
+            <param name="vd">V图用于精化模版</param>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgImprovedGA.InitDispTemplate">
+            <summary>
+            初始化移位向量模版-32方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgImprovedGA.InitDispTemplate(System.Int32)">
+            <summary>
+            初始化移位向量模版-16方向
+            </summary>
+        </member>
+        <member name="M:AlgIterative.AlgGA.AlgImprovedGA.DoGA(System.String)">
+            <summary>
+            执行算法
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,24 @@
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\obj\x86\Debug\AlgEMLib.csprojResolveAssemblyReference.cache
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\AlgEMLib.dll
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\AlgEMLib.pdb
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\AuxStructureLib.dll
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\MatrixOperation.dll
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\AuxStructureLib.pdb
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\obj\x86\Debug\AlgEMLib.dll
+C:\学习\PHD\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\obj\x86\Debug\AlgEMLib.pdb
+C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\AlgEMLib.dll
+C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\AlgEMLib.pdb
+C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\AuxStructureLib.dll
+C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\MatrixOperation.dll
+C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\bin\x86\Debug\AuxStructureLib.pdb
+C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\obj\x86\Debug\AlgEMLib.csprojResolveAssemblyReference.cache
+C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\obj\x86\Debug\AlgEMLib.dll
+C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AlgEMLib\obj\x86\Debug\AlgEMLib.pdb
+C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AlgEMLib.dll
+C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AlgEMLib.pdb
+C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AuxStructureLib.dll
+C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\MatrixOperation.dll
+C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AuxStructureLib.pdb
+C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.csprojResolveAssemblyReference.cache
+C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.dll
+C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.pdb

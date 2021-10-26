@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="DisplaceAlgLib">
+</Property><Property Name="解决方案文件" Value="E:\project\自主科研-道路移位\DisplaceAlgLib\DisplaceAlgLib.sln">
+</Property><Property Name="用户选项文件" Value="E:\project\自主科研-道路移位\DisplaceAlgLib\DisplaceAlgLib.suo">
+</Property><Property Name="Date" Value="2012年12月14日">
+</Property><Property Name="Time" Value="16:27">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="DisplaceAlgLib.sln" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib.sln">
+</Event><Event ErrorLevel="0" Project="" Source="DisplaceAlgLib.suo" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib.suo">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\DisplaceAlgLib.csproj" Description="项目文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\DisplaceAlgLib.csproj">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\BoundPointDisplaceParams.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\BoundPointDisplaceParams.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\ElasticBeam.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\ElasticBeam.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\ElasticBeamsAlg.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\ElasticBeamsAlg.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\EnergyMinPolyLine.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\EnergyMinPolyLine.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\MathFunc.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\MathFunc.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\Matrix.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\Matrix.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\Properties\AssemblyInfo.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\Snake.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\Snake.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\SnakesAlg.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\SnakesAlg.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\UtilFunc.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\DisplaceAlgLib\UtilFunc.cs">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\DisplaceAlgLib.csproj" Description="项目已成功转换">
+</Event><Event ErrorLevel="3" Project="DisplaceAlgLib" Source="DisplaceAlgLib\DisplaceAlgLib.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\CartoGener.csproj" Description="项目文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\CartoGener.csproj">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\CartoGener.csproj.user" Description="项目用户文件成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\CartoGener.csproj.user">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\CreateNewDocument.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\CreateNewDocument.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogInitSnakesParams.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogInitSnakesParams.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogInitSnakesParams.Designer.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogInitSnakesParams.Designer.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogMapSetting.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogMapSetting.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogMapSetting.Designer.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogMapSetting.Designer.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogSnakeSetting.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogSnakeSetting.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogSnakeSetting.Designer.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogSnakeSetting.Designer.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\MainForm.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\MainForm.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\MainForm.Designer.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\MainForm.Designer.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\Program.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\Program.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\Properties\AssemblyInfo.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\Properties\Resources.Designer.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\Properties\Resources.Designer.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\Properties\Settings.Designer.cs" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\Properties\Settings.Designer.cs">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\Properties\Settings.settings" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\Properties\Settings.settings">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\App.ico" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\App.ico">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\Earth.ico" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\Earth.ico">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogInitSnakesParams.resx" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogInitSnakesParams.resx">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogMapSetting.resx" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogMapSetting.resx">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\DialogSnakeSetting.resx" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\DialogSnakeSetting.resx">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\MainForm.resx" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\MainForm.resx">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\Properties\Resources.resx" Description="文件已成功备份为 E:\project\自主科研-道路移位\DisplaceAlgLib\Backup\CartoGener\Properties\Resources.resx">
+</Event><Event ErrorLevel="1" Project="CartoGener" Source="CartoGener\CartoGener.csproj" Description="您的项目以 .NET Framework 2.0 或 3.0 为目标。如果您的项目使用的程序集需要更新的 .NET Framework，则项目生成将失败。通过单击项目菜单上的“属性”，然后在“.NET Framework”下拉框中选择一个新版本，可以更改 .NET Framework 的版本。(在 Visual Basic 中，可在单击“高级编辑器选项...”按钮时显示的“编译”选项卡上找到此下拉框。)">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\CartoGener.csproj" Description="项目已成功转换">
+</Event><Event ErrorLevel="3" Project="CartoGener" Source="CartoGener\CartoGener.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="DisplaceAlgLib.sln" Description="成功转换解决方案">
+</Event><Event ErrorLevel="3" Project="" Source="DisplaceAlgLib.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="DisplaceAlgLib" Source="DisplaceAlgLib\DisplaceAlgLib.csproj" Description="扫描完成: 项目文件不需要升级。">
+</Event><Event ErrorLevel="0" Project="CartoGener" Source="CartoGener\CartoGener.csproj" Description="扫描完成: 项目文件不需要升级。">
+</Event></UpgradeLog>

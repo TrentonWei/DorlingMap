@@ -1,0 +1,4 @@
+E:\移位\2013-4-29\DisplaceAlgLib\AlgEFMDisplace\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\移位\2013-4-29\DisplaceAlgLib\AlgEFMDisplace\obj\x86\Debug\AlgEFMDisplace.Properties.Resources.resources
+E:\移位\2013-4-29\DisplaceAlgLib\AlgEFMDisplace\obj\x86\Debug\GenerateResource.read.1.tlog
+E:\移位\2013-4-29\DisplaceAlgLib\AlgEFMDisplace\obj\x86\Debug\GenerateResource.write.1.tlog
