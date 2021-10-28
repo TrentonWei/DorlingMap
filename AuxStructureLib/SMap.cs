@@ -1065,21 +1065,21 @@ namespace AuxStructureLib
         /// </summary>
         /// <param name="filePath">目录</param>
         /// <param name="prj">投影</param>
-        public void WriteResult2Shp(string filePath,esriSRProjCS4Type prj)
+        public void WriteResult2Shp(string filePath, ISpatialReference prj)
         {
             if(this.TriNodeList!=null&&this.TriNodeList.Count>0)
             {
                 TriNode.Create_WriteVetex2Shp(filePath, @"Vertices", this.TriNodeList, prj);
             }
-            if (this.PointList != null)
+            if (this.PointList != null && this.PointList.Count > 0)
             {
                 this.Create_WritePointObject2Shp(filePath, @"PointObjecrt", prj);
             }
-            if (this.PolylineList != null)
+            if (this.PolylineList != null && this.PolylineList.Count > 0)
             {
                 this.Create_WritePolylineObject2Shp(filePath, @"PolylineObjecrt", prj);
             }
-            if (this.PolygonList != null)
+            if (this.PolygonList != null && this.PolygonList.Count > 0)
             {
                 this.Create_WritePolygonObject2Shp(filePath, @"PolygonObjecrt", prj);
             }
@@ -1202,7 +1202,7 @@ namespace AuxStructureLib
         /// </summary>
         /// <param name="filePath">文件名</param>
         /// <param name="Skeleton_SegmentList">线列表</param>
-        public void Create_WritePolygonObject2Shp(string filePath, string fileName, esriSRProjCS4Type prj)
+        public void Create_WritePolygonObject2Shp(string filePath, string fileName, ISpatialReference prj)
         {
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
@@ -1231,14 +1231,14 @@ namespace AuxStructureLib
             pFieldEdit.Name_2 = strShapeFieldName;
             pFieldEdit.Type_2 = esriFieldType.esriFieldTypeGeometry;
 
-            ISpatialReferenceFactory ispfac = new SpatialReferenceEnvironmentClass();
-            IProjectedCoordinateSystem iprcoorsys = ispfac.CreateProjectedCoordinateSystem((int)prj);
-            ISpatialReference pSpatialReference = iprcoorsys as ISpatialReference;
+            //ISpatialReferenceFactory ispfac = new SpatialReferenceEnvironmentClass();
+            //IProjectedCoordinateSystem iprcoorsys = ispfac.CreateProjectedCoordinateSystem((int)prj);
+            //ISpatialReference pSpatialReference = iprcoorsys as ISpatialReference;
 
             IGeometryDef pGeomDef = new GeometryDefClass();
             IGeometryDefEdit pGeomDefEdit = pGeomDef as IGeometryDefEdit;
             pGeomDefEdit.GeometryType_2 = esriGeometryType.esriGeometryPolygon;
-            pGeomDefEdit.SpatialReference_2 = pSpatialReference;
+            pGeomDefEdit.SpatialReference_2 = prj;
             pFieldEdit.GeometryDef_2 = pGeomDef;
             pFieldsEdit.AddField(pField);
             #endregion
@@ -1343,7 +1343,7 @@ namespace AuxStructureLib
         /// </summary>
         /// <param name="filePath">文件名</param>
         /// <param name="Skeleton_SegmentList">线列表</param>
-        public void Create_WritePolylineObject2Shp(string filePath, string fileName, esriSRProjCS4Type prj)
+        public void Create_WritePolylineObject2Shp(string filePath, string fileName, ISpatialReference prj)
         {
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
@@ -1372,14 +1372,14 @@ namespace AuxStructureLib
             pFieldEdit.Name_2 = strShapeFieldName;
             pFieldEdit.Type_2 = esriFieldType.esriFieldTypeGeometry;
 
-            ISpatialReferenceFactory ispfac = new SpatialReferenceEnvironmentClass();
-            IProjectedCoordinateSystem iprcoorsys = ispfac.CreateProjectedCoordinateSystem((int)prj);
-            ISpatialReference pSpatialReference = iprcoorsys as ISpatialReference;
+            //ISpatialReferenceFactory ispfac = new SpatialReferenceEnvironmentClass();
+            //IProjectedCoordinateSystem iprcoorsys = ispfac.CreateProjectedCoordinateSystem((int)prj);
+            //ISpatialReference pSpatialReference = iprcoorsys as ISpatialReference;
 
             IGeometryDef pGeomDef = new GeometryDefClass();
             IGeometryDefEdit pGeomDefEdit = pGeomDef as IGeometryDefEdit;
             pGeomDefEdit.GeometryType_2 = esriGeometryType.esriGeometryPolyline;
-            pGeomDefEdit.SpatialReference_2 = pSpatialReference;
+            pGeomDefEdit.SpatialReference_2 = prj;
             pFieldEdit.GeometryDef_2 = pGeomDef;
             pFieldsEdit.AddField(pField);
             #endregion
@@ -1479,7 +1479,7 @@ namespace AuxStructureLib
         /// <param name="fileName"></param>
         /// <param name="TriEdgeList"></param>
         /// <param name="prj"></param>
-        public void Create_WritePointObject2Shp(string filePath, string fileName, esriSRProjCS4Type prj)
+        public void Create_WritePointObject2Shp(string filePath, string fileName, ISpatialReference prj)
         {
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
@@ -1508,14 +1508,14 @@ namespace AuxStructureLib
             pFieldEdit.Name_2 = strShapeFieldName;
             pFieldEdit.Type_2 = esriFieldType.esriFieldTypeGeometry;
 
-            ISpatialReferenceFactory ispfac = new SpatialReferenceEnvironmentClass();
-            IProjectedCoordinateSystem iprcoorsys = ispfac.CreateProjectedCoordinateSystem((int)prj);
-            ISpatialReference pSpatialReference = iprcoorsys as ISpatialReference;
+            //ISpatialReferenceFactory ispfac = new SpatialReferenceEnvironmentClass();
+            //IProjectedCoordinateSystem iprcoorsys = ispfac.CreateProjectedCoordinateSystem((int)prj);
+            //ISpatialReference pSpatialReference = iprcoorsys as ISpatialReference;
 
             IGeometryDef pGeomDef = new GeometryDefClass();
             IGeometryDefEdit pGeomDefEdit = pGeomDef as IGeometryDefEdit;
             pGeomDefEdit.GeometryType_2 = esriGeometryType.esriGeometryPoint;
-            pGeomDefEdit.SpatialReference_2 = pSpatialReference;
+            pGeomDefEdit.SpatialReference_2 = prj;
             pFieldEdit.GeometryDef_2 = pGeomDef;
             pFieldsEdit.AddField(pField);
             #endregion

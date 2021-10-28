@@ -95,7 +95,7 @@ namespace AuxStructureLib.ConflictLib
         /// </summary>
         /// <param name="filepath">写冲突到SHP</param>
         /// <param name="i">冲突号</param>
-        public void WriteConflict2Shp(string filepath,int i)
+        public void WriteConflict2Shp(string filepath,int i,ISpatialReference prj)
         {
             List<PolylineObject> PolylineList = new List<PolylineObject>();
             PolylineObject p1 = new PolylineObject();
@@ -112,7 +112,7 @@ namespace AuxStructureLib.ConflictLib
                        esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
             AuxStructureLib.Triangle.Create_WriteTriange2Shp(filepath,
                       @"ConflictTri" + i.ToString(), this.TriangleList,
-                      esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
+                      prj);
         }
     }
 }

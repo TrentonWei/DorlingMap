@@ -58,7 +58,7 @@ namespace AuxStructureLib
         /// <param name="map"></param>
         /// <param name="pg"></param>
         /// <param name="prj"></param>
-        public static void WriteConflict2File(List<Conflict> Conflicts, string filePath, string fileName, SMap map, ProxiGraph pg, esriSRProjCS4Type prj)
+        public static void WriteConflict2File(List<Conflict> Conflicts, string filePath, string fileName, SMap map, ProxiGraph pg, ISpatialReference prj)
         {
             ProxiGraph pg1 = new ProxiGraph();
             pg1.CreateProxiGraphfrmConflicts(map, Conflicts);

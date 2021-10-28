@@ -202,7 +202,7 @@ namespace AlgIterative
         /// <param name="map"></param>
         /// <param name="pg"></param>
         /// <param name="prj"></param>
-        public void WriteConflict2File(string filePath, string fileName, SMap map, ProxiGraph pg,esriSRProjCS4Type prj)
+        public void WriteConflict2File(string filePath, string fileName, SMap map, ProxiGraph pg,ISpatialReference prj)
         {
             ProxiGraph pg1 = new ProxiGraph();
             pg1.CreateProxiGraphfrmConflicts(map, this.Conflicts);

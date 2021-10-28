@@ -234,7 +234,7 @@ namespace AuxStructureLib
         /// 广度遍历二叉树，并输出叶子节点对应的分类
         /// </summary>
         /// <param name="?"></param>
-        public static void Create_WriteClusters(ProxiGraph pg)
+        public static void Create_WriteClusters(ProxiGraph pg,ISpatialReference prj)
         {
             Queue<ProxiGraph> GraphQueue = new Queue<ProxiGraph>();
             GraphQueue.Enqueue(pg);
@@ -269,7 +269,7 @@ namespace AuxStructureLib
             foreach (ProxiGraph cPG in listPG)
             {
                 i++;
-                cPG.WriteProxiGraph2Shp(@"E:\DelaunayShape",@"Cluster"+i.ToString(), esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
+                cPG.WriteProxiGraph2Shp(@"E:\DelaunayShape",@"Cluster"+i.ToString(), prj);
             }
         }
     }

@@ -556,7 +556,7 @@ namespace AuxStructureLib
         /// <summary>
         /// 将结果写入Shape文件
         /// </summary>
-        public void WriteShp(esriSRProjCS4Type pri)
+        public void WriteShp(ISpatialReference pri)
         {
             TriNode.Create_WriteVetex2Shp(@"E:\DelaunayShape", @"Vextex", this.TriNodeList, pri);
             TriEdge.Create_WriteEdge2Shp(@"E:\DelaunayShape", @"Edge", this.TriEdgeList, pri);
@@ -566,7 +566,7 @@ namespace AuxStructureLib
         /// <summary>
         /// 将结果写入Shape文件
         /// </summary>
-        public void WriteShp(string filepath, esriSRProjCS4Type pri)
+        public void WriteShp(string filepath, ISpatialReference pri)
         {
             if (!Directory.Exists(filepath))
                 Directory.CreateDirectory(filepath);

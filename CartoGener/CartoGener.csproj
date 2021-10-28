@@ -142,7 +142,6 @@
     <Compile Include="DorlingMapFrm.Designer.cs">
       <DependentUpon>DorlingMapFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DorlingR.cs" />
     <Compile Include="FeatureHandle.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -152,7 +151,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProxiGraph.cs" />
+    <Compile Include="Symbolization.cs" />
     <EmbeddedResource Include="DorlingMapFrm.resx">
       <DependentUpon>DorlingMapFrm.cs</DependentUpon>
     </EmbeddedResource>
@@ -309,7 +308,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
     <COMReference Include="esriGeoDatabase">
       <Guid>{0475BDB1-E5B2-4CA2-9127-B4B1683E70C2}</Guid>

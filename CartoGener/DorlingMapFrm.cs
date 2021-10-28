@@ -112,13 +112,72 @@ namespace CartoGener
             #region Get the initial Circles
             IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
-            List<Circle> CircleList=DM.GetInitialCircle(pFeatureClass,"T",0.1,0.1,10000,0);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "OWNER_OCC", 0.1, 0.1, 1, 0);
             #endregion
 
             #region Circles to polygonbjects in a map
             SMap Map = new SMap();
-            List<PolygonObject> PoList=DM.GetInitialPolygonObject(CircleList);
+            DM.pMapControl = pMapControl;
+            List<PolygonObject> PoList=DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
+            #endregion
+
+            Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+        }
+
+        /// <summary>
+        /// Proxigraph generation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiG(pFeatureClass);
+            if (OutFilePath != null) { pg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
+        }
+
+        /// <summary>
+        /// BeamsDisplace
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button4_Click(object sender, EventArgs e)
+        {
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region Get the initial Circles and Pg
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "OWNER_OCC", 0.1, 0.1, 1, 0);
+            SMap Map = new SMap();
+            DM.pMapControl = pMapControl;
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiG(pFeatureClass);
+            #endregion
+
+            #region 移位
+            DM.DorlingBeams(pg, Map, 1, 1000, 1, 1, 50, 0);
+            Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
             #endregion
         }
     }

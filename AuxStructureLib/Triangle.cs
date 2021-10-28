@@ -253,7 +253,7 @@ namespace AuxStructureLib
         /// </summary>
         /// <param name="filePath">文件名</param>
         /// <param name="Skeleton_SegmentList">骨架线段列表</param>
-        public static void Create_WriteTriange2Shp(string filePath, string fileName, List<Triangle> TriangleList, esriSRProjCS4Type prj)
+        public static void Create_WriteTriange2Shp(string filePath, string fileName, List<Triangle> TriangleList, ISpatialReference prj)
         {
             #region 创建一个线的shape文件
             string Folderpathstr = filePath;
@@ -280,14 +280,14 @@ namespace AuxStructureLib
             pFieldEdit.Name_2 = strShapeFieldName;
             pFieldEdit.Type_2 = esriFieldType.esriFieldTypeGeometry;
 
-            ISpatialReferenceFactory ispfac = new SpatialReferenceEnvironmentClass();
-            IProjectedCoordinateSystem iprcoorsys = ispfac.CreateProjectedCoordinateSystem((int)prj);
-            ISpatialReference pSpatialReference = iprcoorsys as ISpatialReference;
+            //ISpatialReferenceFactory ispfac = new SpatialReferenceEnvironmentClass();
+            //IProjectedCoordinateSystem iprcoorsys = ispfac.CreateProjectedCoordinateSystem((int)prj);
+            //ISpatialReference pSpatialReference = iprcoorsys as ISpatialReference;
 
             IGeometryDef pGeomDef = new GeometryDefClass();
             IGeometryDefEdit pGeomDefEdit = pGeomDef as IGeometryDefEdit;
             pGeomDefEdit.GeometryType_2 = esriGeometryType.esriGeometryPolygon;
-            pGeomDefEdit.SpatialReference_2 = pSpatialReference;
+            pGeomDefEdit.SpatialReference_2 = prj;
             pFieldEdit.GeometryDef_2 = pGeomDef;
             pFieldsEdit.AddField(pField);
             #endregion

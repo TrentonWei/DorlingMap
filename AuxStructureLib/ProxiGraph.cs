@@ -5,6 +5,7 @@ using System.Text;
 using ESRI.ArcGIS.Geometry;
 using AuxStructureLib;
 using System.IO;
+using ESRI.ArcGIS.Geodatabase;
 
 namespace AuxStructureLib
 {
@@ -783,7 +784,7 @@ namespace AuxStructureLib
         /// <summary>
         /// 写入SHP文件
         /// </summary>
-        public void WriteProxiGraph2Shp(string filePath, string fileName, esriSRProjCS4Type pri)
+        public void WriteProxiGraph2Shp(string filePath, string fileName, ISpatialReference pri)
         {
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
@@ -1091,6 +1092,42 @@ namespace AuxStructureLib
             return false;
         }
 
-       
+        /// <summary>
+        /// 创建ProxiG
+        /// </summary>
+        /// <param name="pFeatureClass">原始图层</param>
+        public void CreateProxiG(IFeatureClass pFeatureClass)
+        {
+            #region Create ProxiNodes
+            for (int i = 0; i < pFeatureClass.FeatureCount(null); i++)
+            {
+                IArea pArea = pFeatureClass.GetFeature(i).Shape as IArea;
+                ProxiNode CacheNode = new ProxiNode(pArea.Centroid.X, pArea.Centroid.Y, i, i);
+                this.NodeList.Add(CacheNode);
+            }
+            #endregion
+
+            #region Create ProxiEdges
+            int edgeID = 0;
+            for (int i = 0; i < pFeatureClass.FeatureCount(null)-1; i++)
+            {
+                for (int j = i+1; j < pFeatureClass.FeatureCount(null); j++)
+                {
+                    if (j != i)
+                    {
+                        IGeometry iGeo = pFeatureClass.GetFeature(i).Shape;
+                        IGeometry jGeo = pFeatureClass.GetFeature(j).Shape;
+
+                        IRelationalOperator iRo = iGeo as IRelationalOperator;
+                        if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
+                        {
+                            ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
+                            this.EdgeList.Add(CacheEdge);
+                        }
+                    }
+                }
+            }
+            #endregion
+        }
     }
 }

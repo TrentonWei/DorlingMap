@@ -21,6 +21,23 @@ namespace CartoGener
 {
     class DMSupport
     {
+          /// <summary>
+        /// 参数
+        /// </summary>
+        public AxESRI.ArcGIS.Controls.AxMapControl pMapControl;
+        public Symbolization sb = new Symbolization();
+
+        #region 构造函数
+        public DMSupport(AxESRI.ArcGIS.Controls.AxMapControl pMapControl)
+        {
+            this.pMapControl = pMapControl;
+        }
+
+        public DMSupport()
+        {
+        }
+        #endregion
+
         /// <summary>
         /// 计算给定两个点之间的距离
         /// </summary>
@@ -159,28 +176,60 @@ namespace CartoGener
         /// <returns></returns>
         public IPolygon CircleToPolygon(Circle CacheCircle)
         {
-            ICircularArc pCircle = new CircularArcClass();
+            IConstructCircularArc pCircle = new CircularArcClass();
 
             #region Get the Center
             IPoint CenterPoint = new PointClass();
             CenterPoint.X = CacheCircle.CenterX;
-            CenterPoint.X = CacheCircle.CenterY;
+            CenterPoint.Y = CacheCircle.CenterY;
             #endregion
 
-            pCircle.PutCoordsByAngle(CenterPoint, Math.PI / 2, Math.PI * 2, CacheCircle.Radius);//Generate a circle
+            pCircle.ConstructCircle(CenterPoint, CacheCircle.Radius,false);//Generate a circle
 
             #region Circle to polygons
+            ICircularArc pArc = pCircle as ICircularArc;
+            ISegment pSegment1 = pArc as ISegment;
             object missing = Type.Missing;
             ISegmentCollection pSegmentColl = new RingClass();
-            pSegmentColl.AddSegment((ISegment)pCircle, ref missing, ref missing);
-            IRing pRing = (IRing)pSegmentColl;
+            pSegmentColl.AddSegment(pSegment1, missing, missing);
+            IRing pRing = pSegmentColl as IRing;
             pRing.Close(); //得到闭合的环
             IGeometryCollection pGeometryCollection = new PolygonClass();
             pGeometryCollection.AddGeometry(pRing, ref missing, ref missing); //环转面
             IPolygon pPolygon = (IPolygon)pGeometryCollection;
             #endregion
 
+            //#region symbolizaiton
+            //object cPolygonSb = sb.PolygonSymbolization(1, 100, 100, 100, 0, 100, 100, 100);
+            //pMapControl.DrawShape(pPolygon, ref cPolygonSb);
+            //#endregion
+
             return pPolygon;
+        }
+
+        /// <summary>
+        /// 由给定的圆生成一个近似圆（正36多边形）
+        /// </summary>
+        /// <param name="CacheCircle"></param>
+        /// <returns></returns>
+        public PolygonObject CircleToPo(Circle CacheCircle)
+        {
+            int ppID = 0;//（polygonobject自己的编号，应该无用）
+            List<TriNode> trilist = new List<TriNode>();
+            //Polygon的点集
+            double curX;
+            double curY;
+            for (int i = 0; i < 37; i++)
+            {
+                curX = CacheCircle.CenterX + CacheCircle.Radius * Math.Cos(i * Math.PI / 18);
+                curY = CacheCircle.CenterY + CacheCircle.Radius * Math.Sin(i * Math.PI / 18);
+                //初始化每个点对象
+                TriNode tPoint = new TriNode(curX, curY, ppID, 1);
+                trilist.Add(tPoint);
+            }
+            //生成自己写的多边形
+            PolygonObject mPolygonObject = new PolygonObject(ppID, trilist);
+            return mPolygonObject;
         }
     }
 }

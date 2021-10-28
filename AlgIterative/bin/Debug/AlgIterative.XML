@@ -1340,7 +1340,7 @@
             <param name="oCurConflicts"></param>
             <param name="newCost"></param>
         </member>
-        <member name="M:AlgIterative.State.WriteConflict2File(System.String,System.String,AuxStructureLib.SMap,AuxStructureLib.ProxiGraph,ESRI.ArcGIS.Geometry.esriSRProjCS4Type)">
+        <member name="M:AlgIterative.State.WriteConflict2File(System.String,System.String,AuxStructureLib.SMap,AuxStructureLib.ProxiGraph,ESRI.ArcGIS.Geometry.ISpatialReference)">
             <summary>
             输出冲突邻近图
             </summary>

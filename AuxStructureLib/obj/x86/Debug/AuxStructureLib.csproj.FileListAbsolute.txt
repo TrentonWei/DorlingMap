@@ -11,7 +11,6 @@ C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AuxS
 C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AuxStructureLib\obj\x86\Debug\AuxStructureLib.csproj.GenerateResource.Cache
 C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AuxStructureLib\obj\x86\Debug\AuxStructureLib.dll
 C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\AuxStructureLib\obj\x86\Debug\AuxStructureLib.pdb
-C:\WorkFiles\06 代码集合\DorlingMap\AuxStructureLib\obj\x86\Debug\AuxStructureLib.csprojResolveAssemblyReference.cache
 C:\WorkFiles\06 代码集合\DorlingMap\AuxStructureLib\obj\x86\Debug\AuxStructureLib.dll
 C:\WorkFiles\06 代码集合\DorlingMap\AuxStructureLib\obj\x86\Debug\AuxStructureLib.pdb
 C:\WorkFiles\06 代码集合\DorlingMap\AuxStructureLib\obj\x86\Debug\AuxStructureLib.csproj.ResolveComReference.cache

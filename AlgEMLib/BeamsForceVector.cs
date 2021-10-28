@@ -421,6 +421,245 @@ namespace AlgEMLib
             return true;
         }
 
+        /// <summary>
+        /// 由邻近图计算外力
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="disThreshold">阈值</param>
+        /// <returns>是否成功</returns>
+        public List<Force> CreateForceVectorfrmGraph(List<PolygonObject> PoList)
+        {
+            #region 计算受力
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return null;
+
+            InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            List<VertexForce> vForceList = new List<VertexForce>();
+
+            foreach (ProxiEdge curEdge in ProxiGraph.EdgeList)
+            {
+                ProxiNode sNode = curEdge.Node1; ProxiNode eNode = curEdge.Node2;
+                PolygonObject Po1 = this.GetPoByID(sNode.TagID, PoList);
+                PolygonObject Po2 = this.GetPoByID(eNode.TagID, PoList);
+
+                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2);
+
+                if (ForceList.Count > 0)
+                {
+                    #region 添加Force
+                    VertexForce svForce = this.GetvForcebyIndex(sNode.ID, vForceList);
+                    if (svForce == null)
+                    {
+                        svForce = new VertexForce(sNode.ID);
+                        vForceList.Add(svForce);
+                    }
+                    svForce.forceList.Add(ForceList[0]);//将当前的受力加入VertexForce数组
+
+                    VertexForce evForce = this.GetvForcebyIndex(eNode.ID, vForceList);
+                    if (evForce == null)
+                    {
+                        evForce = new VertexForce(eNode.ID);
+                        vForceList.Add(evForce);
+                    }
+                    evForce.forceList.Add(ForceList[1]);//将当前的受力加入VertexForce数组
+                    #endregion
+                }
+            }
+            #endregion
+
+            #region 吸引力
+            if (this.isDragForce == true || this.isDragForce == false)
+            {
+                int n = this.ProxiGraph.NodeList.Count;
+                for (int i = 0; i < n; i++)
+                {
+
+                    ProxiNode curNode = this.ProxiGraph.NodeList[i];
+
+                    int id = curNode.ID;
+                    //  int tagID = curNode.TagID;
+                    FeatureType type = curNode.FeatureType;
+                    ProxiNode originalNode = this.OrigialProxiGraph.GetNodebyID(id);
+                    if (originalNode == null)
+                    {
+                        continue;
+                    }
+                    double distance = ComFunLib.CalLineLength(curNode, originalNode);
+                    if (distance > RMSE && (type != FeatureType.PolylineType))
+                    {
+                        //右边
+                        double f = distance - RMSE;
+                        double s = (originalNode.Y - curNode.Y) / distance;
+                        double c = (originalNode.X - curNode.X) / distance;
+                        //这里将力平分给两个对象
+                        double fx = f * c;
+                        double fy = f * s;
+                        Force force = new Force(id, fx, fy, s, c, f);
+                        VertexForce vForce = this.GetvForcebyIndex(id, vForceList);
+                        if (vForce == null)
+                        {
+                            vForce = new VertexForce(id);
+                            vForceList.Add(vForce);
+                        }
+                        vForce.forceList.Add(force);
+                    }
+                }
+                //foreach(Node cur Node )
+            }
+            #endregion
+
+            #region 求合力
+            //先求最大力，以该力的方向为X轴方向建立局部坐标系，求四个主方向上的最大力，最后就合力
+            List<Force> rforceList = new List<Force>();
+            foreach (VertexForce vForce in vForceList)
+            {
+                if (vForce.forceList.Count == 1)//当只受一个力作用时
+                {
+                    rforceList.Add(vForce.forceList[0]);
+
+                }
+                else if (vForce.forceList.Count > 1)
+                {
+                    int index = 0;
+                    double maxFx = 0;
+                    double minFx = 0;
+                    double maxFy = 0;
+                    double minFy = 0;
+                    Force maxF = GetMaxForce(out index, vForce.forceList);
+                    maxFx = maxF.F;
+                    double s = maxF.Sin;
+                    double c = maxF.Cos;
+
+                    for (int i = 0; i < vForce.forceList.Count; i++)
+                    {
+
+                        if (i != index)
+                        {
+                            Force F = vForce.forceList[i];
+                            double fx = F.Fx * c + F.Fy * s;
+                            double fy = F.Fy * c - F.Fx * s;
+
+                            if (minFx > fx) minFx = fx;
+                            if (maxFy < fy) maxFy = fy;
+                            if (minFy > fy) minFy = fy;
+                        }
+                    }
+                    double FFx = maxFx + minFx;
+                    double FFy = maxFy + minFy;
+                    double Fx = FFx * c - FFy * s;
+                    double Fy = FFx * s + FFy * c;
+                    double f = Math.Sqrt(Fx * Fx + Fy * Fy);
+                    Force rForce = new Force(vForce.ID, Fx, Fy, f);
+                    rforceList.Add(rForce);
+                }
+            }
+
+            #endregion
+
+            return rforceList;
+        }
+
+        /// <summary>
+        /// GetPoByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public PolygonObject GetPoByID(int ID,List<PolygonObject> PoList)
+        {
+            PolygonObject Po = null;
+            foreach (PolygonObject CachePo in PoList)
+            {
+                if (CachePo.ID == ID)
+                {
+                    Po=CachePo;
+                    break;
+                }
+            }
+
+            return Po;
+        }
+
+        /// <summary>
+        /// Distance between two trinode
+        /// </summary>
+        /// <param name="sNode"></param>
+        /// <param name="eNode"></param>
+        /// <returns></returns>
+        public double GetDis(ProxiNode sNode, ProxiNode eNode)
+        {
+            double Dis = Math.Sqrt((sNode.X - eNode.X) * (sNode.X - eNode.X) + (sNode.Y - eNode.Y) * (sNode.Y - eNode.Y));
+            return Dis;
+        }
+
+        /// <summary>
+        /// 计算两个建筑物的受力
+        /// </summary>
+        /// <param name="Po1"></param>
+        /// <param name="Po2"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>List<Force>=[sForce,eForce]
+        public List<Force> GetForce(ProxiNode sNode,ProxiNode eNode,PolygonObject sPo1, PolygonObject ePo2)
+        {
+            double EdgeDis = this.GetDis(sNode, eNode);
+            double RSDis = sPo1.R + ePo2.R;
+            List<Force> ForceList = new List<Force>();
+
+            if (EdgeDis < RSDis)
+            {
+                double curForce = RSDis - EdgeDis;
+                double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));
+                double s = (eNode.Y - sNode.Y) / r;
+                double c = (eNode.X - sNode.X) / r;
+                //这里将力平分给两个对象
+                double fx = 0.5 * curForce * c;
+                double fy = 0.5 * curForce * s;
+
+                //if (c < 0) //eNode在sNode左侧 
+                //{
+                Force eForce = new Force(eNode.ID, fx * (-1), fy * (-1), s * (-1), c * (-1), curForce * 0.5);
+                    Force sForce = new Force(sNode.ID, fx, fy, s , c , curForce * 0.5);
+
+                    ForceList.Add(sForce);
+                    ForceList.Add(eForce);
+                //}
+                //else //eNode在sNode右侧 
+                //{
+                //    Force eForce = new Force(eNode.ID, fx * (-1), fy * (-1), s * (-1), c * (-1), curForce * 0.5);
+                //    Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce * 0.5);
+                //    ForceList.Add(sForce);
+                //    ForceList.Add(eForce);
+                //}
+            }
+            //else if (RSDis  < EdgeDis)//这里需要考虑比例尺的问题
+            //{
+            //    double curForce = EdgeDis - RSDis ;///这里需要考虑比例尺的问题
+
+            //    double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));
+            //    double s = (eNode.Y - sNode.Y) / r;
+            //    double c = (eNode.X - sNode.X) / r;
+            //    //这里将力平分给两个对象
+            //    double fx = 0.5 * curForce * c;
+            //    double fy = 0.5 * curForce * s;
+
+            ////    //if (c < 0)//eNode在sNode左侧
+            ////    //{
+            //    Force eForce = new Force(eNode.ID, fx*(-1), fy*(-1), s*(-1) , c*(-1) , curForce * 0.5);
+            //    Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce * 0.5);
+            //    ForceList.Add(sForce);
+            //    ForceList.Add(eForce);
+            //    //}
+            //    //else //eNode在sNode右侧
+            //    //{
+            //    //    Force eForce = new Force(eNode.ID, fx*(-1), fy*(-1), s*(-1), c*(-1), curForce * 0.5);
+            //    //    Force sForce = new Force(sNode.ID, fx , fy , s , c, curForce * 0.5);
+            //    //    ForceList.Add(sForce);
+            //    //    ForceList.Add(eForce);
+            //    //}
+            //}
+          
+            return ForceList;
+        }
 
         /// <summary>
         /// 计算受力并累加到受力向量上去(对于线与点，线与线的情况)
@@ -488,7 +727,7 @@ namespace AlgEMLib
         /// <param name="p2">点2</param>
         private void Cal_Accumulate_Force(double forceValue, NearestPoint p1, NearestPoint p2, int ID1, int ID2)
         {
-            double r=Math.Sqrt((p2.Y-p1.Y)*(p2.Y-p1.Y)+(p2.X-p1.X)*(p2.X-p1.X));
+            double r =Math.Sqrt((p2.Y-p1.Y)*(p2.Y-p1.Y)+(p2.X-p1.X)*(p2.X-p1.X));
             double s = (p2.Y - p1.Y) / r;
             double c = (p2.X - p1.X) / r;
             //这里将力平分给两个对象
@@ -1850,11 +2089,11 @@ namespace AlgEMLib
         /// <returns></returns>
         private Force GetMaxForce(out int index, List<Force> ForceList)
         {
-            double MaxF = -1;
+            double MaxF = 0;
             index = 0;
-            for (int i=0;i<ForceList.Count;i++ )
+            for (int i = 0; i < ForceList.Count; i++)
             {
-                if (ForceList[i].F > MaxF)
+                if (Math.Abs(ForceList[i].F) > Math.Abs(MaxF))
                 {
                     index = i;
                     MaxF = ForceList[i].F;
@@ -1965,6 +2204,23 @@ namespace AlgEMLib
                 return true;
             return false;
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool CreateForceVectorForDorling(List<PolygonObject> PoList)
+        {
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+
+            // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            this.ForceList = CreateForceVectorfrmGraph(PoList);
+
+            if (MakeForceVectorfrmGraphNew())
+                return true;
+            return false;
         }
 
         /// <summary>
@@ -2679,59 +2935,6 @@ namespace AlgEMLib
             return triList;
         }
 
-        ///// <summary>
-        ///// 找到瓶颈三角形
-        ///// </summary>
-        ///// <param name="TriList">三角形列表</param>
-        ///// <returns>返回一个新的三角形列表</returns>
-        //public static List<Triangle> FindBottle_NeckTriangle(List<Triangle> TriList)
-        //{
-        //    if (TriList == null || TriList.Count == 0)
-        //        return null;
-        //    List<Triangle> triList = new List<Triangle>();
-        //    if (TriList.Count == 1)
-        //    {
-        //        return TriList;
-        //    }
-
-        //    else if (TriList.Count == 2)
-        //    {
-        //        // List<Triangle> triList = new List<Triangle>();
-        //        if (TriList[0].W > TriList[1].W)
-        //        {
-        //            //List<Triangle> triList = new List<Triangle>();
-        //            triList.Add(TriList[1]);
-        //            return triList;
-        //        }
-        //        else
-        //        {
-        //            //List<Triangle> triList = new List<Triangle>();
-        //            triList.Add(TriList[0]);
-        //            return triList;
-        //        }
-        //    }
-        //    else if (TriList.Count >= 3)
-        //    {
-
-        //        int n = TriList.Count;
-        //        if (TriList[0].W < TriList[1].W)
-        //        {
-        //            triList.Add(TriList[0]);
-        //        }
-        //        for (int i = 1; i < n - 1; i++)
-        //        {
-        //            if (TriList[i - 1].W >= TriList[i].W && TriList[i + 1].W >= TriList[i].W)
-        //            {
-        //                triList.Add(TriList[i]);
-        //            }
-        //        }
-        //        if (TriList[n - 1].W < TriList[n - 2].W)
-        //        {
-        //            triList.Add(TriList[n - 1]);
-        //        }
-        //    }
-        //    return triList;
-        //}
         /// <summary>
         /// 获得子图网络的受力向量
         /// </summary>

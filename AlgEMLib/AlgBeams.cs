@@ -52,6 +52,24 @@ namespace AlgEMLib
         /// <param name="e">弹性模量</param>
         /// <param name="i">惯性力矩</param>
         /// <param name="a">横截面积</param>
+        /// <param name="disThresholdPP">邻近冲突距离阈值</param>
+        public AlgBeams(ProxiGraph proxiGraph, SMap map, double e, double i, double a)
+        {
+            this.E = e;
+            this.I = i;
+            this.A = a;
+            this.ProxiGraph = proxiGraph;
+            this.Map = map;
+        }
+
+        /// <summary>
+        /// 构造函数-从建筑物群邻近图构建Beams模型
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="map">地图对象</param>
+        /// <param name="e">弹性模量</param>
+        /// <param name="i">惯性力矩</param>
+        /// <param name="a">横截面积</param>
         /// <param name="disThresholdLP">线-面邻近冲突距离阈值</param>
         /// <param name="disThresholdPP">面-面邻近冲突距离阈值</param>
         public AlgBeams(ProxiGraph proxiGraph, SMap map, double e, double i, double a, 
@@ -1482,6 +1500,92 @@ namespace AlgEMLib
             }
         }
 
+        /// <summary>
+        /// DorlingDisplace
+        /// </summary>
+        public void DoDisplacePgDorling(SMap pMap)
+        {
+            fV = new BeamsForceVector(this.ProxiGraph);
+            //求吸引力-2014-3-20所用
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.isDragForce = this.isDragF;
+            fV.CreateForceVectorForDorling(pMap.PolygonList);
+            this.F = fV.Vector_F;
+
+            double MaxD;
+            double MaxF;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
+            {
+                //基本几何算法
+                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 3, 1);
+
+                this.UpdataCoordsforPGbyForce_Group();
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+                if (MaxF > 0)
+                {
+                    this.isContinue = true;
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+            }
+            else
+            {
+                //计算刚度矩阵
+                bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                this.K = bM.Matrix_K;
+
+                this.SetBoundPointParamforPG();//设置边界条件
+
+                this.D = this.K.Inverse() * this.F;
+
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.E *= k;
+                    //再次计算刚度矩阵
+                    bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                    this.K = bM.Matrix_K;
+                    SetBoundPointParamforPG();//设置边界条件
+                    this.D = this.K.Inverse() * this.F;
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPGDorling();      //更新坐标
+            }
+
+            this.OutputDisplacementandForces(fV.ForceList);
+
+            if (MaxF <=  0.01)
+            {
+                this.isContinue = false;
+            }
+        }
 
         /// <summary>
         /// 邻近图的移位算法实现-设置边界条件
@@ -1839,6 +1943,66 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// 更新坐标位置
+        /// </summary>
+        private void UpdataCoordsforPGDorling()
+        {
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                int index = curNode.ID;
+                int tagID = curNode.TagID;
+                FeatureType fType = curNode.FeatureType;
+                VoronoiPolygon vp = null;
+
+                PolygonObject po = this.GetPoByID(tagID, this.Map.PolygonList);
+
+                double curDx0 = this.D[3 * index, 0];
+                double curDy0 = this.D[3 * index + 1, 0];
+                double curDx = this.D[3 * index, 0];
+                double curDy = this.D[3 * index + 1, 0];
+
+                if (this.IsTopCos == true)
+                {
+                    vp = this.VD.GetVPbyIDandType(tagID, fType);
+                    vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+                    this.D[3 * index, 0] = curDx;
+                    this.D[3 * index + 1, 0] = curDy;
+                }
+
+                //纠正拓扑错误
+                curNode.X += curDx;
+                curNode.Y += curDy;
+
+                foreach (TriNode curPoint in po.PointList)
+                {
+                    curPoint.X += curDx;
+                    curPoint.Y += curDy;
+                }
+            }
+        }
+
+        /// <summary>
+        /// GetPoByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public PolygonObject GetPoByID(int ID, List<PolygonObject> PoList)
+        {
+            PolygonObject Po = null;
+            foreach (PolygonObject CachePo in PoList)
+            {
+                if (CachePo.ID == ID)
+                {
+                    Po = CachePo;
+                    break;
+                }
+            }
+
+            return Po;
+        }
+
+        /// <summary>
         /// 直接采用受力更新坐标位置
         /// </summary>
         private void UpdataCoordsforPGbyForce_Group()
@@ -2019,9 +2183,6 @@ namespace AlgEMLib
             tableConflict.Columns.Add("ID", typeof(int));
             tableConflict.Columns.Add("ConflictCount", typeof(int));
 
-
-
-
             #region 三角网+骨架线+邻近图+冲突检测
             DelaunayTin dt = new DelaunayTin(this.Map.TriNodeList);
             dt.CreateDelaunayTin(AlgDelaunayType.Side_extent);
@@ -2178,7 +2339,7 @@ namespace AlgEMLib
          //   OutputTotalDisplacementforProxmityGraph(this.OriginalGraph, this.ProxiGraph, this.Map);
         }
 
-        public void DoDispaceBader1(double r, int times, double scale, double disThreshold)
+        public void DoDispaceBader1(double r, int times, double scale, double disThreshold,ISpatialReference prj)
         {
             #region 三角网+骨架线+邻近图+冲突检测
             DelaunayTin dt = new DelaunayTin(this.Map.TriNodeList);
@@ -2207,8 +2368,8 @@ namespace AlgEMLib
             ProxiGraph mstpg = mst.MST;
 
 
-            pg.WriteProxiGraph2Shp(strPath, @"Proximity", esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
-            mstpg.WriteProxiGraph2Shp(strPath, @"MSTPg", esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
+            pg.WriteProxiGraph2Shp(strPath, @"Proximity", prj);
+            mstpg.WriteProxiGraph2Shp(strPath, @"MSTPg", prj);
 
             ////删除街道与建筑物之间的边
             //List<ProxiEdge> LPedgeList = new List<ProxiEdge>();
