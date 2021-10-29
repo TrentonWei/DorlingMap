@@ -22,6 +22,7 @@ namespace AuxStructureLib
         Group
     }
 
+    [Serializable]
     public class ProxiNode:Node
     {
         /// <summary>

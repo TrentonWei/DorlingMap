@@ -8,6 +8,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 多边形与多边形之间最近点
     /// </summary>
+    [Serializable]
     public class NearestPoint : Node
     {
         /// <summary>

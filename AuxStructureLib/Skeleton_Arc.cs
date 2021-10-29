@@ -5,6 +5,7 @@ using System.Text;
 
 namespace AuxStructureLib
 {
+    [Serializable]
     public class Skeleton_Arc : PolylineObject
     {
         public MapObject LeftMapObj = null;

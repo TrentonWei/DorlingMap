@@ -18,10 +18,7 @@ using System.Collections.Generic;
 using DisplaceAlgLib;
 using AuxStructureLib;
 using AlgEMLib;
-using AlgIterative;
 using System.Diagnostics;
-using AlgIterative.AlgGA;
-using AlgIterative.AlgIA;
 using AuxStructureLib.IO;
 
 namespace CartoGener

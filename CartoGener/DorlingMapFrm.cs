@@ -176,7 +176,7 @@ namespace CartoGener
             #endregion
 
             #region 移位
-            DM.DorlingBeams(pg, Map, 1, 1000, 1, 1, 50, 0);
+            DM.DorlingBeams(pg, Map, 1, 1000, 1, 1, 100, 0);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
             #endregion
         }

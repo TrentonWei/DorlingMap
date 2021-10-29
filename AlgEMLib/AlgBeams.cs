@@ -1525,7 +1525,7 @@ namespace AlgEMLib
                 //基本几何算法
                 this.D = new Matrix(this.ProxiGraph.NodeList.Count * 3, 1);
 
-                this.UpdataCoordsforPGbyForce_Group();
+                this.UpdataCoordsforPGDorling(); 
 
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -1953,32 +1953,44 @@ namespace AlgEMLib
                 int tagID = curNode.TagID;
                 FeatureType fType = curNode.FeatureType;
                 VoronoiPolygon vp = null;
+                Force force = fV.GetForcebyIndex(index);
 
                 PolygonObject po = this.GetPoByID(tagID, this.Map.PolygonList);
-
-                double curDx0 = this.D[3 * index, 0];
-                double curDy0 = this.D[3 * index + 1, 0];
-                double curDx = this.D[3 * index, 0];
-                double curDy = this.D[3 * index + 1, 0];
-
-                if (this.IsTopCos == true)
+                double curDx0 = 0;
+                double curDy0 = 0;
+                double curDx = 0;
+                double curDy = 0;
+                if (force != null)
                 {
-                    vp = this.VD.GetVPbyIDandType(tagID, fType);
-                    vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+
+                    curDx0 = this.fV.GetForcebyIndex(index).Fx;
+                    curDy0 = this.fV.GetForcebyIndex(index).Fy;
+                    curDx = this.fV.GetForcebyIndex(index).Fx;
+                    curDy = this.fV.GetForcebyIndex(index).Fy;
+                    if (this.IsTopCos == true)
+                    {
+                        vp = this.VD.GetVPbyIDandType(tagID, fType);
+                        vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+                        this.D[3 * index, 0] = curDx;
+                        this.D[3 * index + 1, 0] = curDy;
+                    }
+                    //纠正拓扑错误
+                    curNode.X += curDx;
+                    curNode.Y += curDy;
+
+                    foreach (TriNode curPoint in po.PointList)
+                    {
+                        curPoint.X += curDx;
+                        curPoint.Y += curDy;
+                    }
+                }
+                else
+                {
                     this.D[3 * index, 0] = curDx;
                     this.D[3 * index + 1, 0] = curDy;
                 }
-
-                //纠正拓扑错误
-                curNode.X += curDx;
-                curNode.Y += curDy;
-
-                foreach (TriNode curPoint in po.PointList)
-                {
-                    curPoint.X += curDx;
-                    curPoint.Y += curDy;
-                }
             }
+
         }
 
         /// <summary>

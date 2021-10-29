@@ -66,16 +66,10 @@ C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.cspr
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\CartoGener.exe
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\CartoGener.pdb
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AlgEMLib.dll
-C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AlgIterative.dll
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AuxStructureLib.dll
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\DisplaceAlgLib.dll
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\MatrixOperation.dll
-C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AForge.Genetic.dll
-C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AForge.Math.dll
-C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AForge.dll
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AlgEMLib.pdb
-C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AlgIterative.pdb
-C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AlgIterative.xml
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AuxStructureLib.pdb
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\DisplaceAlgLib.pdb
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AxInterop.esriControls.dll

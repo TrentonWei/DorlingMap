@@ -14,6 +14,8 @@ using ESRI.ArcGIS.DataSourcesGDB;
 using ESRI.ArcGIS.DataSourcesFile;
 using AuxStructureLib;
 using AlgEMLib;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CartoGener
 {
@@ -153,6 +155,21 @@ namespace CartoGener
         }
 
         /// <summary>
+        /// 深拷贝（通用拷贝）
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static object Clone(object obj)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(memoryStream, obj);
+            memoryStream.Position = 0;
+            return formatter.Deserialize(memoryStream);
+        }
+
+
+        /// <summary>
         /// Beams Displace
         /// </summary>
         /// <param name="pg">邻近图</param>
@@ -164,19 +181,18 @@ namespace CartoGener
         /// <param name="Iterations">迭代次数</param>
         public void DorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations,int algType)
         {
+            AlgBeams algBeams = new AlgBeams(pg, pMap, E, I, A);
+            //求吸引力-2014-3-20所用
+
+            ProxiGraph CopyG = Clone((object)pg) as ProxiGraph;
+            algBeams.OriginalGraph = CopyG;
+            algBeams.Scale = scale;
+            algBeams.AlgType = algType;
             for (int i = 0; i < Iterations; i++)//迭代计算
             {
                 Console.WriteLine(i.ToString());//标识
-
-                #region 调用Beams算法
-                AlgBeams algBeams = new AlgBeams(pg, pMap, E, I, A);
-                //求吸引力-2014-3-20所用
-                algBeams.OriginalGraph = pg;
-                algBeams.Scale = scale;
-                algBeams.AlgType = algType;
-                algBeams.DoDisplacePgDorling(pMap);
-                #endregion
-
+                          
+                algBeams.DoDisplacePgDorling(pMap);// 调用Beams算法 
                 if (algBeams.isContinue == false)
                 {
                     break;

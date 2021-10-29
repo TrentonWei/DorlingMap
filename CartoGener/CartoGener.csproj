@@ -211,10 +211,6 @@
       <Project>{409C3D39-6614-4F2C-A3CF-E9122B58C908}</Project>
       <Name>AlgEMLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AlgIterative\AlgIterative.csproj">
-      <Project>{FCDC0100-4536-4AF1-A3B7-C8645F533D15}</Project>
-      <Name>AlgIterative</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AuxStructureLib\AuxStructureLib.csproj">
       <Project>{7753C0F5-7C46-42CC-A19B-017650CD778B}</Project>
       <Name>AuxStructureLib</Name>

@@ -6,8 +6,7 @@ using ESRI.ArcGIS.Geometry;
 
 namespace AuxStructureLib
 {
-
-
+    [Serializable]
     public abstract class MapObject
     {
         public int ID=-1;
@@ -30,6 +29,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 点目标
     /// </summary>
+    [Serializable]
     public class PointObject : MapObject
     {
         public TriNode Point= null;
@@ -81,6 +81,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 线目标
     /// </summary>
+    [Serializable]
     public class PolylineObject : MapObject
     {
         //public int ID = -1;
@@ -294,6 +295,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 面目标
     /// </summary>
+    [Serializable]
     public class PolygonObject : MapObject
     {
         public double R;//表示对应Circle的半径

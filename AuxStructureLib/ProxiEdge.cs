@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 namespace AuxStructureLib
 {
+    [Serializable]
     public class ProxiEdge
     {
         public int ID;

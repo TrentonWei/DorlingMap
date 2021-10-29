@@ -468,44 +468,44 @@ namespace AlgEMLib
             #endregion
 
             #region 吸引力
-            if (this.isDragForce == true || this.isDragForce == false)
-            {
-                int n = this.ProxiGraph.NodeList.Count;
-                for (int i = 0; i < n; i++)
-                {
+            //if (this.isDragForce == true || this.isDragForce == false)
+            //{
+            //    int n = this.ProxiGraph.NodeList.Count;
+            //    for (int i = 0; i < n; i++)
+            //    {
 
-                    ProxiNode curNode = this.ProxiGraph.NodeList[i];
+            //        ProxiNode curNode = this.ProxiGraph.NodeList[i];
 
-                    int id = curNode.ID;
-                    //  int tagID = curNode.TagID;
-                    FeatureType type = curNode.FeatureType;
-                    ProxiNode originalNode = this.OrigialProxiGraph.GetNodebyID(id);
-                    if (originalNode == null)
-                    {
-                        continue;
-                    }
-                    double distance = ComFunLib.CalLineLength(curNode, originalNode);
-                    if (distance > RMSE && (type != FeatureType.PolylineType))
-                    {
-                        //右边
-                        double f = distance - RMSE;
-                        double s = (originalNode.Y - curNode.Y) / distance;
-                        double c = (originalNode.X - curNode.X) / distance;
-                        //这里将力平分给两个对象
-                        double fx = f * c;
-                        double fy = f * s;
-                        Force force = new Force(id, fx, fy, s, c, f);
-                        VertexForce vForce = this.GetvForcebyIndex(id, vForceList);
-                        if (vForce == null)
-                        {
-                            vForce = new VertexForce(id);
-                            vForceList.Add(vForce);
-                        }
-                        vForce.forceList.Add(force);
-                    }
-                }
-                //foreach(Node cur Node )
-            }
+            //        int id = curNode.ID;
+            //        //  int tagID = curNode.TagID;
+            //        FeatureType type = curNode.FeatureType;
+            //        ProxiNode originalNode = this.OrigialProxiGraph.GetNodebyID(id);
+            //        if (originalNode == null)
+            //        {
+            //            continue;
+            //        }
+            //        double distance = ComFunLib.CalLineLength(curNode, originalNode);
+            //        if (distance > RMSE && (type != FeatureType.PolylineType))
+            //        {
+            //            //右边
+            //            double f = distance - RMSE;
+            //            double s = (originalNode.Y - curNode.Y) / distance;
+            //            double c = (originalNode.X - curNode.X) / distance;
+            //            //这里将力平分给两个对象
+            //            double fx = f * c;
+            //            double fy = f * s;
+            //            Force force = new Force(id, fx, fy, s, c, f);
+            //            VertexForce vForce = this.GetvForcebyIndex(id, vForceList);
+            //            if (vForce == null)
+            //            {
+            //                vForce = new VertexForce(id);
+            //                vForceList.Add(vForce);
+            //            }
+            //            vForce.forceList.Add(force);
+            //        }
+            //    }
+            //    //foreach(Node cur Node )
+            //}
             #endregion
 
             #region 求合力
@@ -617,15 +617,15 @@ namespace AlgEMLib
 
                 //if (c < 0) //eNode在sNode左侧 
                 //{
-                Force eForce = new Force(eNode.ID, fx * (-1), fy * (-1), s * (-1), c * (-1), curForce * 0.5);
-                    Force sForce = new Force(sNode.ID, fx, fy, s , c , curForce * 0.5);
+                    Force eForce = new Force(eNode.ID, fx , fy , s , c , curForce * 0.5);
+                    Force sForce = new Force(sNode.ID, fx*(-1), fy*(-1), s*(-1), c*(-1), curForce * 0.5);
 
                     ForceList.Add(sForce);
                     ForceList.Add(eForce);
                 //}
                 //else //eNode在sNode右侧 
                 //{
-                //    Force eForce = new Force(eNode.ID, fx * (-1), fy * (-1), s * (-1), c * (-1), curForce * 0.5);
+                //    Force eForce = new Force(eNode.ID, fx*(-1) , fy*(-1) , s*(-1) , c*(-1) , curForce * 0.5);
                 //    Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce * 0.5);
                 //    ForceList.Add(sForce);
                 //    ForceList.Add(eForce);

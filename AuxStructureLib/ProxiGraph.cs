@@ -12,6 +12,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 邻近图
     /// </summary>
+    [Serializable]
     public class ProxiGraph
     {
         /// <summary>

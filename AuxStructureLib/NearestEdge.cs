@@ -11,6 +11,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 多边形与多边形之间最近边
     /// </summary>
+    [Serializable]
     public class NearestEdge
     {
         public int ID;//编号
