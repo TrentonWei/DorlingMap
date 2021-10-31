@@ -13,16 +13,15 @@ namespace AlgEMLib
 {
     public class AlgBeams:AlgEM
     {
+        #region 参数
         //public double PAT = 0.6;
         public double E=10000;
         public double I=2;
         public double A=2;
-        public string strPath = "";
-
-        
+        public string strPath = "";   
         BeamsStiffMatrix bM=null;
         BeamsForceVector fV = null;
-       
+        #endregion
 
         #region 邻近图移位
         /// <summary>
@@ -246,45 +245,6 @@ namespace AlgEMLib
             }
         }
 
-
-        ///// <summary>
-        ///// 设置边界点的受力
-        ///// </summary>
-        ///// <param name="index">顶点索引号</param>
-        //private void SetBoundPointParamsForce(int index, float fx, float fy)
-        //{
-        //    int r1 = index * 2;
-
-        //    for (int i = 0; i < this._Fx.Row; i++)
-        //    {
-        //        if (i == r1)
-        //        {
-        //            this._Fx[r1, 0] = fx;
-        //            this._Fy[r1, 0] = fy;
-        //        }
-        //        else
-        //        {
-        //            this._Fx[i, 0] = this._Fx[i, 0] - fx * _K[i, r1];
-        //            this._Fy[i, 0] = this._Fy[i, 0] - fy * _K[i, r1];
-        //        }
-        //    }
-        //    for (int i = 0; i < _K.Col; i++)
-        //    {
-        //        if (i == r1)
-        //        {
-        //            _K[r1, i] = 1;//对角线上元素赋值为1
-        //        }
-        //        else
-        //        {
-        //            _K[r1, i] = 0;//其他地方赋值为0
-        //        }
-        //    }
-        //}
-
-
-
-
-
         /// <summary>
         /// 更新坐标位置
         /// </summary>
@@ -300,55 +260,6 @@ namespace AlgEMLib
             }
             
         }
-
-        ///// <summary>
-        ///// 迭代
-        ///// </summary>
-        //public override void DoDispaceIterate()
-        //{
-        //    ComMatrix_K();       //求刚度矩阵
-
-        //    if (!MakeForceVector())   //建立并计算力向量
-        //    {
-        //        return;
-        //    }
-        //    #region 求1+rK
-        //    int n = this._K.Col;
-        //    this._d = new Matrix(n, 1);
-        //    Matrix identityMatrix = new Matrix(n, n);
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        this._F[i, 0] *= r;
-        //        this._d[i, 0] = 0.0;
-        //        for (int j = 0; j < n; j++)
-        //        {
-        //            this._K[i, j] *= r;
-        //            if (i == j)
-        //                identityMatrix[i, j] = 1.0;
-        //            else
-        //                identityMatrix[i, j] = 0;
-        //        }
-        //    }
-        //    this._K = identityMatrix + this._K;
-        //    #endregion
-        //    this.SetBoundPointParams();
-
-        //    for (int i = 0; i < time; i++)
-        //    {
-        //        this._F = this._d + r * this._F;
-
-        //        this.SetBoundPointParamsForce();
-        //        ComDisplace();
-        //        this.UpdataCoords();
-        //        CreategeoSetFromRes();
-        //        if (!MakeForceVector())   //建立并计算力向量
-        //        {
-        //            return;
-        //        }
-        //    }
-        //    StaticDis();
-        //}
-
         #endregion
 
         #region 单条线的移位
@@ -475,6 +386,7 @@ namespace AlgEMLib
                 this.SetBoundPointParamsBigNumber(n - 1, 0, 0);
                // SetBoundPointParamsOld(n - 1, 0, 0);
         }
+
         /// <summary>
         /// 设置边界条件
         /// </summary>
@@ -526,7 +438,6 @@ namespace AlgEMLib
             }
         }
 
-
         /// <summary>
         /// 读取文件中的边界条件并设置
         /// </summary>
@@ -545,7 +456,6 @@ namespace AlgEMLib
                 SetBoundPointParamsBigNumber(curID, curDx, curDy);
             }
         }
-
      
         /// <summary>
         /// 置大数法
@@ -574,7 +484,6 @@ namespace AlgEMLib
                 K[r3, r3] = 10000000000000000 * K[r3, r3];
             }
         }
-
         #endregion
 
         #region 邻近图移位-2014-2-28
@@ -596,8 +505,6 @@ namespace AlgEMLib
             this.Map = map;
             this.ConflictList = conflictList;
         }
-
-     
 
         /// <summary>
         /// 邻近图的移位算法实现
@@ -687,7 +594,6 @@ namespace AlgEMLib
             }
         }
 
-
         /// <summary>
         /// 邻近图的移位算法实现-设置边界条件
         /// </summary>
@@ -748,84 +654,6 @@ namespace AlgEMLib
             }
         }
 
-
-
-        ///// <summary>
-        ///// 输出移位值和力
-        ///// </summary>
-        ///// <param name="ForceList">力列表</param>
-        //private void OutputDisplacementandForces(List<Force> ForceList)
-        //{
-        //    if (ForceList == null || ForceList.Count == 0)
-        //        return;
-        //    DataSet ds = new DataSet();
-        //    //创建一个表
-        //    DataTable tableforce = new DataTable();
-        //    tableforce.TableName = "DispalcementandForces";
-        //    tableforce.Columns.Add("ID", typeof(int));
-        //    tableforce.Columns.Add("TagID", typeof(int));
-        //    tableforce.Columns.Add("F", typeof(double));
-        //    tableforce.Columns.Add("D", typeof(double));
-        //    tableforce.Columns.Add("Fx", typeof(double));
-        //    tableforce.Columns.Add("Dx", typeof(double));
-        //    tableforce.Columns.Add("Fy", typeof(double));
-        //    tableforce.Columns.Add("Dy", typeof(double));
-
-        //    foreach (Force force in ForceList)
-        //    {
-        //        double dx = this.D[3 * force.ID, 0];
-        //        double dy = this.D[3 * force.ID + 1, 0];
-        //        double d = Math.Sqrt(dx * dx + dy * dy);
-        //        DataRow dr = tableforce.NewRow();
-        //        dr[0] = force.ID;
-        //      //  dr[1] = force.SID;
-        //        dr[2] = force.F;
-        //        dr[3] = d;
-        //        dr[4] = force.Fx;
-        //        dr[5] = dx;
-        //        dr[6] = force.Fy;
-        //        dr[7] = dy;
-        //        tableforce.Rows.Add(dr);
-        //    }
-        //    TXTHelper.ExportToTxt(tableforce, this.strPath + @"-DandF.txt");
-        //}
-
-        ///// <summary>
-        ///// 统计移位值
-        ///// </summary>
-        //private void StaticDis(out double MaxD, out double MaxF, out int indexMaxD, out int indexMaxF)
-        //{
-        //    int n = this.D.Row / 3;
-        //    MaxD = -1;
-        //    MaxF = -1;
-        //    double curD;
-        //    indexMaxD = -1;
-        //    indexMaxF = -1;
-
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        // curD = Math.Sqrt(this.D[3 * i, 0] * this.D[3 * i, 0] + this.D[3 * i + 1, 0] * this.D[3 * i + 1, 0]);
-
-        //        // if (curD > MaxD)
-        //        // {
-        //        //     indexMaxD = i;
-        //        //      MaxD = curD;
-        //        //   }
-
-
-        //        if (this.fV.ForceList[i].F > MaxF)
-        //        {
-        //            indexMaxF = i;
-        //            MaxF = fV.ForceList[i].F;
-        //        }
-        //    }
-
-        //    MaxD = Math.Sqrt(this.D[3 * indexMaxF, 0] * this.D[3 * indexMaxF, 0] + this.D[3 * indexMaxF + 1, 0] * this.D[3 * indexMaxF + 1, 0]);
-        //}
-
-
-
-
         /// <summary>
         /// 将Force的属性IsBouldPoint为True的点设置为边界点，
         /// 具体地，邻近图中道路上的顶点设为不动的边界条件
@@ -845,126 +673,10 @@ namespace AlgEMLib
                     r2 = k * 3 + 1;
                     r3 = k * 3 + 2;
 
-                    this.SetBoundPointParamsBigNumber(k, 0, 0);
-
-                    /*  this.F[r1, 0] = 0;
-                      this.F[r2, 0] = 0;
-                      this.F[r3, 0] = 0;
-
-                      for (int i = 0; i < K.Col; i++)
-                      {
-                          if (i == r1)
-                          {
-                              K[r1, i] = 1;//对角线上元素赋值为1
-                          }
-                          else
-                          {
-                              K[r1, i] = 0;//其他地方赋值为0
-                          }
-
-                          if (i == r2)
-                          {
-                              K[r2, i] = 1;//对角线上元素赋值为1
-                          }
-                          else
-                          {
-                              K[r2, i] = 0;//其他地方赋值为0
-                          }
-
-                          if (i == r3)
-                          {
-                              K[r3, i] = 1;//对角线上元素赋值为1
-                          }
-                          else
-                          {
-                              K[r3, i] = 0;//其他地方赋值为0
-                          }
-                      }*/
+                    this.SetBoundPointParamsBigNumber(k, 0, 0);                
                 }
             }
         }
-
-        /// <summary>
-        /// 设置邻近图的边界点2014-3-2
-        /// </summary>
-        //private void SetBoundPointParamforPG()
-        //{
-        //    Force curForce = null;
-        //    foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
-        //    {
-        //        if (curNode.FeatureType == FeatureType.PolylineType)
-        //        {
-        //            int index = curNode.ID;
-        //            this.SetBoundPointParamsBigNumber(index, 0, 0);
-
-        //            /* 
-        //             *                       
-        //             * int  r1 = index * 3;
-        //           int r2 = index * 3 + 1;
-        //          int  r3 = index * 3 + 2;
-        //             * this.F[r1, 0] = 0;
-        //              this.F[r2, 0] = 0;
-        //              this.F[r3, 0] = 0;
-
-        //              for (int i = 0; i < K.Col; i++)
-        //              {
-        //                  if (i == r1)
-        //                  {
-        //                      K[r1, i] = 1;//对角线上元素赋值为1
-        //                  }
-        //                  else
-        //                  {
-        //                      K[r1, i] = 0;//其他地方赋值为0
-        //                  }
-
-        //                  if (i == r2)
-        //                  {
-        //                      K[r2, i] = 1;//对角线上元素赋值为1
-        //                  }
-        //                  else
-        //                  {
-        //                      K[r2, i] = 0;//其他地方赋值为0
-        //                  }
-
-        //                  if (i == r3)
-        //                  {
-        //                      K[r3, i] = 1;//对角线上元素赋值为1
-        //                  }
-        //                  else
-        //                  {
-        //                      K[r3, i] = 0;//其他地方赋值为0
-        //                  }
-        //              }*/
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 设置邻近图的边界点2014-3-2
-        ///// </summary>
-        //private void SetBoundPointParamforPG_BC()
-        //{
-        //    foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
-        //    {
-        //        int index = curNode.ID;
-        //        if (curNode.FeatureType == FeatureType.PolylineType)
-        //        {
-                
-        //            this.SetBoundPointParamsBigNumber(index, 0, 0);
-        //        }
-        //        else if (curNode.FeatureType == FeatureType.PolygonType)
-        //        {
-        //            Force force = this.fV.GetForcebyIndex(index);
-        //            if (force != null)
-        //            {
-        //                double dx = force.Fx;
-        //                double dy = force.Fy;
-        //                this.SetBoundPointParamsBigNumber(index, dx, dy);
-        //            }
-        //        }
-        //    }
-        //}
-
 
         /// <summary>
         /// 更新坐标位置
@@ -1064,56 +776,6 @@ namespace AlgEMLib
                 }
             }
         }
-
-
-        ///// <summary>
-        ///// 迭代
-        ///// </summary>
-        //public override void DoDispaceIterate()
-        //{
-        //    ComMatrix_K();       //求刚度矩阵
-
-        //    if (!MakeForceVector())   //建立并计算力向量
-        //    {
-        //        return;
-        //    }
-        //    #region 求1+rK
-        //    int n = this._K.Col;
-        //    this._d = new Matrix(n, 1);
-        //    Matrix identityMatrix = new Matrix(n, n);
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        this._F[i, 0] *= r;
-        //        this._d[i, 0] = 0.0;
-        //        for (int j = 0; j < n; j++)
-        //        {
-        //            this._K[i, j] *= r;
-        //            if (i == j)
-        //                identityMatrix[i, j] = 1.0;
-        //            else
-        //                identityMatrix[i, j] = 0;
-        //        }
-        //    }
-        //    this._K = identityMatrix + this._K;
-        //    #endregion
-        //    this.SetBoundPointParams();
-
-        //    for (int i = 0; i < time; i++)
-        //    {
-        //        this._F = this._d + r * this._F;
-
-        //        this.SetBoundPointParamsForce();
-        //        ComDisplace();
-        //        this.UpdataCoords();
-        //        CreategeoSetFromRes();
-        //        if (!MakeForceVector())   //建立并计算力向量
-        //        {
-        //            return;
-        //        }
-        //    }
-        //    StaticDis();
-        //}
-
         #endregion
 
         #region 道路网移位-2014-2-28
@@ -1134,6 +796,7 @@ namespace AlgEMLib
             this.A = a;
             this.ConflictList = conflictList;
         }
+
         /// <summary>
         /// 构造函数-从一个线对象构建Beams模型2014-1-18
         /// </summary>
@@ -1151,7 +814,6 @@ namespace AlgEMLib
             this.A = a;
             this.fV = fv;
         }
-
 
         /// <summary>
         /// 自适应设置E
@@ -1202,7 +864,6 @@ namespace AlgEMLib
 
             OutputDisplacementandForces(fV.ForceList);
         }
-
 
         /// <summary>
         ///道路网设置边界条件移位
@@ -1407,8 +1068,6 @@ namespace AlgEMLib
             this.ConflictList = conflictList;
             this.Groups = groups;
         }
-
-
 
         /// <summary>
         /// 邻近图的移位算法实现
@@ -1647,142 +1306,6 @@ namespace AlgEMLib
             }
         }
 
-
-
-        ///// <summary>
-        ///// 输出移位值和力
-        ///// </summary>
-        ///// <param name="ForceList">力列表</param>
-        //private void OutputDisplacementandForces(List<Force> ForceList)
-        //{
-        //    if (ForceList == null || ForceList.Count == 0)
-        //        return;
-        //    DataSet ds = new DataSet();
-        //    //创建一个表
-        //    DataTable tableforce = new DataTable();
-        //    tableforce.TableName = "DispalcementandForces";
-        //    tableforce.Columns.Add("ID", typeof(int));
-        //    tableforce.Columns.Add("TagID", typeof(int));
-        //    tableforce.Columns.Add("F", typeof(double));
-        //    tableforce.Columns.Add("D", typeof(double));
-        //    tableforce.Columns.Add("Fx", typeof(double));
-        //    tableforce.Columns.Add("Dx", typeof(double));
-        //    tableforce.Columns.Add("Fy", typeof(double));
-        //    tableforce.Columns.Add("Dy", typeof(double));
-
-        //    foreach (Force force in ForceList)
-        //    {
-        //        double dx = this.D[3 * force.ID, 0];
-        //        double dy = this.D[3 * force.ID + 1, 0];
-        //        double d = Math.Sqrt(dx * dx + dy * dy);
-        //        DataRow dr = tableforce.NewRow();
-        //        dr[0] = force.ID;
-        //      //  dr[1] = force.SID;
-        //        dr[2] = force.F;
-        //        dr[3] = d;
-        //        dr[4] = force.Fx;
-        //        dr[5] = dx;
-        //        dr[6] = force.Fy;
-        //        dr[7] = dy;
-        //        tableforce.Rows.Add(dr);
-        //    }
-        //    TXTHelper.ExportToTxt(tableforce, this.strPath + @"-DandF.txt");
-        //}
-
-        ///// <summary>
-        ///// 统计移位值
-        ///// </summary>
-        //private void StaticDis(out double MaxD, out double MaxF, out int indexMaxD, out int indexMaxF)
-        //{
-        //    int n = this.D.Row / 3;
-        //    MaxD = -1;
-        //    MaxF = -1;
-        //    double curD;
-        //    indexMaxD = -1;
-        //    indexMaxF = -1;
-
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        // curD = Math.Sqrt(this.D[3 * i, 0] * this.D[3 * i, 0] + this.D[3 * i + 1, 0] * this.D[3 * i + 1, 0]);
-
-        //        // if (curD > MaxD)
-        //        // {
-        //        //     indexMaxD = i;
-        //        //      MaxD = curD;
-        //        //   }
-
-
-        //        if (this.fV.ForceList[i].F > MaxF)
-        //        {
-        //            indexMaxF = i;
-        //            MaxF = fV.ForceList[i].F;
-        //        }
-        //    }
-
-        //    MaxD = Math.Sqrt(this.D[3 * indexMaxF, 0] * this.D[3 * indexMaxF, 0] + this.D[3 * indexMaxF + 1, 0] * this.D[3 * indexMaxF + 1, 0]);
-        //}
-
-
-
-
-        ///// <summary>
-        ///// 将Force的属性IsBouldPoint为True的点设置为边界点，
-        ///// 具体地，邻近图中道路上的顶点设为不动的边界条件
-        ///// </summary>
-        //private void SetBoundPointParams()
-        //{
-        //    int r1, r2, r3;//x,y,a
-        //    int index = 0;
-        //    Force curF = null;
-        //    for (int k = 0; k < fV.ForceList.Count; k++)
-        //    {
-        //        curF = fV.ForceList[k];
-        //        if (curF.IsBouldPoint)
-        //        {
-
-        //            r1 = k * 3;
-        //            r2 = k * 3 + 1;
-        //            r3 = k * 3 + 2;
-
-        //            this.SetBoundPointParamsBigNumber(k, 0, 0);
-
-        //            /*  this.F[r1, 0] = 0;
-        //              this.F[r2, 0] = 0;
-        //              this.F[r3, 0] = 0;
-
-        //              for (int i = 0; i < K.Col; i++)
-        //              {
-        //                  if (i == r1)
-        //                  {
-        //                      K[r1, i] = 1;//对角线上元素赋值为1
-        //                  }
-        //                  else
-        //                  {
-        //                      K[r1, i] = 0;//其他地方赋值为0
-        //                  }
-
-        //                  if (i == r2)
-        //                  {
-        //                      K[r2, i] = 1;//对角线上元素赋值为1
-        //                  }
-        //                  else
-        //                  {
-        //                      K[r2, i] = 0;//其他地方赋值为0
-        //                  }
-
-        //                  if (i == r3)
-        //                  {
-        //                      K[r3, i] = 1;//对角线上元素赋值为1
-        //                  }
-        //                  else
-        //                  {
-        //                      K[r3, i] = 0;//其他地方赋值为0
-        //                  }
-        //              }*/
-        //        }
-        //    }
-        //}
-
         /// <summary>
         /// 设置邻近图的边界点2014-3-2
         /// </summary>
@@ -1795,45 +1318,6 @@ namespace AlgEMLib
                 {
                     int index = curNode.ID;
                     this.SetBoundPointParamsBigNumber(index, 0, 0);
-
-                    /* 
-                     *                       
-                     * int  r1 = index * 3;
-                   int r2 = index * 3 + 1;
-                  int  r3 = index * 3 + 2;
-                     * this.F[r1, 0] = 0;
-                      this.F[r2, 0] = 0;
-                      this.F[r3, 0] = 0;
-
-                      for (int i = 0; i < K.Col; i++)
-                      {
-                          if (i == r1)
-                          {
-                              K[r1, i] = 1;//对角线上元素赋值为1
-                          }
-                          else
-                          {
-                              K[r1, i] = 0;//其他地方赋值为0
-                          }
-
-                          if (i == r2)
-                          {
-                              K[r2, i] = 1;//对角线上元素赋值为1
-                          }
-                          else
-                          {
-                              K[r2, i] = 0;//其他地方赋值为0
-                          }
-
-                          if (i == r3)
-                          {
-                              K[r3, i] = 1;//对角线上元素赋值为1
-                          }
-                          else
-                          {
-                              K[r3, i] = 0;//其他地方赋值为0
-                          }
-                      }*/
                 }
             }
         }
@@ -1863,7 +1347,6 @@ namespace AlgEMLib
                 }
             }
         }
-
 
         /// <summary>
         /// 更新坐标位置
@@ -2110,56 +1593,6 @@ namespace AlgEMLib
                 }
             }
         }
-
-
-        ///// <summary>
-        ///// 迭代
-        ///// </summary>
-        //public override void DoDispaceIterate()
-        //{
-        //    ComMatrix_K();       //求刚度矩阵
-
-        //    if (!MakeForceVector())   //建立并计算力向量
-        //    {
-        //        return;
-        //    }
-        //    #region 求1+rK
-        //    int n = this._K.Col;
-        //    this._d = new Matrix(n, 1);
-        //    Matrix identityMatrix = new Matrix(n, n);
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        this._F[i, 0] *= r;
-        //        this._d[i, 0] = 0.0;
-        //        for (int j = 0; j < n; j++)
-        //        {
-        //            this._K[i, j] *= r;
-        //            if (i == j)
-        //                identityMatrix[i, j] = 1.0;
-        //            else
-        //                identityMatrix[i, j] = 0;
-        //        }
-        //    }
-        //    this._K = identityMatrix + this._K;
-        //    #endregion
-        //    this.SetBoundPointParams();
-
-        //    for (int i = 0; i < time; i++)
-        //    {
-        //        this._F = this._d + r * this._F;
-
-        //        this.SetBoundPointParamsForce();
-        //        ComDisplace();
-        //        this.UpdataCoords();
-        //        CreategeoSetFromRes();
-        //        if (!MakeForceVector())   //建立并计算力向量
-        //        {
-        //            return;
-        //        }
-        //    }
-        //    StaticDis();
-        //}
-
         #endregion
 
         #region Bader Truss移位
@@ -2383,21 +1816,6 @@ namespace AlgEMLib
             pg.WriteProxiGraph2Shp(strPath, @"Proximity", prj);
             mstpg.WriteProxiGraph2Shp(strPath, @"MSTPg", prj);
 
-            ////删除街道与建筑物之间的边
-            //List<ProxiEdge> LPedgeList = new List<ProxiEdge>();
-            //foreach (ProxiEdge edge in mstpg.EdgeList)
-            //{
-            //    if (edge.Node1.FeatureType == FeatureType.PolylineType || edge.Node2.FeatureType == FeatureType.PolylineType)
-            //    {
-            //        LPedgeList.Add(edge);
-            //    }
-            //}
-
-            //foreach (ProxiEdge edge in LPedgeList)
-            //{
-            //    mstpg.EdgeList.Remove(edge);
-            //}
-
             AlgDijkstra dijkstra = new AlgDijkstra();
             dijkstra.CreateAdjMatrixfrmProximityGraph(mstpg);
 
@@ -2477,22 +1895,9 @@ namespace AlgEMLib
             //输出各点的移位总和
             //   OutputTotalDisplacementforProxmityGraph(this.OriginalGraph, this.ProxiGraph, this.Map);
         }
-
         #endregion
 
-
-        public override void DoDispace()
-        {
-            throw new NotImplementedException();
-        }
-        public override void DoDispaceIterate()
-        {
-            throw new NotImplementedException();
-        }
-
-
         #region forBader
-
         /// <summary>
         /// 设置邻近图的边界点2014-3-2
         /// </summary>
@@ -2662,5 +2067,15 @@ namespace AlgEMLib
         }
         #endregion
 
+        #region 其它
+        public override void DoDispace()
+        {
+            throw new NotImplementedException();
+        }
+        public override void DoDispaceIterate()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
     }
 }

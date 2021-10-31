@@ -442,7 +442,7 @@ namespace AlgEMLib
                 PolygonObject Po1 = this.GetPoByID(sNode.TagID, PoList);
                 PolygonObject Po2 = this.GetPoByID(eNode.TagID, PoList);
 
-                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2);
+                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2, 1);//考虑引力
 
                 if (ForceList.Count > 0)
                 {
@@ -599,7 +599,8 @@ namespace AlgEMLib
         /// <param name="Po2"></param>
         /// <param name="?"></param>
         /// <returns></returns>List<Force>=[sForce,eForce]
-        public List<Force> GetForce(ProxiNode sNode,ProxiNode eNode,PolygonObject sPo1, PolygonObject ePo2)
+        /// Type=0,只考虑斥力；Type=1，既考虑引力，也考虑斥力
+        public List<Force> GetForce(ProxiNode sNode,ProxiNode eNode,PolygonObject sPo1, PolygonObject ePo2,int Type)
         {
             double EdgeDis = this.GetDis(sNode, eNode);
             double RSDis = sPo1.R + ePo2.R;
@@ -631,32 +632,36 @@ namespace AlgEMLib
                 //    ForceList.Add(eForce);
                 //}
             }
-            //else if (RSDis  < EdgeDis)//这里需要考虑比例尺的问题
-            //{
-            //    double curForce = EdgeDis - RSDis ;///这里需要考虑比例尺的问题
+            else if (RSDis < EdgeDis)//这里需要考虑比例尺的问题
+            {
+                double curForce = EdgeDis - RSDis;///这里需要考虑比例尺的问题
 
-            //    double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));
-            //    double s = (eNode.Y - sNode.Y) / r;
-            //    double c = (eNode.X - sNode.X) / r;
-            //    //这里将力平分给两个对象
-            //    double fx = 0.5 * curForce * c;
-            //    double fy = 0.5 * curForce * s;
+                double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));
+                double s = (eNode.Y - sNode.Y) / r;
+                double c = (eNode.X - sNode.X) / r;
+                //这里将力平分给两个对象
+                double fx = 0.5 * curForce * c;
+                double fy = 0.5 * curForce * s;
 
-            ////    //if (c < 0)//eNode在sNode左侧
-            ////    //{
-            //    Force eForce = new Force(eNode.ID, fx*(-1), fy*(-1), s*(-1) , c*(-1) , curForce * 0.5);
-            //    Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce * 0.5);
-            //    ForceList.Add(sForce);
-            //    ForceList.Add(eForce);
-            //    //}
-            //    //else //eNode在sNode右侧
-            //    //{
-            //    //    Force eForce = new Force(eNode.ID, fx*(-1), fy*(-1), s*(-1), c*(-1), curForce * 0.5);
-            //    //    Force sForce = new Force(sNode.ID, fx , fy , s , c, curForce * 0.5);
-            //    //    ForceList.Add(sForce);
-            //    //    ForceList.Add(eForce);
-            //    //}
-            //}
+                //    //if (c < 0)//eNode在sNode左侧
+                //    //{
+
+                if (Type == 1)
+                {
+                    Force eForce = new Force(eNode.ID, fx * (-1), fy * (-1), s * (-1), c * (-1), curForce * 0.5);
+                    Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce * 0.5);
+                    ForceList.Add(sForce);
+                    ForceList.Add(eForce);
+                }
+                //}
+                //else //eNode在sNode右侧
+                //{
+                //    Force eForce = new Force(eNode.ID, fx*(-1), fy*(-1), s*(-1), c*(-1), curForce * 0.5);
+                //    Force sForce = new Force(sNode.ID, fx , fy , s , c, curForce * 0.5);
+                //    ForceList.Add(sForce);
+                //    ForceList.Add(eForce);
+                //}
+            }
           
             return ForceList;
         }

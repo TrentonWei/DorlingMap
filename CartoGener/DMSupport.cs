@@ -50,6 +50,47 @@ namespace CartoGener
         }
 
         /// <summary>
+        /// 计算两个点的距离
+        /// </summary>
+        /// <param name="Node1"></param>
+        /// <param name="Node2"></param>
+        /// <returns></returns>
+        double GetDis(ProxiNode Node1, ProxiNode Node2)
+        {
+            double Dis = Math.Sqrt((Node1.X - Node2.X) * (Node1.X - Node2.X) + (Node1.Y - Node2.Y) * (Node1.Y - Node2.Y));
+            return Dis;
+        }
+
+        /// <summary>
+        /// 依据ID获取对应的建筑物
+        /// </summary>
+        /// <param name="PoList"></param>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        PolygonObject GetObjectByID(List<PolygonObject> PoList, int ID)
+        {
+            bool NullLabel = false; int TID = 0;
+            for (int i = 0; i < PoList.Count; i++)
+            {
+                if (PoList[i].ID == ID)
+                {
+                    NullLabel = true;
+                    TID = ID;
+                    break;
+                }
+            }
+
+            if (!NullLabel)
+            {
+                return null;
+            }
+            else
+            {
+                return PoList[TID];
+            }
+        }
+
+        /// <summary>
         /// 计算给定的两个圆的距离
         /// </summary>
         /// <param name="C1"></param>

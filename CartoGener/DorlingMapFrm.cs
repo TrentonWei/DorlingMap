@@ -175,6 +175,10 @@ namespace CartoGener
             pg.CreateProxiG(pFeatureClass);
             #endregion
 
+            #region Delete the longer edges
+            
+            #endregion
+
             #region 移位
             DM.DorlingBeams(pg, Map, 1, 1000, 1, 1, 100, 0);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);

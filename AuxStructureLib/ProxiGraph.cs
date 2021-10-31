@@ -155,6 +155,8 @@ namespace AuxStructureLib
             }
 
         }
+
+
         /// <summary>
         /// 创建结点列表
         /// </summary>
@@ -196,7 +198,6 @@ namespace AuxStructureLib
                 }
             }
         }
-
 
         /// <summary>
         /// 创建边
@@ -305,6 +306,7 @@ namespace AuxStructureLib
             }
 
         }
+
         /// <summary>
         /// 从骨架线构造邻近图
         /// </summary>
@@ -334,6 +336,7 @@ namespace AuxStructureLib
             this.CreateEdgesforPointandPolygon(skeleton);
             CreateNodesandEdgesforPolyline_LP(map, skeleton);
         }
+
         /// <summary>
         /// 从骨架线构造邻近图
         /// </summary>
@@ -699,6 +702,7 @@ namespace AuxStructureLib
             CreateNodes(map);
             CreateEdges(conflicts);
         }
+
         /// <summary>
         /// 根据索引获取结点
         /// </summary>
@@ -749,6 +753,7 @@ namespace AuxStructureLib
             }
             return null;
         }
+
         /// <summary>
         /// 根据两端点的索引号获取边
         /// </summary>
@@ -764,6 +769,7 @@ namespace AuxStructureLib
             }
             return null;
         }
+
         /// <summary>
         /// 获取所有与node相关联的边
         /// </summary>
@@ -1129,6 +1135,70 @@ namespace AuxStructureLib
                 }
             }
             #endregion
+        }
+
+        /// <summary>
+        /// 计算两个点的距离
+        /// </summary>
+        /// <param name="Node1"></param>
+        /// <param name="Node2"></param>
+        /// <returns></returns>
+        double GetDis(ProxiNode Node1, ProxiNode Node2)
+        {
+            double Dis = Math.Sqrt((Node1.X - Node2.X) * (Node1.X - Node2.X) + (Node1.Y - Node2.Y) * (Node1.Y - Node2.Y));
+            return Dis;
+        }
+
+        /// <summary>
+        /// 依据ID获取对应的建筑物
+        /// </summary>
+        /// <param name="PoList"></param>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        PolygonObject GetObjectByID(List<PolygonObject> PoList, int ID)
+        {
+            bool NullLabel = false; int TID = 0;
+            for (int i = 0; i < PoList.Count; i++)
+            {
+                if (PoList[i].ID == ID)
+                {
+                    NullLabel = true;
+                    TID = ID;
+                    break;
+                }
+            }
+
+            if (!NullLabel)
+            {
+                return null;
+            }
+            else
+            {
+                return PoList[TID];
+            }
+        }
+
+        /// <summary>
+        /// /// <summary>
+        /// 删除较长的边(距离计算考虑了圆的半径)
+        /// </summary>
+        /// </summary>
+        /// <param name="Td">边的阈值条件</param>
+        public void DeleteLongerEdges(List<ProxiEdge> EdgeList,List<PolygonObject> PoList, double Td)
+        {
+            for (int i = EdgeList.Count - 1; i >= 0; i--)
+            {
+                ProxiNode Node1 = EdgeList[i].Node1;
+                ProxiNode Node2 = EdgeList[i].Node2;
+
+                double EdgeDis = this.GetDis(Node1, Node2);
+                double RSDis = this.GetObjectByID(PoList,Node1.ID).R + this.GetObjectByID(PoList,Node2.ID).R;
+
+                if ((EdgeDis-RSDis) > Td)
+                {
+                    EdgeList.RemoveAt(i);
+                }
+            }
         }
     }
 }
