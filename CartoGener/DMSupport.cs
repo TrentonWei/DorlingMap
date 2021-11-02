@@ -55,7 +55,7 @@ namespace CartoGener
         /// <param name="Node1"></param>
         /// <param name="Node2"></param>
         /// <returns></returns>
-        double GetDis(ProxiNode Node1, ProxiNode Node2)
+        public double GetDis(ProxiNode Node1, ProxiNode Node2)
         {
             double Dis = Math.Sqrt((Node1.X - Node2.X) * (Node1.X - Node2.X) + (Node1.Y - Node2.Y) * (Node1.Y - Node2.Y));
             return Dis;
@@ -67,7 +67,7 @@ namespace CartoGener
         /// <param name="PoList"></param>
         /// <param name="ID"></param>
         /// <returns></returns>
-        PolygonObject GetObjectByID(List<PolygonObject> PoList, int ID)
+        public PolygonObject GetObjectByID(List<PolygonObject> PoList, int ID)
         {
             bool NullLabel = false; int TID = 0;
             for (int i = 0; i < PoList.Count; i++)
@@ -271,6 +271,43 @@ namespace CartoGener
             //生成自己写的多边形
             PolygonObject mPolygonObject = new PolygonObject(ppID, trilist);
             return mPolygonObject;
+        }
+
+        /// <summary>
+        /// PG和Map的regulation
+        /// </summary>
+        /// <param name="Pg"></param>
+        /// <param name="pMap"></param>
+        /// <returns></returns>
+        public SMap regulation(ProxiGraph Pg, SMap pMap)
+        {
+            SMap newMap = new SMap();
+
+            #region 获取PoList
+            List<PolygonObject> PoList = new List<PolygonObject>();
+            foreach (ProxiNode Pn in Pg.NodeList)
+            {
+                foreach (PolygonObject Po in pMap.PolygonList)
+                {
+                    if (Po.ID == Pn.TagID)
+                    {
+                        PoList.Add(Po);
+                    }
+                }
+            }
+            #endregion
+
+            #region 更新Pg和Map
+            for (int i = 0; i < Pg.NodeList.Count; i++)
+            {
+                Pg.NodeList[i].ID = i;
+                Pg.NodeList[i].TagID = i;
+                PoList[i].ID = i;
+            }
+            #endregion
+
+            newMap.PolygonList = PoList;
+            return newMap;
         }
     }
 }

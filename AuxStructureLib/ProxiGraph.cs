@@ -6,6 +6,8 @@ using ESRI.ArcGIS.Geometry;
 using AuxStructureLib;
 using System.IO;
 using ESRI.ArcGIS.Geodatabase;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace AuxStructureLib
 {
@@ -1150,7 +1152,7 @@ namespace AuxStructureLib
         }
 
         /// <summary>
-        /// 依据ID获取对应的建筑物
+        /// 依据ID获取对应的Circle
         /// </summary>
         /// <param name="PoList"></param>
         /// <param name="ID"></param>
@@ -1181,8 +1183,8 @@ namespace AuxStructureLib
         /// <summary>
         /// /// <summary>
         /// 删除较长的边(距离计算考虑了圆的半径)
-        /// </summary>
-        /// </summary>
+        /// </summary>EdgeList=邻近图的边
+        /// </summary>PoList=circles
         /// <param name="Td">边的阈值条件</param>
         public void DeleteLongerEdges(List<ProxiEdge> EdgeList,List<PolygonObject> PoList, double Td)
         {
@@ -1199,6 +1201,119 @@ namespace AuxStructureLib
                     EdgeList.RemoveAt(i);
                 }
             }
+        }
+
+        /// <summary>
+        /// 虽然不邻接，但是冲突的Circles
+        /// </summary>
+        /// <param name="PoList"></param>
+        public void PgRefined(List<PolygonObject> PoList)
+        {
+            for (int i = 0; i < PoList.Count-1; i++)
+            {
+                for (int j = i + 1; j < PoList.Count; j++)
+                {
+                    ProxiNode Node1 = this.NodeList[PoList[i].ID];
+                    ProxiNode Node2 = this.NodeList[PoList[j].ID];
+
+                    double EdgeDis = this.GetDis(Node1, Node2);
+                    double RSDis =PoList[i].R + PoList[j].R;
+
+                    if (EdgeDis < RSDis)
+                    {
+                        bool Label = false;
+                        foreach (ProxiEdge Pe in this.EdgeList)
+                        {
+                            if ((Pe.Node1 == Node1 && Pe.Node2 == Node2) ||
+                                (Pe.Node1 == Node2 && Pe.Node2 == Node1))
+                            {
+                                Label = true;
+                                break;
+                            }
+                        }
+
+                        if (!Label)
+                        {
+                            ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
+                            rPe.adajactLable = false;
+                            this.EdgeList.Add(rPe);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 深拷贝（通用拷贝）
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static object Clone(object obj)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(memoryStream, obj);
+            memoryStream.Position = 0;
+            return formatter.Deserialize(memoryStream);
+        }
+
+        /// <summary>
+        ///将邻近图中邻接的邻近图分组 
+        /// </summary>
+        /// <returns></returns>
+        public List<ProxiGraph> GetGroupPg()
+        {
+            ProxiGraph CopyPg = Clone((object)this) as ProxiGraph;
+            List<ProxiGraph> subPgList = new List<ProxiGraph>();
+
+            #region 求解过程
+            while (CopyPg.NodeList.Count > 0)
+            {
+                List<ProxiNode> NodeToContinue = new List<ProxiNode>();
+                NodeToContinue.Add(CopyPg.NodeList[0]);
+                ProxiGraph CachePg = new ProxiGraph();
+                while (NodeToContinue.Count > 0)
+                {
+                    if (!CachePg.NodeList.Contains(NodeToContinue[0]))
+                    {
+                        CachePg.NodeList.Add(NodeToContinue[0]);
+                    }
+
+                    for (int i = CopyPg.EdgeList.Count - 1; i >= 0;i-- )
+                    {
+                        ProxiEdge Pe = CopyPg.EdgeList[i];
+                        if (Pe.Node1.ID == NodeToContinue[0].ID)
+                        {
+                            if (!CachePg.NodeList.Contains(Pe.Node2))
+                            {
+                                CachePg.NodeList.Add(Pe.Node2);
+                                CachePg.EdgeList.Add(Pe);
+                                NodeToContinue.Add(Pe.Node2);
+                                CopyPg.EdgeList.Remove(Pe);
+                            }
+
+                        }
+                        else if (Pe.Node2.ID == NodeToContinue[0].ID)
+                        {
+                            if (!CachePg.NodeList.Contains(Pe.Node1))
+                            {
+                                CachePg.NodeList.Add(Pe.Node1);
+                                CachePg.EdgeList.Add(Pe);
+                                NodeToContinue.Add(Pe.Node1);
+                                CopyPg.EdgeList.Remove(Pe);
+                            }
+                        }
+                    }
+
+                    CopyPg.NodeList.Remove(NodeToContinue[0]);
+                    NodeToContinue.Remove(NodeToContinue[0]);                    
+                }
+
+                subPgList.Add(CachePg);
+            }
+            #endregion
+
+            return subPgList;
         }
     }
 }

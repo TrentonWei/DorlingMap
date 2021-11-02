@@ -58,7 +58,7 @@ namespace CartoGener
             { 
                 for (int i = 0; i < ValueList.Count; i++)
                 {
-                    double R = (((ValueList[i] - MinValue) / (MaxValue - MinValue)) * (MaxValue - MinValue) + MinR) * scale;
+                    double R = ((ValueList[i] - MinValue) / (MaxValue - MinValue) * (MaxR - MinR) + MinR) * scale;
                     RList.Add(R);
                 }
             }
@@ -88,7 +88,7 @@ namespace CartoGener
         /// <param name="scale"></param>
         /// <param name="RType"></param>
         /// <returns></returns>
-        public double GetAveCR(ProxiGraph pg, List<PolygonObject> PoList, List<double> ValueList, double MinR, double MaxR, double scale, int RType)
+        public double GetAveCR(ProxiGraph pg, List<double> ValueList, double MinR, double MaxR, double scale, int RType)
         {
             double AveCR = 0;
             int CCount = 0;
@@ -114,7 +114,7 @@ namespace CartoGener
                 ProxiNode Node2 = Pe.Node2;
 
                 double EdgeDis = DMS.GetDis(Node1, Node2);
-                double RSDis = DMS.GetObjectByID(PoList, Node1.ID).R + DMS.GetObjectByID(PoList, Node2.ID).R;
+                double RSDis = RList[Node1.ID] + RList[Node2.ID];
 
                 if (EdgeDis < RSDis)
                 {
@@ -139,13 +139,13 @@ namespace CartoGener
         /// <param name="scale"></param>
         /// <param name="RType"></param>
         /// <returns></returns>
-        public List<double> GetFinalListR(ProxiGraph pg, List<PolygonObject> PoList, List<double> ValueList, double MinR, double initialMaxR, double scale, int RType, double CCTd)
+        public List<double> GetFinalListR(ProxiGraph pg, List<double> ValueList, double MinR, double initialMaxR, double scale, int RType, double CCTd)
         {
-            double AveCR = this.GetAveCR(pg, PoList, ValueList, MinR, initialMaxR, scale, RType);
+            double AveCR = this.GetAveCR(pg, ValueList, MinR, initialMaxR, scale, RType);
             List<double> RList = this.GetR(ValueList, MinR, initialMaxR, scale, RType);//Return R
 
             #region 智能阻尼振荡过程
-            while (Math.Abs(AveCR - CCTd) < 0.01)
+            while (Math.Abs(AveCR - CCTd) < 0.001)
             {
 
                 if (AveCR > CCTd)
@@ -158,7 +158,7 @@ namespace CartoGener
                 }
 
                 RList = this.GetR(ValueList, MinR, initialMaxR, scale, RType);//Return R
-                AveCR = this.GetAveCR(pg, PoList, ValueList, MinR, initialMaxR, scale, RType);
+                AveCR = this.GetAveCR(pg, ValueList, MinR, initialMaxR, scale, RType);
 
             }
             #endregion
@@ -171,7 +171,7 @@ namespace CartoGener
         /// </summary>
         /// <param name="pFeatureClass"></param>
         /// <returns></returns>
-        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass,string ValueField,double MinR,double Rate,double scale, int RType)
+        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, string ValueField,double MinR,double MaxR,double scale, int RType)
         {
             int i = 0; 
             List<Circle> InitialCircleList = new List<Circle>();         
@@ -199,7 +199,52 @@ namespace CartoGener
             #endregion
 
             #region assign R for circles
-            List<double> RList=this.GetR(ValueList, MinR, Rate,scale, RType);
+            List<double> RList = this.GetR(ValueList, MinR, MaxR, scale, RType);
+           
+            for (int j = 0; j < InitialCircleList.Count; j++)
+            {
+                InitialCircleList[j].Radius = RList[j];
+            }
+            #endregion
+
+            return InitialCircleList;
+        }
+
+        /// <summary>
+        /// Get the initial Circles with R
+        /// </summary>
+        /// <param name="pFeatureClass"></param>
+        /// <returns></returns>
+        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, ProxiGraph Pg, string ValueField, double MinR, double MaxR, double scale, int RType,double CCTd)
+        {
+            int i = 0;
+            List<Circle> InitialCircleList = new List<Circle>();
+            List<double> ValueList = new List<double>();
+
+            #region Circles without R
+            IFeatureCursor pFeatureCursor = pFeatureClass.Update(null, true);
+            IFeature pFeature = pFeatureCursor.NextFeature();
+            while (pFeature != null)
+            {
+                Circle CacheCircle = new Circle(i);
+                double Value = DMS.GetValue(pFeature, ValueField);
+                ValueList.Add(Value);
+                CacheCircle.Value = Value;
+                CacheCircle.scale = scale;
+
+                IArea pArea = pFeature.Shape as IArea;
+                CacheCircle.CenterX = pArea.Centroid.X;
+                CacheCircle.CenterY = pArea.Centroid.Y;
+                InitialCircleList.Add(CacheCircle);
+
+                i++;
+                pFeature = pFeatureCursor.NextFeature();
+            }
+            #endregion
+
+            #region assign R for circles
+            List<double> RList = this.GetFinalListR(Pg, ValueList, MinR, MaxR, scale, RType, CCTd);
+
             for (int j = 0; j < InitialCircleList.Count; j++)
             {
                 InitialCircleList[j].Radius = RList[j];
@@ -268,7 +313,6 @@ namespace CartoGener
             return formatter.Deserialize(memoryStream);
         }
 
-
         /// <summary>
         /// Beams Displace
         /// </summary>
@@ -279,7 +323,7 @@ namespace CartoGener
         /// <param name="I">惯性力矩</param>
         /// <param name="A">横切面积</param>
         /// <param name="Iterations">迭代次数</param>
-        public void DorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations,int algType)
+        public void DorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations,int algType,double StopT)
         {
             AlgBeams algBeams = new AlgBeams(pg, pMap, E, I, A);
             //求吸引力-2014-3-20所用
@@ -292,7 +336,8 @@ namespace CartoGener
             {
                 Console.WriteLine(i.ToString());//标识
                           
-                algBeams.DoDisplacePgDorling(pMap);// 调用Beams算法 
+                algBeams.DoDisplacePgDorling(pMap,StopT);// 调用Beams算法 
+                pg.PgRefined(pMap.PolygonList);//每次处理完都需要更新Pg
                 if (algBeams.isContinue == false)
                 {
                     break;

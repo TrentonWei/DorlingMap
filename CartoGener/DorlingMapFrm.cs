@@ -38,6 +38,7 @@ namespace CartoGener
         string OutlocalFilePath, OutfileNameExt, OutFilePath;
         FeatureHandle pFeatureHandle = new FeatureHandle();
         DMClass DM = new DMClass();
+        DMSupport DMS = new DMSupport();
         #endregion
 
         /// <summary>
@@ -112,12 +113,11 @@ namespace CartoGener
             #region Get the initial Circles
             IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "OWNER_OCC", 0.1, 0.1, 1, 0);
-            #endregion
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiG(pFeatureClass);
 
-            #region Circles to polygonbjects in a map
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass,pg, "POPULATION", 0.1, 10, 1, 0,0.4);
             SMap Map = new SMap();
-            DM.pMapControl = pMapControl;
             List<PolygonObject> PoList=DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
             #endregion
@@ -145,6 +145,12 @@ namespace CartoGener
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph pg = new ProxiGraph();
             pg.CreateProxiG(pFeatureClass);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "POPULATION", 0.1, 10, 1, 0, 0.2);
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            pg.DeleteLongerEdges(pg.EdgeList, Map.PolygonList, 1.0);//删除长的边
+            pg.PgRefined(Map.PolygonList);
             if (OutFilePath != null) { pg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
         }
 
@@ -166,21 +172,64 @@ namespace CartoGener
             #region Get the initial Circles and Pg
             IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "OWNER_OCC", 0.1, 0.1, 1, 0);
-            SMap Map = new SMap();
             DM.pMapControl = pMapControl;
-            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
-            Map.PolygonList = PoList;
             ProxiGraph pg = new ProxiGraph();
             pg.CreateProxiG(pFeatureClass);
-            #endregion
 
-            #region Delete the longer edges
-            
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "POPULATION", 0.1, 10, 1, 0, 0.2);
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            pg.DeleteLongerEdges(pg.EdgeList, Map.PolygonList, 1.0);//删除长的边
+            List<ProxiGraph> PgList = pg.GetGroupPg();
             #endregion
 
             #region 移位
-            DM.DorlingBeams(pg, Map, 1, 1000, 1, 1, 100, 0);
+            SMap OutMap = new SMap();
+            for (int i = 0; i < PgList.Count; i++)
+            {
+                if (PgList[i].NodeList.Count > 1)
+                {
+                    SMap newMap = DMS.regulation(PgList[i], Map);
+                    DM.DorlingBeams(PgList[i], newMap, 1, 1000, 1, 1, 100, 0,0.000001);
+                    OutMap.PolygonList.AddRange(newMap.PolygonList);
+                }
+            }
+            OutMap.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+            #endregion
+        }
+
+        /// <summary>
+        /// 不分组移位
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button5_Click(object sender, EventArgs e)
+        {
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region Get the initial Circles and Pg
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            DM.pMapControl = pMapControl;
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiG(pFeatureClass);
+
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "POPULATION", 0.1, 10, 1, 0, 0.4);
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            pg.PgRefined(PoList);
+
+            SMap newMap = DMS.regulation(pg, Map);
+            DM.DorlingBeams(pg, newMap, 1, 1000, 1, 1, 100, 0, 0.000001);
+
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
             #endregion
         }

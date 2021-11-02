@@ -442,7 +442,7 @@ namespace AlgEMLib
                 PolygonObject Po1 = this.GetPoByID(sNode.TagID, PoList);
                 PolygonObject Po2 = this.GetPoByID(eNode.TagID, PoList);
 
-                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2, 1);//考虑引力
+                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2, 0);//考虑引力
 
                 if (ForceList.Count > 0)
                 {
@@ -602,6 +602,9 @@ namespace AlgEMLib
         /// Type=0,只考虑斥力；Type=1，既考虑引力，也考虑斥力
         public List<Force> GetForce(ProxiNode sNode,ProxiNode eNode,PolygonObject sPo1, PolygonObject ePo2,int Type)
         {
+            ProxiNode tNode1 = sPo1.CalProxiNode();
+            ProxiNode tNode2 = ePo2.CalProxiNode();
+
             double EdgeDis = this.GetDis(sNode, eNode);
             double RSDis = sPo1.R + ePo2.R;
             List<Force> ForceList = new List<Force>();
@@ -2221,7 +2224,7 @@ namespace AlgEMLib
                 return false;
 
             // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
-            this.ForceList = CreateForceVectorfrmGraph(PoList);
+            this.ForceList = CreateForceVectorfrmGraph(PoList);//ForceList
 
             if (MakeForceVectorfrmGraphNew())
                 return true;

@@ -128,6 +128,7 @@
             this.axTOCControl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axTOCControl1.OcxState")));
             this.axTOCControl1.Size = new System.Drawing.Size(397, 727);
             this.axTOCControl1.TabIndex = 13;
+            this.axTOCControl1.OnMouseDown += new AxESRI.ArcGIS.Controls.ITOCControlEvents_OnMouseDownEventHandler(this.axTOCControl1_OnMouseDown_1);
             // 
             // axToolbarControl1
             // 

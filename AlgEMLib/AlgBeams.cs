@@ -1162,14 +1162,14 @@ namespace AlgEMLib
         /// <summary>
         /// DorlingDisplace
         /// </summary>
-        public void DoDisplacePgDorling(SMap pMap)
+        public void DoDisplacePgDorling(SMap pMap,double StopT)
         {
             fV = new BeamsForceVector(this.ProxiGraph);
             //求吸引力-2014-3-20所用
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
-            fV.CreateForceVectorForDorling(pMap.PolygonList);
+            fV.CreateForceVectorForDorling(pMap.PolygonList);//ForceList
             this.F = fV.Vector_F;
 
             double MaxD;
@@ -1179,7 +1179,7 @@ namespace AlgEMLib
             int indexMaxD = -1;
             int indexMaxF = -1;
 
-            if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
+            if (this.ProxiGraph.NodeList.Count <= 2)
             {
                 //基本几何算法
                 this.D = new Matrix(this.ProxiGraph.NodeList.Count * 3, 1);
@@ -1238,9 +1238,9 @@ namespace AlgEMLib
                 UpdataCoordsforPGDorling();      //更新坐标
             }
 
-            this.OutputDisplacementandForces(fV.ForceList);
+            ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
 
-            if (MaxF <=  0.01)
+            if (MaxF <=  StopT)
             {
                 this.isContinue = false;
             }
@@ -1458,7 +1458,7 @@ namespace AlgEMLib
                         this.D[3 * index + 1, 0] = curDy;
                     }
                     //纠正拓扑错误
-                    curNode.X += curDx;
+                    curNode.X += curDx;//更新邻近图
                     curNode.Y += curDy;
 
                     foreach (TriNode curPoint in po.PointList)

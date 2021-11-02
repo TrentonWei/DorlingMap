@@ -98,6 +98,25 @@ namespace CartoGener
                 return;
             }
         }
+
+        private void axTOCControl1_OnMouseDown_1(object sender, AxESRI.ArcGIS.Controls.ITOCControlEvents_OnMouseDownEvent e)
+        {
+            if (axMapControl1.LayerCount > 0)
+            {
+                esriTOCControlItem pItem = new esriTOCControlItem();
+                //pLayer = new FeatureLayerClass();
+                IBasicMap pBasicMap = new MapClass();
+                object pOther = new object();
+                object pIndex = new object();
+                // Returns the item in the TOCControl at the specified coordinates.
+                axTOCControl1.HitTest(e.x, e.y, ref pItem, ref pBasicMap, ref pLayer, ref pOther, ref pIndex);
+            }
+
+            if (e.button == 2)
+            {
+                this.contextMenuStrip1.Show(axTOCControl1, e.x, e.y);
+            }
+        }
     }
 }
 
