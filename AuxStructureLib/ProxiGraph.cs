@@ -6,6 +6,7 @@ using ESRI.ArcGIS.Geometry;
 using AuxStructureLib;
 using System.IO;
 using ESRI.ArcGIS.Geodatabase;
+using ESRI.ArcGIS.esriSystem;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -326,6 +327,247 @@ namespace AuxStructureLib
             this.CreateNodesforPointandPolygon(map);
             this.CreateEdgesforPointandPolygon(skeleton);
             CreateNodesandPerpendicular_EdgesforPolyline_(map, skeleton);
+        }
+
+        /// <summary>
+        /// 创建点集的MST（最短距离）
+        /// </summary>
+        public void CreateMST(List<ProxiNode> PnList, List<ProxiEdge> PeList,List<PolygonObject> PoList)
+        {
+            #region 矩阵初始化
+            double[,] matrixGraph = new double[PnList.Count, PnList.Count];
+
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                for (int j = 0; j < PnList.Count; j++)
+                {
+                    matrixGraph[i, j] = -1;
+                }
+            }
+            #endregion
+
+            #region 矩阵赋值
+            //double MinV = 1000000;//矩阵最小值
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                ProxiNode Point1 = PnList[i];
+
+                for (int j = 0; j < PeList.Count; j++)
+                {
+                    ProxiEdge Edge1 = PeList[j];
+
+                    ProxiNode pPoint1 = Edge1.Node1;
+                    ProxiNode pPoint2 = Edge1.Node2;
+                    if (Point1.X == pPoint1.X && Point1.Y == pPoint1.Y)
+                    {
+                        for (int m = 0; m < PnList.Count; m++)
+                        {
+                            ProxiNode Point2 = PnList[m];
+
+                            if (Point2.X == pPoint2.X && Point2.Y == pPoint2.Y)
+                            {
+                                #region 计算两个圆之间的距离
+                                PolygonObject Po1 = this.GetObjectByID(PoList, pPoint1.TagID);
+                                PolygonObject Po2 = this.GetObjectByID(PoList, pPoint2.TagID);
+
+                                double EdgeDis = this.GetDis(pPoint1, pPoint2);
+                                double RSDis = Po1.R + Po2.R;
+                                #endregion
+
+                                matrixGraph[i, m] = matrixGraph[m, i] = EdgeDis - RSDis;
+                                //if (EdgeDis - RSDis < MinV)
+                                //{
+                                //    MinV = EdgeDis - RSDis;//获取矩阵最小值
+                                //}
+                            }
+                        }
+                    }
+                }
+            }
+
+            
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                for (int j = 0; j < PnList.Count; j++)
+                {
+                    if (matrixGraph[i, j] == -1 || matrixGraph[j, i] == -1)
+                    {
+                        matrixGraph[i, j] = matrixGraph[j, i] = 100000;
+                    }             
+                }
+            }
+            #endregion
+
+            #region MST计算
+            IArray LabelArray = new ArrayClass();//MST点集
+            IArray fLabelArray = new ArrayClass();
+            List<List<int>> EdgesGroup = new List<List<int>>();//MST边集
+
+            for (int F = 0; F < PnList.Count; F++)
+            {
+                fLabelArray.Add(F);
+            }
+
+            int LabelFirst = 0;//任意添加一个节点
+            LabelArray.Add(LabelFirst);
+            //int x = 0;
+            int LabelArrayNum;
+            do
+            {
+                LabelArrayNum = LabelArray.Count;
+                int fLabelArrayNum = fLabelArray.Count;
+                double MinDist = 100001;
+                List<int> Edge = new List<int>();
+
+                int EdgeLabel2 = -1;
+                int EdgeLabel1 = -1;
+                int Label = -1;
+
+                for (int i = 0; i < LabelArrayNum; i++)
+                {
+                    int p1 = (int)LabelArray.get_Element(i);
+
+                    for (int j = 0; j < fLabelArrayNum; j++)
+                    {
+                        int p2 = (int)fLabelArray.get_Element(j);
+
+                        if (matrixGraph[p1, p2] < MinDist)
+                        {
+                            MinDist = matrixGraph[p1, p2];
+                            EdgeLabel2 = p2;
+                            EdgeLabel1 = p1;
+                            Label = j;
+                        }
+                    }
+                }
+
+
+                //x++;
+                Edge.Add(EdgeLabel1);
+                Edge.Add(EdgeLabel2);
+                EdgesGroup.Add(Edge);
+
+                fLabelArray.Remove(Label);
+                LabelArray.Add(EdgeLabel2);
+
+            } while (LabelArrayNum < PnList.Count);
+            #endregion
+
+            #region 生成MST的nodes和Edges
+            int EdgesGroupNum = EdgesGroup.Count;
+            List<ProxiEdge> MSTEdgeList = new List<ProxiEdge>();
+
+            for (int i = 0; i < EdgesGroupNum; i++)
+            {
+                int m, n;
+                m = EdgesGroup[i][0];
+                n = EdgesGroup[i][1];
+
+                ProxiNode Pn1 = PnList[m];
+                ProxiNode Pn2 = PnList[n];
+
+                foreach (ProxiEdge Pe in PeList)
+                {
+                    if ((Pe.Node1.X == Pn1.X && Pe.Node2.X == Pn2.X) || (Pe.Node1.X == Pn2.X && Pe.Node2.X == Pn1.X))
+                    {
+                        if (!MSTEdgeList.Contains(Pe))
+                        {
+                            MSTEdgeList.Add(Pe);
+                            break;
+                        }
+                    }
+                }
+
+            }
+            #endregion
+
+            this.EdgeList = MSTEdgeList;
+        }
+
+        /// <summary>
+        /// 创建点集的RNG图（最短距离）
+        ///
+        ///RNG计算(找到邻近图中每一个三角形，删除三角形中的最长边)
+        ///说明：对于任意一条边，找到对应的三角形；如果是最长边，则删除（如果是一条边，保留；如果是两条边，若是最长边，删除）
+        /// </summary>
+        public void CreateRNG(List<ProxiNode> PnList, List<ProxiEdge> PeList, List<PolygonObject> PoList)
+        {
+            #region 找到潜在RNG对应的每条边，判断是否是邻近图中三角形对应的最长边，如果是，删除
+            for (int i = this.EdgeList.Count - 1; i >= 0; i--)
+            {
+                #region Dis For EdgeList[i]
+                ProxiEdge Edge1 = this.EdgeList[i];
+
+                ProxiNode pPoint1 = Edge1.Node1;
+                ProxiNode pPoint2 = Edge1.Node2;
+
+                PolygonObject Po1 = this.GetObjectByID(PoList, pPoint1.TagID);
+                PolygonObject Po2 = this.GetObjectByID(PoList, pPoint2.TagID);
+
+                double EdgeDis = this.GetDis(pPoint1, pPoint2);
+                double RSDis = Po1.R + Po2.R;
+
+                double CacheDis = EdgeDis - RSDis;
+                #endregion
+
+                #region 判断边是否为三角形对应的最长边
+                for (int j = 0; j < PnList.Count; j++)
+                {
+                    bool Label1 = false; bool Label2 = false;
+                    double Distance1 = 0; double Distance2 = 0;
+                    ProxiNode mPn = PnList[j];
+                    if (mPn.X != pPoint1.X && mPn.X != pPoint2.X)
+                    {
+                        for (int m = 0; m < PeList.Count; m++)
+                        {
+                            #region mPn与pPoint1是否为边
+                            if ((mPn.TagID == PeList[m].Node1.TagID && pPoint1.TagID == PeList[m].Node2.TagID) || mPn.TagID == PeList[m].Node2.TagID && pPoint1.TagID == PeList[m].Node1.TagID)
+                            {
+                                Label1 = true;
+
+                                ProxiEdge CacheEdge1 = this.EdgeList[m];
+                                ProxiNode CachepPoint1 = CacheEdge1.Node1;
+                                ProxiNode CachepPoint2 = CacheEdge1.Node2;
+                                PolygonObject CachePo1 = this.GetObjectByID(PoList, CacheEdge1.Node1.TagID);
+                                PolygonObject CachePo2 = this.GetObjectByID(PoList, CacheEdge1.Node2.TagID);
+
+                                double CacheEdgeDis = this.GetDis(CachepPoint1, CachepPoint2);
+                                double CacheRSDis = CachePo1.R + CachePo2.R;
+                                Distance1 = CacheEdgeDis - CacheRSDis;
+                            }
+                            #endregion
+
+                            #region mPn与Pn2是否为边
+                            if ((mPn.TagID == PeList[m].Node1.TagID && pPoint2.TagID == PeList[m].Node2.TagID) || mPn.TagID == PeList[m].Node2.TagID && pPoint2.TagID == PeList[m].Node1.TagID)
+                            {
+                                Label2 = true;
+
+                                ProxiEdge CacheEdge1 = this.EdgeList[m];
+                                ProxiNode CachepPoint1 = CacheEdge1.Node1;
+                                ProxiNode CachepPoint2 = CacheEdge1.Node2;
+                                PolygonObject CachePo1 = this.GetObjectByID(PoList, CacheEdge1.Node1.TagID);
+                                PolygonObject CachePo2 = this.GetObjectByID(PoList, CacheEdge1.Node2.TagID);
+
+                                double CacheEdgeDis = this.GetDis(CachepPoint1, CachepPoint2);
+                                double CacheRSDis = CachePo1.R + CachePo2.R;
+                                Distance2 = CacheEdgeDis - CacheRSDis;
+                            }
+                            #endregion
+                        }
+                    }
+
+                    if (Label1 && Label2)
+                    {
+                        if (CacheDis > Distance1 && CacheDis > Distance2)
+                        {
+                            this.EdgeList.Remove(Edge1);
+                            break;
+                        }
+                    }
+                }
+                #endregion
+            }
+            #endregion
         }
 
 

@@ -1161,15 +1161,16 @@ namespace AlgEMLib
 
         /// <summary>
         /// DorlingDisplace
+        /// MaxTd 吸力的作用范围
         /// </summary>
-        public void DoDisplacePgDorling(SMap pMap,double StopT)
+        public void DoDisplacePgDorling(SMap pMap, double StopT,double MaxTd,int ForceType,bool WeightConsi)
         {
             fV = new BeamsForceVector(this.ProxiGraph);
             //求吸引力-2014-3-20所用
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
-            fV.CreateForceVectorForDorling(pMap.PolygonList);//ForceList
+            fV.CreateForceVectorForDorling(pMap.PolygonList,MaxTd,ForceType,WeightConsi);//ForceList
             this.F = fV.Vector_F;
 
             double MaxD;
@@ -1181,21 +1182,31 @@ namespace AlgEMLib
 
             if (this.ProxiGraph.NodeList.Count <= 2)
             {
-                //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 3, 1);
+                #region 基本几何算法（直接移位）
+                BeamsForceVector BFV = new BeamsForceVector();
+                PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, pMap.PolygonList);
+                PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, pMap.PolygonList);
+                List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, MaxTd, WeightConsi);//考虑引力
+                #endregion
 
-                this.UpdataCoordsforPGDorling(); 
+                #region 更新坐标
+                for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
+                {
+                    ProxiNode curNode = this.ProxiGraph.NodeList[i];
+                    curNode.X += ForceList[i].Fx;//更新邻近图
+                    curNode.Y += ForceList[i].Fy;
 
-                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
-                if (MaxF > 0)
-                {
-                    this.isContinue = true;
+                    PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
+                    foreach (TriNode curPoint in po.PointList)
+                    {
+                        curPoint.X += ForceList[i].Fx;
+                        curPoint.Y += ForceList[i].Fy;
+                    }
                 }
-                else
-                {
-                    this.isContinue = false;
-                    return;
-                }
+                #endregion
+
+                MaxF = 0;
+                this.isContinue = false;
             }
             else
             {
@@ -1204,8 +1215,15 @@ namespace AlgEMLib
                 this.K = bM.Matrix_K;
 
                 this.SetBoundPointParamforPG();//设置边界条件
-
-                this.D = this.K.Inverse() * this.F;
+                try
+                {
+                    this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                }
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
 
 
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
@@ -1227,7 +1245,15 @@ namespace AlgEMLib
                     bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
                     this.K = bM.Matrix_K;
                     SetBoundPointParamforPG();//设置边界条件
-                    this.D = this.K.Inverse() * this.F;
+                    try
+                    {
+                        this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                    }
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
                 }
                 else
                 {
@@ -1240,7 +1266,7 @@ namespace AlgEMLib
 
             ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
 
-            if (MaxF <=  StopT)
+            if (MaxF <= StopT)
             {
                 this.isContinue = false;
             }

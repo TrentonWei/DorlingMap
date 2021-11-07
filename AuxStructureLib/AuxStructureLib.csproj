@@ -342,7 +342,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
     <COMReference Include="esriSystemUI">
       <Guid>{4ECCA6E2-B16B-4ACA-BD17-E74CAE4C150A}</Guid>

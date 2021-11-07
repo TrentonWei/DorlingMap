@@ -45,7 +45,7 @@ namespace CartoGener
         /// <param name="ValueList"></param>
         /// <param name="MinR"></param>
         /// <param name="Rate"></param>a unit for 100
-        /// <param name="RType">=0 linear R</param>=1 SinR
+        /// <param name="RType">=0 linear R</param>=1 SinR；=2 sqrt
         /// <returns></returns>
         public List<Double> GetR(List<double> ValueList,double MinR,double MaxR, double scale,int RType)
         {
@@ -69,7 +69,16 @@ namespace CartoGener
             {
                 for (int i = 0; i < ValueList.Count; i++)
                 {
-                    double R = (Math.Sin((ValueList[i] - MinValue) / (MaxValue - MinValue)) * (MaxR - MinR) + MinR) * scale;
+                    double R = (Math.Sin(((ValueList[i] - MinValue) / (MaxValue - MinValue)) * Math.PI / 2) * (MaxR - MinR) + MinR) * scale;
+                    RList.Add(R);
+                }
+            }
+            else if (RType == 2)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = (Math.Sqrt(((ValueList[i] - MinValue) / (MaxValue - MinValue)) * Math.PI / 2) * (MaxR - MinR) + MinR) * scale;
+                    RList.Add(R);
                 }
             }
             #endregion 
@@ -87,44 +96,81 @@ namespace CartoGener
         /// <param name="MaxR"></param>
         /// <param name="scale"></param>
         /// <param name="RType"></param>
+        /// Percent=取前百分比的类别
         /// <returns></returns>
-        public double GetAveCR(ProxiGraph pg, List<double> ValueList, double MinR, double MaxR, double scale, int RType)
+        public double GetAveCR(ProxiGraph pg, List<double> ValueList, double MinR, double MaxR, double scale, int RType,int AveType,double Percent)
         {
             double AveCR = 0;
             int CCount = 0;
             double CCSumDis = 0;
-
-            #region GetTheRList
-            List<double> RList = new List<double>();//R
-
-            if (RType == 0)
-            {
-                RList = this.GetR(ValueList, MinR, MaxR, scale, RType);
-            }
-            else if (RType == 1)
-            {
-                RList = this.GetR(ValueList, MinR, MaxR, scale, RType);
-            }
-            #endregion
+            List<double> RList = this.GetR(ValueList, MinR, MaxR, scale, RType);
 
             #region Compute the AveCR
-            foreach (ProxiEdge Pe in pg.EdgeList)
+            if (AveType == 0)//冲突点的阈值
             {
-                ProxiNode Node1 = Pe.Node1;
-                ProxiNode Node2 = Pe.Node2;
-
-                double EdgeDis = DMS.GetDis(Node1, Node2);
-                double RSDis = RList[Node1.ID] + RList[Node2.ID];
-
-                if (EdgeDis < RSDis)
+                for (int i = 0; i < pg.NodeList.Count - 1; i++)
                 {
-                    CCount++;
-                    CCSumDis = (RSDis - EdgeDis) + CCSumDis;
+                    for (int j = i + 1; j < pg.NodeList.Count; j++)
+                    {
+                        double EdgeDis = DMS.GetDis(pg.NodeList[i], pg.NodeList[j]);
+                        double RSDis = RList[pg.NodeList[i].ID] + RList[pg.NodeList[j].ID];
+
+                        if (EdgeDis < RSDis)
+                        {
+                            CCount++;
+                            CCSumDis = (RSDis - EdgeDis) + CCSumDis;
+                        }
+                    }
                 }
             }
-            #endregion
 
-            AveCR = CCSumDis / CCount;
+            else if (AveType == 1)//冲突边的阈值
+            {
+                foreach (ProxiEdge Pe in pg.EdgeList)
+                {
+                    ProxiNode Node1 = Pe.Node1;
+                    ProxiNode Node2 = Pe.Node2;
+
+                    double EdgeDis = DMS.GetDis(Node1, Node2);
+                    double RSDis = RList[Node1.ID] + RList[Node2.ID];
+
+                    if (EdgeDis < RSDis)
+                    {
+                        CCount++;
+                        CCSumDis = (RSDis - EdgeDis) + CCSumDis;
+                    }
+                }
+            }
+
+            else if (AveType == 2)//前n%的平均值
+            {
+                List<double> DisList = new List<double>();
+                foreach (ProxiEdge Pe in pg.EdgeList)
+                {
+                    ProxiNode Node1 = Pe.Node1;
+                    ProxiNode Node2 = Pe.Node2;
+
+                    double EdgeDis = DMS.GetDis(Node1, Node2);
+                    double RSDis = RList[Node1.ID] + RList[Node2.ID];
+
+                    double KDis = RSDis - EdgeDis;
+                    if (KDis < 0)
+                    {
+                        KDis = 0;
+                    }
+
+                    DisList.Add(KDis);
+                }
+                List<double> largerList = DisList.Take(Convert.ToInt16(Math.Ceiling(DisList.Count * Percent))).ToList<double>();
+                CCSumDis = largerList.Sum();
+                CCount = largerList.Count;
+            }
+            #endregion
+            if (CCount > 0)
+            {
+                return AveCR = CCSumDis / CCount;
+            }
+
             return AveCR;
         }
 
@@ -139,13 +185,13 @@ namespace CartoGener
         /// <param name="scale"></param>
         /// <param name="RType"></param>
         /// <returns></returns>
-        public List<double> GetFinalListR(ProxiGraph pg, List<double> ValueList, double MinR, double initialMaxR, double scale, int RType, double CCTd)
+        public List<double> GetFinalListR(ProxiGraph pg, List<double> ValueList, double MinR, double initialMaxR, double scale, int RType, double CCTd,double Percent)
         {
-            double AveCR = this.GetAveCR(pg, ValueList, MinR, initialMaxR, scale, RType);
+            double AveCR = this.GetAveCR(pg, ValueList, MinR, initialMaxR, scale, RType, 2, Percent);
             List<double> RList = this.GetR(ValueList, MinR, initialMaxR, scale, RType);//Return R
 
             #region 智能阻尼振荡过程
-            while (Math.Abs(AveCR - CCTd) < 0.001)
+            while(Math.Abs(AveCR - CCTd) > 0.001)
             {
 
                 if (AveCR > CCTd)
@@ -158,8 +204,7 @@ namespace CartoGener
                 }
 
                 RList = this.GetR(ValueList, MinR, initialMaxR, scale, RType);//Return R
-                AveCR = this.GetAveCR(pg, ValueList, MinR, initialMaxR, scale, RType);
-
+                AveCR = this.GetAveCR(pg, ValueList, MinR, initialMaxR, scale, RType, 2,Percent);
             }
             #endregion
 
@@ -215,7 +260,7 @@ namespace CartoGener
         /// </summary>
         /// <param name="pFeatureClass"></param>
         /// <returns></returns>
-        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, ProxiGraph Pg, string ValueField, double MinR, double MaxR, double scale, int RType,double CCTd)
+        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, ProxiGraph Pg, string ValueField, double MinR, double MaxR, double scale, int RType,double CCTd,double Percent)
         {
             int i = 0;
             List<Circle> InitialCircleList = new List<Circle>();
@@ -243,7 +288,7 @@ namespace CartoGener
             #endregion
 
             #region assign R for circles
-            List<double> RList = this.GetFinalListR(Pg, ValueList, MinR, MaxR, scale, RType, CCTd);
+            List<double> RList = this.GetFinalListR(Pg, ValueList, MinR, MaxR, scale, RType, CCTd,Percent);
 
             for (int j = 0; j < InitialCircleList.Count; j++)
             {
@@ -323,7 +368,7 @@ namespace CartoGener
         /// <param name="I">惯性力矩</param>
         /// <param name="A">横切面积</param>
         /// <param name="Iterations">迭代次数</param>
-        public void DorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations,int algType,double StopT)
+        public void DorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations,int algType,double StopT,double MaxTd,int ForceType,bool WeightConsi)
         {
             AlgBeams algBeams = new AlgBeams(pg, pMap, E, I, A);
             //求吸引力-2014-3-20所用
@@ -336,7 +381,7 @@ namespace CartoGener
             {
                 Console.WriteLine(i.ToString());//标识
                           
-                algBeams.DoDisplacePgDorling(pMap,StopT);// 调用Beams算法 
+                algBeams.DoDisplacePgDorling(pMap,StopT,MaxTd,ForceType,WeightConsi);// 调用Beams算法 
                 pg.PgRefined(pMap.PolygonList);//每次处理完都需要更新Pg
                 if (algBeams.isContinue == false)
                 {

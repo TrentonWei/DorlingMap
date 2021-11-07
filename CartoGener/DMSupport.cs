@@ -289,9 +289,11 @@ namespace CartoGener
             {
                 foreach (PolygonObject Po in pMap.PolygonList)
                 {
-                    if (Po.ID == Pn.TagID)
+                    if (Po.ID == Pn.TagID && !PoList.Contains(Po))
                     {
-                        PoList.Add(Po);
+                        PolygonObject CachePo = new PolygonObject(PoList.Count, Po.PointList);
+                        CachePo.R = Po.R;
+                        PoList.Add(CachePo);
                     }
                 }
             }
@@ -302,7 +304,6 @@ namespace CartoGener
             {
                 Pg.NodeList[i].ID = i;
                 Pg.NodeList[i].TagID = i;
-                PoList[i].ID = i;
             }
             #endregion
 
