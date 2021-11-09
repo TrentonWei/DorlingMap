@@ -1382,6 +1382,107 @@ namespace AuxStructureLib
         }
 
         /// <summary>
+        /// 创建ProxiG
+        /// </summary>
+        /// <param name="pFeatureClass">原始图层</param>
+        public void CreateProxiGByDT(IFeatureClass pFeatureClass)
+        {
+            #region Create ProxiNodes
+            List<TriNode> TriNodeList = new List<TriNode>();
+            for (int i = 0; i < pFeatureClass.FeatureCount(null); i++)
+            {
+                IArea pArea = pFeatureClass.GetFeature(i).Shape as IArea;
+                ProxiNode CacheNode = new ProxiNode(pArea.Centroid.X, pArea.Centroid.Y, i, i);
+                TriNode CacheTriNode = new TriNode(pArea.Centroid.X, pArea.Centroid.Y, i, i);
+                this.NodeList.Add(CacheNode);
+                TriNodeList.Add(CacheTriNode);
+            }
+            #endregion
+
+            #region Create ProxiEdges
+            DelaunayTin dt = new DelaunayTin(TriNodeList);
+            dt.CreateDelaunayTin(AlgDelaunayType.Side_extent);
+
+            int TestCount = 0;
+            for (int i = 0; i < dt.TriEdgeList.Count; i++)
+            {
+                TriEdge tE = dt.TriEdgeList[i];
+                if (!this.repeatEdge(tE, this.EdgeList))
+                {
+
+                    int edgeID = 0;
+
+                    IGeometry iGeo = pFeatureClass.GetFeature(tE.startPoint.TagValue).Shape;
+                    IGeometry jGeo = pFeatureClass.GetFeature(tE.endPoint.TagValue).Shape;
+
+                    IRelationalOperator iRo = iGeo as IRelationalOperator;
+                    if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
+                    {
+                        ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[tE.startPoint.TagValue], this.NodeList[tE.endPoint.TagValue]);
+                        CacheEdge.adajactLable = true;
+                        this.EdgeList.Add(CacheEdge);
+                        TestCount++;
+                        edgeID++;
+                    }
+
+                    else
+                    {
+                        ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[tE.startPoint.TagValue], this.NodeList[tE.endPoint.TagValue]);
+                        CacheEdge.adajactLable = false;
+                        this.EdgeList.Add(CacheEdge);
+                        edgeID++;
+                    }
+                }
+            }
+
+            int Testloc = 0;
+            #endregion
+        }
+         
+        /// <summary>
+        /// 判断给定的边是否是当前邻近图中的重复边
+        /// </summary>
+        /// <param name="Pe"></param>
+        /// <param name="EdgeList"></param>
+        public bool repeatEdge(ProxiEdge Pe,List<ProxiEdge> EdgeList)
+        {
+            bool repeatLabel = false;
+            foreach(ProxiEdge CachePe in EdgeList)
+            {
+                if((CachePe.Node1.TagID==Pe.Node1.TagID && CachePe.Node2.TagID==Pe.Node2.TagID)||
+                    (CachePe.Node1.TagID==Pe.Node2.TagID && CachePe.Node2.TagID==Pe.Node1.TagID))
+                {
+                    repeatLabel = true;
+                    break;
+                }
+            }
+
+            return repeatLabel;
+        }
+
+        /// <summary>
+        /// 判断给定的边是否是当前邻近图中的重复边
+        /// </summary>
+        /// <param name="Pe"></param>
+        /// <param name="EdgeList"></param>
+        /// true 重复；False不重复
+        public bool repeatEdge(TriEdge tP, List<ProxiEdge> EdgeList)
+        {
+            bool repeatLabel = false;
+            foreach (ProxiEdge CachePe in EdgeList)
+            {
+                if ((CachePe.Node1.TagID == tP.startPoint.TagValue && CachePe.Node2.TagID == tP.endPoint.TagValue) ||
+                    (CachePe.Node1.TagID == tP.endPoint.TagValue && CachePe.Node2.TagID == tP.startPoint.TagValue))
+                {
+                    repeatLabel = true;
+                    break;
+                }
+            }
+
+            return repeatLabel;
+        }
+
+        /// <summary>
         /// 计算两个点的距离
         /// </summary>
         /// <param name="Node1"></param>
@@ -1463,23 +1564,12 @@ namespace AuxStructureLib
 
                     if (EdgeDis < RSDis)
                     {
-                        bool Label = false;
-                        foreach (ProxiEdge Pe in this.EdgeList)
-                        {
-                            if ((Pe.Node1 == Node1 && Pe.Node2 == Node2) ||
-                                (Pe.Node1 == Node2 && Pe.Node2 == Node1))
-                            {
-                                Label = true;
-                                break;
-                            }
-                        }
 
-                        if (!Label)
+                        ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
+                        if (!this.repeatEdge(rPe, this.EdgeList))
                         {
-                            ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
-                            rPe.adajactLable = false;
                             this.EdgeList.Add(rPe);
-                        }
+                        }                     
                     }
                 }
             }

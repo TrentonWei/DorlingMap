@@ -661,14 +661,16 @@ namespace AlgEMLib
                 double fx = 0.5 * curForce * c;
                 double fy = 0.5 * curForce * s;
 
-                if (ForceType == 1 && Adj && !WeigthConsi)
+                //if (ForceType == 1 && Adj && !WeigthConsi)
+                if (ForceType == 1 && !WeigthConsi)
                 {
                     Force eForce = new Force(eNode.ID, fx * (-1), fy * (-1), s * (-1), c * (-1), curForce * 0.5);
                     Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce * 0.5);
                     ForceList.Add(sForce);
                     ForceList.Add(eForce);
                 }
-                else if (ForceType == 1 && Adj && WeigthConsi)
+                //else if (ForceType == 1 && Adj && WeigthConsi)
+                else if (ForceType == 1 && WeigthConsi)
                 {
                     double w1 = ePo2.R / RSDis; double w2 = sPo1.R / RSDis;
 

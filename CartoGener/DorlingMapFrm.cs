@@ -144,15 +144,20 @@ namespace CartoGener
             IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph pg = new ProxiGraph();
-            pg.CreateProxiG(pFeatureClass);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "POPULATION", 1, 50, 1, 1, 0.01,0.1);
+            pg.CreateProxiGByDT(pFeatureClass);
+
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", 1, 50, 1, 1, 0.01,0.1);
+
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
             //pg.DeleteLongerEdges(pg.EdgeList, Map.PolygonList, 25);//删除长的边
             //pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
-            pg.CreateRNG(pg.NodeList, pg.EdgeList, PoList);
+            //pg.CreateRNG(pg.NodeList, pg.EdgeList, PoList);
             pg.PgRefined(Map.PolygonList);
+            pg.DeleteLongerEdges(pg.EdgeList, Map.PolygonList, 25);//删除长的边
             if (OutFilePath != null) { pg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
         }
 
@@ -174,17 +179,21 @@ namespace CartoGener
             #region Get the initial Circles and Pg
             IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
-            DM.pMapControl = pMapControl;
             ProxiGraph pg = new ProxiGraph();
-            pg.CreateProxiG(pFeatureClass);
+            pg.CreateProxiGByDT(pFeatureClass);
 
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "POPULATION", 1.0, 50, 1, 1, 0.1, 0.05);
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", 1, 50, 1, 1, 0.01, 0.1);
+
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
+            //pg.DeleteLongerEdges(pg.EdgeList, Map.PolygonList, 25);//删除长的边
+            //pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
             pg.CreateRNG(pg.NodeList, pg.EdgeList, PoList);
             pg.PgRefined(Map.PolygonList);
-            //pg.DeleteLongerEdges(pg.EdgeList, Map.PolygonList, 25);//删除长的边
+            pg.DeleteLongerEdges(pg.EdgeList, Map.PolygonList, 25);//删除长的边
             List<ProxiGraph> PgList = pg.GetGroupPg();
             #endregion
 

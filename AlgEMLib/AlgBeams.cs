@@ -1192,15 +1192,27 @@ namespace AlgEMLib
                 #region 更新坐标
                 for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
                 {
-                    ProxiNode curNode = this.ProxiGraph.NodeList[i];
-                    curNode.X += ForceList[i].Fx;//更新邻近图
-                    curNode.Y += ForceList[i].Fy;
+                    int Cachei = -1;
+
+                    if (i == 0)
+                    {
+                        Cachei = 1;
+
+                    }
+                    else
+                    {
+                        Cachei = 0;
+                    }
+
+                    ProxiNode curNode = this.ProxiGraph.NodeList[Cachei];
+                    curNode.X += ForceList[Cachei].Fx;//更新邻近图
+                    curNode.Y += ForceList[Cachei].Fy;
 
                     PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
                     foreach (TriNode curPoint in po.PointList)
                     {
-                        curPoint.X += ForceList[i].Fx;
-                        curPoint.Y += ForceList[i].Fy;
+                        curPoint.X += ForceList[Cachei].Fx;
+                        curPoint.Y += ForceList[Cachei].Fy;
                     }
                 }
                 #endregion
@@ -1208,6 +1220,7 @@ namespace AlgEMLib
                 MaxF = 0;
                 this.isContinue = false;
             }
+
             else
             {
                 //计算刚度矩阵
