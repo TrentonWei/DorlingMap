@@ -38,6 +38,10 @@ namespace AuxStructureLib
         /// 多变形的个数字段
         /// </summary>
         private int polygonCount = -1;
+        /// <summary>
+        /// 边列表
+        /// </summary>
+        public List<ProxiEdge> MSTEdgeList = null;
 
         /// <summary>
         /// 多边形个数属性
@@ -485,6 +489,161 @@ namespace AuxStructureLib
         }
 
         /// <summary>
+        /// 创建点集的MST（最短距离）
+        /// </summary>
+        public void CreateMSTRevise(List<ProxiNode> PnList, List<ProxiEdge> PeList, List<PolygonObject> PoList)
+        {
+            #region 矩阵初始化
+            double[,] matrixGraph = new double[PnList.Count, PnList.Count];
+
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                for (int j = 0; j < PnList.Count; j++)
+                {
+                    matrixGraph[i, j] = -1;
+                }
+            }
+            #endregion
+
+            #region 矩阵赋值
+            //double MinV = 1000000;//矩阵最小值
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                ProxiNode Point1 = PnList[i];
+
+                for (int j = 0; j < PeList.Count; j++)
+                {
+                    ProxiEdge Edge1 = PeList[j];
+
+                    ProxiNode pPoint1 = Edge1.Node1;
+                    ProxiNode pPoint2 = Edge1.Node2;
+                    if (Point1.X == pPoint1.X && Point1.Y == pPoint1.Y)
+                    {
+                        for (int m = 0; m < PnList.Count; m++)
+                        {
+                            ProxiNode Point2 = PnList[m];
+
+                            if (Point2.X == pPoint2.X && Point2.Y == pPoint2.Y)
+                            {
+                                #region 计算两个圆之间的距离
+                                PolygonObject Po1 = this.GetObjectByID(PoList, pPoint1.TagID);
+                                PolygonObject Po2 = this.GetObjectByID(PoList, pPoint2.TagID);
+
+                                double EdgeDis = this.GetDis(pPoint1, pPoint2);
+                                double RSDis = Po1.R + Po2.R;
+                                #endregion
+
+                                matrixGraph[i, m] = matrixGraph[m, i] = EdgeDis - RSDis;
+                                //if (EdgeDis - RSDis < MinV)
+                                //{
+                                //    MinV = EdgeDis - RSDis;//获取矩阵最小值
+                                //}
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                for (int j = 0; j < PnList.Count; j++)
+                {
+                    if (matrixGraph[i, j] == -1 || matrixGraph[j, i] == -1)
+                    {
+                        matrixGraph[i, j] = matrixGraph[j, i] = 100000;
+                    }
+                }
+            }
+            #endregion
+
+            #region MST计算
+            IArray LabelArray = new ArrayClass();//MST点集
+            IArray fLabelArray = new ArrayClass();
+            List<List<int>> EdgesGroup = new List<List<int>>();//MST边集
+
+            for (int F = 0; F < PnList.Count; F++)
+            {
+                fLabelArray.Add(F);
+            }
+
+            int LabelFirst = 0;//任意添加一个节点
+            LabelArray.Add(LabelFirst);
+            //int x = 0;
+            int LabelArrayNum;
+            do
+            {
+                LabelArrayNum = LabelArray.Count;
+                int fLabelArrayNum = fLabelArray.Count;
+                double MinDist = 100001;
+                List<int> Edge = new List<int>();
+
+                int EdgeLabel2 = -1;
+                int EdgeLabel1 = -1;
+                int Label = -1;
+
+                for (int i = 0; i < LabelArrayNum; i++)
+                {
+                    int p1 = (int)LabelArray.get_Element(i);
+
+                    for (int j = 0; j < fLabelArrayNum; j++)
+                    {
+                        int p2 = (int)fLabelArray.get_Element(j);
+
+                        if (matrixGraph[p1, p2] < MinDist)
+                        {
+                            MinDist = matrixGraph[p1, p2];
+                            EdgeLabel2 = p2;
+                            EdgeLabel1 = p1;
+                            Label = j;
+                        }
+                    }
+                }
+
+
+                //x++;
+                Edge.Add(EdgeLabel1);
+                Edge.Add(EdgeLabel2);
+                EdgesGroup.Add(Edge);
+
+                fLabelArray.Remove(Label);
+                LabelArray.Add(EdgeLabel2);
+
+            } while (LabelArrayNum < PnList.Count);
+            #endregion
+
+            #region 生成MST的nodes和Edges
+            int EdgesGroupNum = EdgesGroup.Count;
+            List<ProxiEdge> MSTEdgeList = new List<ProxiEdge>();
+
+            for (int i = 0; i < EdgesGroupNum; i++)
+            {
+                int m, n;
+                m = EdgesGroup[i][0];
+                n = EdgesGroup[i][1];
+
+                ProxiNode Pn1 = PnList[m];
+                ProxiNode Pn2 = PnList[n];
+
+                foreach (ProxiEdge Pe in PeList)
+                {
+                    if ((Pe.Node1.X == Pn1.X && Pe.Node2.X == Pn2.X) || (Pe.Node1.X == Pn2.X && Pe.Node2.X == Pn1.X))
+                    {
+                        if (!MSTEdgeList.Contains(Pe))
+                        {
+                            MSTEdgeList.Add(Pe);
+                            break;
+                        }
+                    }
+                }
+
+            }
+            #endregion
+
+            this.MSTEdgeList = MSTEdgeList;
+        }
+
+        /// <summary>
         /// 创建点集的RNG图（最短距离）
         ///
         ///RNG计算(找到邻近图中每一个三角形，删除三角形中的最长边)
@@ -570,7 +729,6 @@ namespace AuxStructureLib
             #endregion
         }
 
-
         /// <summary>
         /// 从骨架线构造邻近图
         /// </summary>
@@ -625,7 +783,6 @@ namespace AuxStructureLib
             }
             return false;
         }
-
 
         /// <summary>
         /// 添加点与线、面与线的邻近边和线上的邻近点（仅仅加入与街道垂直的邻近边）
@@ -1073,7 +1230,6 @@ namespace AuxStructureLib
 
         }
 
-
         /// <summary>
         /// 就算边的权重
         /// </summary>
@@ -1084,6 +1240,7 @@ namespace AuxStructureLib
                 edge.Weight = edge.NearestEdge.NearestDistance;
             }
         }
+
         /// <summary>
         /// 从最小外接矩形中获取相似性信息
         /// </summary>
@@ -1307,6 +1464,7 @@ namespace AuxStructureLib
                 }
             }
         }
+
         /// <summary>
         /// 化简边
         /// </summary>
@@ -1344,10 +1502,11 @@ namespace AuxStructureLib
         }
 
         /// <summary>
-        /// 创建ProxiG
+        /// 创建ProxiG （依据拓扑关系创建邻近图）
+        /// Td表示邻接的参数
         /// </summary>
         /// <param name="pFeatureClass">原始图层</param>
-        public void CreateProxiG(IFeatureClass pFeatureClass)
+        public void CreateProxiG(IFeatureClass pFeatureClass,double Td)
         {
             #region Create ProxiNodes
             for (int i = 0; i < pFeatureClass.FeatureCount(null); i++)
@@ -1372,8 +1531,16 @@ namespace AuxStructureLib
                         IRelationalOperator iRo = iGeo as IRelationalOperator;
                         if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
                         {
-                            ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
-                            this.EdgeList.Add(CacheEdge);
+                            ITopologicalOperator iTo = iGeo as ITopologicalOperator;
+                            IGeometry pGeo = iTo.Intersect(jGeo, esriGeometryDimension.esriGeometry1Dimension) as IGeometry;
+                            IPolyline pPolyline = pGeo as IPolyline;
+
+                            IPolygon iPo=iGeo as IPolygon;IPolygon jPo=jGeo as IPolygon;
+                            if (pPolyline.Length / iPo.Length > Td || pPolyline.Length / jPo.Length > Td)
+                            {
+                                ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
+                                this.EdgeList.Add(CacheEdge);
+                            }
                         }
                     }
                 }
@@ -1402,16 +1569,89 @@ namespace AuxStructureLib
             #region Create ProxiEdges
             DelaunayTin dt = new DelaunayTin(TriNodeList);
             dt.CreateDelaunayTin(AlgDelaunayType.Side_extent);
+                     
+            int edgeID = 0;
+            for (int i = 0; i < dt.TriEdgeList.Count; i++)
+            {
+                TriEdge tE = dt.TriEdgeList[i];
+                
+                if (!this.repeatEdge(tE, this.EdgeList))
+                {                    
+                    ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[tE.startPoint.TagValue], this.NodeList[tE.endPoint.TagValue]);
+                    //CacheEdge.adajactLable = true;
+                    this.EdgeList.Add(CacheEdge);
+                    edgeID++;
+                }
+            }
+            #endregion
+        }
 
-            int TestCount = 0;
+        /// <summary>
+        /// 创建ProxiG
+        /// </summary>
+        /// <param name="pFeatureClass">原始图层</param>
+        public void CreateProxiGByDT(List<PolygonObject> PoList)
+        {
+            #region Create ProxiNodes
+            List<TriNode> TriNodeList = new List<TriNode>();
+            for (int i = 0; i < PoList.Count; i++)
+            {
+                ProxiNode CacheNode = new ProxiNode(PoList[i].CalProxiNode().X, PoList[i].CalProxiNode().Y, i, i);
+                TriNode CacheTriNode = new TriNode(PoList[i].CalProxiNode().X, PoList[i].CalProxiNode().Y, i, i);
+                this.NodeList.Add(CacheNode);
+                TriNodeList.Add(CacheTriNode);
+            }
+            #endregion
+
+            #region Create ProxiEdges
+            DelaunayTin dt = new DelaunayTin(TriNodeList);
+            dt.CreateDelaunayTin(AlgDelaunayType.Side_extent);
+
+            int edgeID = 0;
+            for (int i = 0; i < dt.TriEdgeList.Count; i++)
+            {
+                TriEdge tE = dt.TriEdgeList[i];
+
+                if (!this.repeatEdge(tE, this.EdgeList))
+                {
+                    ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[tE.startPoint.TagValue], this.NodeList[tE.endPoint.TagValue]);
+                    //CacheEdge.adajactLable = true;
+                    this.EdgeList.Add(CacheEdge);
+                    edgeID++;
+                }
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// 创建ProxiG
+        /// </summary>
+        /// <param name="pFeatureClass">原始图层</param>
+        public void CreateProxiGByDTConsiTop(IFeatureClass pFeatureClass)
+        {
+            #region Create ProxiNodes
+            List<TriNode> TriNodeList = new List<TriNode>();
+            for (int i = 0; i < pFeatureClass.FeatureCount(null); i++)
+            {
+                IArea pArea = pFeatureClass.GetFeature(i).Shape as IArea;
+                ProxiNode CacheNode = new ProxiNode(pArea.Centroid.X, pArea.Centroid.Y, i, i);
+                TriNode CacheTriNode = new TriNode(pArea.Centroid.X, pArea.Centroid.Y, i, i);
+                this.NodeList.Add(CacheNode);
+                TriNodeList.Add(CacheTriNode);
+            }
+            #endregion
+
+            #region Create ProxiEdges
+            DelaunayTin dt = new DelaunayTin(TriNodeList);
+            dt.CreateDelaunayTin(AlgDelaunayType.Side_extent);
+
+            int edgeID = 0;
             for (int i = 0; i < dt.TriEdgeList.Count; i++)
             {
                 TriEdge tE = dt.TriEdgeList[i];
                 if (!this.repeatEdge(tE, this.EdgeList))
                 {
-
-                    int edgeID = 0;
-
+                   
                     IGeometry iGeo = pFeatureClass.GetFeature(tE.startPoint.TagValue).Shape;
                     IGeometry jGeo = pFeatureClass.GetFeature(tE.endPoint.TagValue).Shape;
 
@@ -1421,7 +1661,6 @@ namespace AuxStructureLib
                         ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[tE.startPoint.TagValue], this.NodeList[tE.endPoint.TagValue]);
                         CacheEdge.adajactLable = true;
                         this.EdgeList.Add(CacheEdge);
-                        TestCount++;
                         edgeID++;
                     }
 
@@ -1434,11 +1673,9 @@ namespace AuxStructureLib
                     }
                 }
             }
-
-            int Testloc = 0;
             #endregion
         }
-         
+
         /// <summary>
         /// 判断给定的边是否是当前邻近图中的重复边
         /// </summary>
@@ -1547,6 +1784,45 @@ namespace AuxStructureLib
         }
 
         /// <summary>
+        /// 删除穿过给定圆的边
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        /// <param name="PoList"></param>
+        public void DeleteCrossEdge(List<ProxiEdge> EdgeList, List<PolygonObject> PoList)
+        {
+            ComFunLib CFL=new ComFunLib();
+            for (int i = EdgeList.Count - 1; i >= 0; i--)
+            {
+                ProxiNode Node1 = EdgeList[i].Node1;
+                ProxiNode Node2 = EdgeList[i].Node2;
+                double R1 = this.GetObjectByID(PoList, Node1.ID).R;
+                double R2 = this.GetObjectByID(PoList, Node2.ID).R; 
+
+                foreach(PolygonObject Po in PoList)
+                {
+                    ProxiNode PoNode = Po.CalProxiNode();
+
+                    double EdgeDis1 = this.GetDis(Node1, PoNode);
+                    double RSDis1 = this.GetObjectByID(PoList, Node1.ID).R + Po.R;
+                    double EdgeDis2 = this.GetDis(Node2, PoNode);
+                    double RSDis2 = this.GetObjectByID(PoList, Node2.ID).R + Po.R;
+
+                    #region 给定圆与特定圆不重合
+                    if (EdgeDis1 > RSDis1 && EdgeDis2 > RSDis2)
+                    {
+                        double KDis = CFL.pCalMinDisPoint2Line(PoNode, Node1, Node2);
+                        if (KDis < Po.R)
+                        {
+                            EdgeList.RemoveAt(i);
+                        }
+                    }
+                    #endregion
+                }
+            }
+        }
+
+        /// <summary>
+        /// 依据冲突refine proximity graph
         /// 虽然不邻接，但是冲突的Circles
         /// </summary>
         /// <param name="PoList"></param>
@@ -1564,13 +1840,74 @@ namespace AuxStructureLib
 
                     if (EdgeDis < RSDis)
                     {
-
                         ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
                         if (!this.repeatEdge(rPe, this.EdgeList))
                         {
+                            rPe.StepOverLap = true;
                             this.EdgeList.Add(rPe);
                         }                     
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 删除上一步因重叠新添加的边
+        /// </summary>
+        public void OverlapDelete()
+        {
+            for (int i = this.EdgeList.Count - 1; i >= 0; i--)
+            {
+                ProxiEdge Pe = this.EdgeList[i];
+                if (Pe.StepOverLap)
+                {
+                    this.EdgeList.Remove(Pe);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 依据邻近关系refine proximity graph
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        public void PgRefined(List<ProxiEdge> EdgeList)
+        {
+            foreach (ProxiEdge rPe in EdgeList)
+            {
+                if (!this.repeatEdge(rPe, this.EdgeList))
+                {
+                    ProxiEdge cachePe = new ProxiEdge(this.EdgeList.Count, this.NodeList[rPe.Node1.ID], this.NodeList[rPe.Node2.ID]);
+                    this.EdgeList.Add(cachePe);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 依据MST边标识属性
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        public void MSTPgAttri(List<ProxiEdge> pEdgeList)
+        {
+            foreach (ProxiEdge rPe in this.EdgeList)
+            {
+                if (this.repeatEdge(rPe, pEdgeList))
+                {
+                    rPe.MSTLable = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 依据邻近边标识属性
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        public void PrPgAttri(List<ProxiEdge> pEdgeList)
+        {
+            foreach (ProxiEdge rPe in this.EdgeList)
+            {
+                if (this.repeatEdge(rPe, pEdgeList))
+                {
+                    rPe.adajactLable = true;
                 }
             }
         }
@@ -1616,23 +1953,31 @@ namespace AuxStructureLib
                         ProxiEdge Pe = CopyPg.EdgeList[i];
                         if (Pe.Node1.ID == NodeToContinue[0].ID)
                         {
+                            if (!CachePg.EdgeList.Contains(Pe))
+                            {
+                                CachePg.EdgeList.Add(Pe);
+                                CopyPg.EdgeList.Remove(Pe);
+                            }
+
                             if (!CachePg.NodeList.Contains(Pe.Node2))
                             {
                                 CachePg.NodeList.Add(Pe.Node2);
-                                CachePg.EdgeList.Add(Pe);
-                                NodeToContinue.Add(Pe.Node2);
-                                CopyPg.EdgeList.Remove(Pe);
+                                NodeToContinue.Add(Pe.Node2);                               
                             }
 
                         }
                         else if (Pe.Node2.ID == NodeToContinue[0].ID)
                         {
+                            if (!CachePg.EdgeList.Contains(Pe))
+                            {
+                                CachePg.EdgeList.Add(Pe);
+                                CopyPg.EdgeList.Remove(Pe);
+                            }
+
                             if (!CachePg.NodeList.Contains(Pe.Node1))
                             {
-                                CachePg.NodeList.Add(Pe.Node1);
-                                CachePg.EdgeList.Add(Pe);
-                                NodeToContinue.Add(Pe.Node1);
-                                CopyPg.EdgeList.Remove(Pe);
+                                CachePg.NodeList.Add(Pe.Node1);                                
+                                NodeToContinue.Add(Pe.Node1);                              
                             }
                         }
                     }

@@ -469,6 +469,54 @@ namespace AuxStructureLib
             }
             return 9999999;
         }
+
+        /// <summary>
+        /// 点到线段的最小距离
+        /// </summary>
+        /// <param name="v1">顶点</param>
+        /// <param name="v2">底边顶点1</param>
+        /// <param name="v3">底边顶点2</param>
+        /// <param name="nearestPoint">最近距离</param>
+        /// <returns>最小距离</returns>
+        public double pCalMinDisPoint2Line(Node v1, Node v2, Node v3)
+        {
+            if ((v1.X == v2.X && v1.Y == v2.Y) || (v1.X == v3.X && v1.Y == v3.Y))
+            {
+                return 0;
+            }
+
+            double A = (v1.X - v2.X) * (v1.X - v2.X) + (v1.Y - v2.Y) * (v1.Y - v2.Y);
+            double B = (v2.X - v3.X) * (v2.X - v3.X) + (v2.Y - v3.Y) * (v2.Y - v3.Y);
+            double C = (v3.X - v1.X) * (v3.X - v1.X) + (v3.Y - v1.Y) * (v3.Y - v1.Y);
+            double a = Math.Sqrt(A);
+            double b = Math.Sqrt(B);
+            double c = Math.Sqrt(C);
+
+            double cosB = (A + B - C) / (2 * a * b);
+            double cosC = (C + B - A) / (2 * b * c);
+
+            if (cosB > 0 && cosC > 0)
+            {
+                double d = Math.Sqrt((v2.X - v3.X) * (v2.X - v3.X) + (v2.Y - v3.Y) * (v2.Y - v3.Y));
+                double e = (v3.X - v2.X) * (v1.X - v2.X) + (v3.Y - v2.Y) * (v1.Y - v2.Y);
+                e = e / (d * d);
+                double x4 = v2.X + (v3.X - v2.X) * e;
+                double y4 = v2.Y + (v3.Y - v2.Y) * e;
+                return Math.Sqrt((x4 - v1.X) * (x4 - v1.X) + (y4 - v1.Y) * (y4 - v1.Y));
+            }
+            else
+            {
+                if (cosB <= 0)
+                {
+                    return a;
+                }
+                else if (cosC <= 0)
+                {
+                    return c;
+                }
+            }
+            return 9999999;
+        }
         ///// <summary>
         ///// 计算多边形的重心（中心）
         ///// </summary>

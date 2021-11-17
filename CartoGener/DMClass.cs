@@ -382,7 +382,13 @@ namespace CartoGener
                 Console.WriteLine(i.ToString());//标识
                           
                 algBeams.DoDisplacePgDorling(pMap,StopT,MaxTd,ForceType,WeightConsi);// 调用Beams算法 
+                pg.OverlapDelete();
                 pg.PgRefined(pMap.PolygonList);//每次处理完都需要更新Pg
+                pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
+                pg.DeleteCrossEdge(pg.EdgeList, pMap.PolygonList);//删除穿过的边
+                pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
+                pg.PgRefined(pg.MSTEdgeList);//MSTrefine
+
                 if (algBeams.isContinue == false)
                 {
                     break;

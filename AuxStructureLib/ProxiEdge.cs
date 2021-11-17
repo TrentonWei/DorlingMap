@@ -23,7 +23,9 @@ namespace AuxStructureLib
         public double W_A_Simi = -1;
         public double W_Peri_Simi = -1;
         public double W_Area_Simi = -1;
-        public bool adajactLable = true;//标识是由于邻近产生的边
+        public bool adajactLable = false;//标识是由于邻近产生的边
+        public bool StepOverLap = false;//标识是否是由于重叠新产生的邻近边
+        public bool MSTLable = false;//标识是否是MST的边
 
         public Skeleton_Arc Ske_Arc = null;
 

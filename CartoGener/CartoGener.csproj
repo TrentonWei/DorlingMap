@@ -88,6 +88,12 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AlgEMLib">
+      <HintPath>..\AlgEMLib\bin\x86\Debug\AlgEMLib.dll</HintPath>
+    </Reference>
+    <Reference Include="AuxStructureLib">
+      <HintPath>..\AuxStructureLib\bin\x86\Debug\AuxStructureLib.dll</HintPath>
+    </Reference>
     <Reference Include="DisplaceAlgLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DisplaceAlgLib\bin\Debug\DisplaceAlgLib.dll</HintPath>
@@ -205,16 +211,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AlgEMLib\AlgEMLib.csproj">
-      <Project>{409C3D39-6614-4F2C-A3CF-E9122B58C908}</Project>
-      <Name>AlgEMLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AuxStructureLib\AuxStructureLib.csproj">
-      <Project>{7753C0F5-7C46-42CC-A19B-017650CD778B}</Project>
-      <Name>AuxStructureLib</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="AxesriControls">
