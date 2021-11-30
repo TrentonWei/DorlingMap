@@ -8,6 +8,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 候选状态位置
     /// </summary>
+    [Serializable]
     public class TrialPosition
     {
         public int ID;

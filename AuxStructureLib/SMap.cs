@@ -1084,6 +1084,31 @@ namespace AuxStructureLib
                 this.Create_WritePolygonObject2Shp(filePath, @"PolygonObjecrt", prj);
             }
         }
+
+        /// <summary>
+        /// 将结果写入SHP
+        /// </summary>
+        /// <param name="filePath">目录</param>
+        /// <param name="prj">投影</param>
+        public void WriteResult2Shp(string filePath, string name,ISpatialReference prj)
+        {
+            if (this.TriNodeList != null && this.TriNodeList.Count > 0)
+            {
+                TriNode.Create_WriteVetex2Shp(filePath, @name+"Vertices", this.TriNodeList, prj);
+            }
+            if (this.PointList != null && this.PointList.Count > 0)
+            {
+                this.Create_WritePointObject2Shp(filePath, @name+"PointObject"+name, prj);
+            }
+            if (this.PolylineList != null && this.PolylineList.Count > 0)
+            {
+                this.Create_WritePolylineObject2Shp(filePath, @name+"PolylineObject"+name, prj);
+            }
+            if (this.PolygonList != null && this.PolygonList.Count > 0)
+            {
+                this.Create_WritePolygonObject2Shp(filePath, @name+"PolygonObject"+name, prj);
+            }
+        }
         /// <summary>
         /// 创建要素
         /// </summary>

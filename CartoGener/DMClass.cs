@@ -40,6 +40,62 @@ namespace CartoGener
         DMSupport DMS = new DMSupport();
 
         /// <summary>
+        /// 获取已经无冲突的Circle群
+        /// </summary>
+        /// <param name="PoList"></param>
+        /// <returns></returns>
+        public List<List<PolygonObject>> CircleGroup(List<PolygonObject> PoList,double outTd,double inTd)
+        {
+            List<List<PolygonObject>> CircleList = new List<List<PolygonObject>>();
+            List<PolygonObject> CopyPoList = Clone((object)PoList) as List<PolygonObject>;
+
+            while(CopyPoList.Count > 0)
+            {
+                List<PolygonObject> PoToContinue = new List<PolygonObject>();
+                PoToContinue.Add(CopyPoList[0]);
+                List<PolygonObject> subPoList = new List<PolygonObject>();
+                subPoList.Add(CopyPoList[0]);
+                CopyPoList.RemoveAt(0);
+
+                while (PoToContinue.Count > 0)
+                {
+                    ProxiNode tNode1 = PoToContinue[0].CalProxiNode(); ;
+                    for (int i = CopyPoList.Count-1; i >= 0; i--)
+                    {                        
+                        ProxiNode tNode2 = CopyPoList[i].CalProxiNode();
+                        double EdgeDis = this.GetDis(tNode1, tNode2);
+                        double RSDis = PoToContinue[0].R + CopyPoList[i].R;
+
+                        if ((RSDis-EdgeDis)<inTd && (EdgeDis - RSDis) < outTd)
+                        {
+                            PoToContinue.Add(CopyPoList[i]);
+                            subPoList.Add(CopyPoList[i]);
+                            CopyPoList.RemoveAt(i);
+                        }
+                    }
+
+                    PoToContinue.RemoveAt(0);
+                }
+
+                CircleList.Add(subPoList);
+            }
+
+            return CircleList;
+        }
+
+        /// <summary>
+        /// Distance between two trinode
+        /// </summary>
+        /// <param name="sNode"></param>
+        /// <param name="eNode"></param>
+        /// <returns></returns>
+        public double GetDis(ProxiNode sNode, ProxiNode eNode)
+        {
+            double Dis = Math.Sqrt((sNode.X - eNode.X) * (sNode.X - eNode.X) + (sNode.Y - eNode.Y) * (sNode.Y - eNode.Y));
+            return Dis;
+        }
+
+        /// <summary>
         /// Compute the radius for each Circle
         /// </summary>
         /// <param name="ValueList"></param>
@@ -368,7 +424,7 @@ namespace CartoGener
         /// <param name="I">惯性力矩</param>
         /// <param name="A">横切面积</param>
         /// <param name="Iterations">迭代次数</param>
-        public void DorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations,int algType,double StopT,double MaxTd,int ForceType,bool WeightConsi)
+        public void DorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations,int algType,double StopT,double MaxTd,int ForceType,bool WeightConsi,double InterDis)
         {
             AlgBeams algBeams = new AlgBeams(pg, pMap, E, I, A);
             //求吸引力-2014-3-20所用
@@ -381,13 +437,53 @@ namespace CartoGener
             {
                 Console.WriteLine(i.ToString());//标识
                           
-                algBeams.DoDisplacePgDorling(pMap,StopT,MaxTd,ForceType,WeightConsi);// 调用Beams算法 
+                algBeams.DoDisplacePgDorling(pMap,StopT,MaxTd,ForceType,WeightConsi,InterDis);// 调用Beams算法 
                 pg.OverlapDelete();
                 pg.PgRefined(pMap.PolygonList);//每次处理完都需要更新Pg
-                pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
-                pg.DeleteCrossEdge(pg.EdgeList, pMap.PolygonList);//删除穿过的边
-                pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
-                pg.PgRefined(pg.MSTEdgeList);//MSTrefine
+                //pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
+                //pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
+                //pg.DeleteCrossEdge(pg.EdgeList, pMap.PolygonList);//删除穿过的边                
+                //pg.PgRefined(pg.MSTEdgeList);//MSTrefine
+
+                if (algBeams.isContinue == false)
+                {
+                    break;
+                }
+            }
+        }
+
+        /// Beams Displace
+        /// </summary>
+        /// <param name="pg">邻近图</param>
+        /// <param name="pMap">Dorling图层</param>
+        /// <param name="scale">比例尺</param>
+        /// <param name="E">弹性模量</param>
+        /// <param name="I">惯性力矩</param>
+        /// <param name="A">横切面积</param>
+        /// <param name="Iterations">迭代次数</param>
+        public void GroupDorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations, int algType, double StopT, double MaxTd, int ForceType, bool WeightConsi,int j)
+        {
+            AlgBeams algBeams = new AlgBeams(pg, pMap, E, I, A);
+            //求吸引力-2014-3-20所用
+
+            ProxiGraph CopyG = Clone((object)pg) as ProxiGraph;
+            algBeams.OriginalGraph = CopyG;
+            algBeams.Scale = scale;
+            algBeams.AlgType = algType;
+            for (int i = 0; i < Iterations; i++)//迭代计算
+            {
+                Console.WriteLine(i.ToString());//标识
+
+                algBeams.GroupDoDisplacePgDorling(pMap, StopT, MaxTd, ForceType, WeightConsi);// 调用Beams算法
+                pg.OverlapDelete();
+                pg.GroupPgRefined(pMap.PolygonList);//每次处理完都需要更新Pg
+                //pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
+                //pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
+                //pg.DeleteCrossEdge(pg.EdgeList, pMap.PolygonList);//删除穿过的边                
+                //pg.PgRefined(pg.MSTEdgeList);//MSTrefine
+
+                pg.WriteProxiGraph2Shp("C:\\Users\\10988\\Desktop\\ex", "邻近图" + j.ToString()+i.ToString(), pMapControl.Map.SpatialReference);
+                pMap.WriteResult2Shp("C:\\Users\\10988\\Desktop\\ex",j.ToString()+i.ToString(), pMapControl.Map.SpatialReference);    
 
                 if (algBeams.isContinue == false)
                 {

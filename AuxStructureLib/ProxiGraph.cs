@@ -1852,6 +1852,78 @@ namespace AuxStructureLib
         }
 
         /// <summary>
+        /// 依据冲突refine proximity graph
+        /// </summary>
+        /// <param name="PoList"></param>
+        public void GroupPgRefined(List<PolygonObject> PoList)
+        {
+            for (int i = 0; i < PoList.Count - 1; i++)
+            {
+                for (int j = i + 1; j < PoList.Count; j++)
+                {
+                    if (!this.GroupPos(PoList[i], PoList[j]))
+                    {
+                        ProxiNode Node1 = this.GetTarNode(PoList[i].ID);
+                        ProxiNode Node2 = this.GetTarNode(PoList[j].ID);
+
+                        double EdgeDis = this.GetDis(Node1, Node2);
+                        double RSDis = PoList[i].R + PoList[j].R;
+
+                        if (EdgeDis < RSDis + 0.05)
+                        {
+                            ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
+                            if (!this.repeatEdge(rPe, this.EdgeList))
+                            {
+                                rPe.StepOverLap = true;
+                                this.EdgeList.Add(rPe);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 判断两个建筑物是否是同一个Group中的建筑物
+        /// </summary>
+        /// <param name="Po1"></param>
+        /// <param name="Po2"></param>
+        /// <returns></returns>
+        public bool GroupPos(PolygonObject Po1, PolygonObject Po2)
+        {
+            bool GroupLable = false;
+
+            for (int i = 0; i < this.NodeList.Count; i++)
+            {
+                if (this.NodeList[i].TagIds.Contains(Po1.ID) && this.NodeList[i].TagIds.Contains(Po2.ID))
+                {
+                    GroupLable = true;
+                    break;
+                }
+            }
+
+            return GroupLable;
+        }
+
+        /// <summary>
+        /// 返回建筑物对应Node
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public ProxiNode GetTarNode(int Id)
+        {
+            foreach (ProxiNode Pn in this.NodeList)
+            {
+                if (Pn.TagIds.Contains(Id))
+                {
+                    return Pn;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// 删除上一步因重叠新添加的边
         /// </summary>
         public void OverlapDelete()
@@ -1870,9 +1942,9 @@ namespace AuxStructureLib
         /// 依据邻近关系refine proximity graph
         /// </summary>
         /// <param name="EdgeList"></param>
-        public void PgRefined(List<ProxiEdge> EdgeList)
+        public void PgRefined(List<ProxiEdge> pEdgeList)
         {
-            foreach (ProxiEdge rPe in EdgeList)
+            foreach (ProxiEdge rPe in pEdgeList)
             {
                 if (!this.repeatEdge(rPe, this.EdgeList))
                 {
@@ -1991,6 +2063,89 @@ namespace AuxStructureLib
             #endregion
 
             return subPgList;
+        }
+
+        /// <summary>
+        /// 依据
+        /// </summary>
+        public void PgReConstruction(List<List<PolygonObject>> Circles,ProxiGraph OldPg)
+        {
+            #region Create ProxiNodes
+            List<TriNode> TriNodeList = new List<TriNode>();
+            for (int i = 0; i <Circles.Count; i++)
+            {
+                ProxiNode CacheNode = this.GetCenter(Circles[i]); CacheNode.ID = i; CacheNode.TagID = i;
+                TriNode CacheTriNode = new TriNode(CacheNode.X, CacheNode.Y, i, i);
+                this.NodeList.Add(CacheNode);
+                TriNodeList.Add(CacheTriNode);
+            }
+            #endregion
+
+            #region Create ProxiEdges
+ 
+            for (int i = 0; i < OldPg.EdgeList.Count; i++)
+            {
+                ProxiNode Node1 = OldPg.EdgeList[i].Node1;
+                ProxiNode Node2 = OldPg.EdgeList[i].Node2;
+
+                #region 确定对应的Node
+                int TagID1=-1;int TagID2=-1;
+                bool bID1 = false; bool bID2 = false;
+                for (int j = 0; j < this.NodeList.Count; j++)
+                {
+                    if (this.NodeList[j].TagIds.Contains(Node1.ID))
+                    {
+                        TagID1 = j;
+                        bID1 = true;
+                    }
+                    if (this.NodeList[j].TagIds.Contains(Node2.ID))
+                    {
+                        TagID2 = j;
+                        bID2 = true;
+                    }
+
+                    if (bID1 && bID2)
+                    {
+                        break;
+                    }
+                }
+                #endregion
+                if (TagID1 != TagID2)//同一个群中邻近边需删除
+                {
+                    ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, this.NodeList[TagID1], this.NodeList[TagID2]);
+                    if (!this.repeatEdge(rPe, this.EdgeList))
+                    {
+                        this.EdgeList.Add(rPe);
+                    }
+                }
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// 获取给定的PoList的中心
+        /// </summary>
+        /// <param name="PoList"></param>
+        /// <returns></returns>
+        public ProxiNode GetCenter(List<PolygonObject> PoList)
+        {
+            double RSum = 0;
+            for (int i = 0; i < PoList.Count; i++)
+            {
+                RSum = RSum + PoList[i].R;
+            }
+
+            double X = 0; double Y = 0; List<int> PoIds = new List<int>();
+            for (int i = 0; i < PoList.Count; i++)
+            {
+                X = PoList[i].CalProxiNode().X * (PoList[i].R / RSum) + X;
+                Y = PoList[i].CalProxiNode().Y * (PoList[i].R / RSum) + Y;
+                PoIds.Add(PoList[i].ID);
+            }
+
+            ProxiNode CacheNode = new ProxiNode(X, Y);
+            CacheNode.TagIds = PoIds;
+            return CacheNode;
         }
     }
 }
