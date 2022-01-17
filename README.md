@@ -9,7 +9,7 @@ An automatic algorithm for generation of a circular cartogram, namely DorlingMap
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/principle.png)
 
 #The result_1
-![image](https://github.com/TrentonWei/DorlingMap/blob/master/Result%201.tif)
+![image](https://github.com/TrentonWei/DorlingMap/blob/master/Result1.png)
 
 #The result_2
-![image](https://github.com/TrentonWei/DorlingMap/blob/master/Result%202.tif)
+![image](https://github.com/TrentonWei/DorlingMap/blob/master/Result2.png)
