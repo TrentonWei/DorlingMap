@@ -301,6 +301,9 @@ namespace AuxStructureLib
         public double R;//表示对应Circle的半径
        // public int ID = -1;
         public List<TriNode> PointList = null;    //节点列表
+        public double Value;
+        public double TargetID = 0;
+        public string Name;
 
         public List<TrialPosition> TriableList = null;    //节点列表
         private double area=-1;

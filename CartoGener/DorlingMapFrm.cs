@@ -119,7 +119,7 @@ namespace CartoGener
             ProxiGraph pg = new ProxiGraph();
             pg.CreateProxiG(pFeatureClass, 0);
 
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "POPULATION", 1, 50, 1, 1, 0.01, 0.1);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "AREA", 1, 50, 1, 1, 0.01, 0.1);
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
@@ -212,7 +212,7 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// BeamsDisplace
+        /// BeamsDisplace   考虑了部分吸引力可删除
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -231,7 +231,7 @@ namespace CartoGener
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", 1, 50, 1, 1, 0.01, 0.1);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 1, 0.01, 0.1);
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
@@ -240,6 +240,7 @@ namespace CartoGener
 
             #region 构建MST+npg refine
             npg.DeleteLongerEdges(npg.EdgeList, Map.PolygonList, 4);//删除长边
+            //npg.DeleteLongerEdges(npg.EdgeList, Map.PolygonList, 20);//删除长边
             npg.DeleteCrossEdge(npg.EdgeList, Map.PolygonList);//删除穿过边                           
             ProxiGraph pg = new ProxiGraph();
             pg.CreateProxiGByDT(pFeatureClass);
@@ -248,6 +249,7 @@ namespace CartoGener
             npg.PgRefined(Map.PolygonList);//重叠边refine  
 
             npg.DeleteLongerEdges(npg.EdgeList, Map.PolygonList, 4);
+            //npg.DeleteLongerEdges(npg.EdgeList, Map.PolygonList, 20);//删除长边
             #endregion
 
             List<ProxiGraph> PgList = npg.GetGroupPg();
@@ -258,11 +260,17 @@ namespace CartoGener
                 if (PgList[i].NodeList.Count > 1)
                 {
                     SMap newMap = DMS.regulation(PgList[i], Map);
-                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 200, 0, 0.05, 30, 1, true, 0.2);
+                    int PNum = Map.PolygonList.Count;
+                    if (Map.PolygonList.Count < 10)
+                    {
+                        PNum = 10;
+                    }
+
+                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 30, 1, true, 0.2);
                     if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString()+1, pMap.SpatialReference); }
                     OutMap.WriteResult2Shp(OutFilePath, "1",pMap.SpatialReference);
 
-                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 300, 0, 0.05, 30, 0, true, 0.2);                    
+                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 30, 0, true, 0.2);                  
                     if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 2, pMap.SpatialReference); }
                     OutMap.WriteResult2Shp(OutFilePath, "2", pMap.SpatialReference);
                     
@@ -366,7 +374,7 @@ namespace CartoGener
             IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph npg = new ProxiGraph();
-            npg.CreateProxiG(pFeatureClass, 0.2);
+            npg.CreateProxiG(pFeatureClass, 0);
             List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", 1, 50, 1, 1, 0.01, 0.1);
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
@@ -529,7 +537,7 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// 渐进式聚合
+        /// 渐进式聚合（MST）
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -600,7 +608,7 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// 不考虑Group
+        /// 不考虑Group 邻近图+MST
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -662,5 +670,221 @@ namespace CartoGener
 
             OutMap.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
         }
+
+        /// <summary>
+        /// DT+其它
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button11_Click(object sender, EventArgs e)
+        {
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region 构建邻近关系
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiGByDTConsiTop(pFeatureClass);//依据DT构建的邻近图(考虑拓扑关系)
+
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass, 0.2);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", 1, 50, 1, 1, 0.01, 0.1);
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            #endregion
+
+            #region 删除长边和Cross的边
+            pg.DeleteLongerEdges(pg.EdgeList, Map.PolygonList, 20);//删除长边
+            pg.DeleteCrossEdge(pg.EdgeList, Map.PolygonList);//删除穿过边  
+            #endregion
+
+            List<ProxiGraph> PgList = pg.GetGroupPg();
+            #region 移位
+            SMap OutMap = new SMap();
+            for (int i = 0; i < PgList.Count; i++)
+            {
+                if (PgList[i].NodeList.Count > 1)
+                {
+                    SMap newMap = DMS.regulation(PgList[i], Map);
+                    DM.DorlingBeams(PgList[i], newMap, 1, 1000, 1, 1, 40, 0, 0.0001, 1000, 2, true, 0.2);
+                    OutMap.PolygonList.AddRange(newMap.PolygonList);
+                    if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString(), pMap.SpatialReference); }
+                }
+
+                else
+                {
+                    SMap newMap = DMS.regulation(PgList[i], Map);
+                    OutMap.PolygonList.AddRange(newMap.PolygonList);
+                }
+            }
+            #endregion
+
+            OutMap.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+        }
+
+        /// <summary>
+        /// Dorling Approach
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button12_Click(object sender, EventArgs e)
+        {
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region 构建邻近关系
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass, 0);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 1, 0.01, 0.1);
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            //npg.CreateRNG(npg.NodeList, npg.EdgeList, PoList);
+            #endregion
+
+            #region 构建MST+npg refine
+            //npg.DeleteLongerEdges(npg.EdgeList, Map.PolygonList, 4);//删除长边
+            ////npg.DeleteLongerEdges(npg.EdgeList, Map.PolygonList, 20);//删除长边
+            //npg.DeleteCrossEdge(npg.EdgeList, Map.PolygonList);//删除穿过边                           
+            ProxiGraph pg = new ProxiGraph();
+
+            #region Create ProxiNodes
+            for (int i = 0; i < Map.PolygonList.Count; i++)
+            {
+                ProxiNode CacheNode = new ProxiNode(Map.PolygonList[i].CalProxiNode().X, Map.PolygonList[i].CalProxiNode().Y, i, i);
+                pg.NodeList.Add(CacheNode);
+            }
+            #endregion
+
+            //pg.CreateProxiGByDT(pFeatureClass);
+            //pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
+            //npg.PgRefined(pg.EdgeList);//MSTrefine 
+            pg.PgRefined(Map.PolygonList);//重叠边refine  
+
+            //npg.DeleteLongerEdges(npg.EdgeList, Map.PolygonList, 4);
+            //npg.DeleteLongerEdges(npg.EdgeList, Map.PolygonList, 20);//删除长边
+            #endregion
+
+            List<ProxiGraph> PgList = pg.GetGroupPg();
+            #region 移位
+            SMap OutMap = new SMap();
+            for (int i = 0; i < PgList.Count; i++)
+            {
+                if (PgList[i].NodeList.Count > 1)
+                {
+                    SMap newMap = DMS.regulation(PgList[i], Map);
+                    int PNum = Map.PolygonList.Count;
+                    if (Map.PolygonList.Count < 10)
+                    {
+                        PNum = 10;
+                    }
+
+                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 30, 1, true, 0.2);
+                    if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 1, pMap.SpatialReference); }
+                    //OutMap.WriteResult2Shp(OutFilePath, "1", pMap.SpatialReference);
+
+                    if (PgList[i].EdgeList.Count > 0)
+                    {
+                        DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 30, 0, true, 0.2);
+                        if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 2, pMap.SpatialReference); }
+                        //OutMap.WriteResult2Shp(OutFilePath, "2", pMap.SpatialReference);
+                    }
+
+                    OutMap.PolygonList.AddRange(newMap.PolygonList);
+                }
+
+                else
+                {
+                    SMap newMap = DMS.regulation(PgList[i], Map);
+                    OutMap.PolygonList.AddRange(newMap.PolygonList);
+                }
+            }
+
+            OutMap.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+            #endregion
+        }
+
+        /// <summary>
+        /// MSTBeams
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button11_Click_1(object sender, EventArgs e)
+        {
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region 构建邻近关系
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass, 0);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 1, 0.01, 0.1);
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            //npg.CreateRNG(npg.NodeList, npg.EdgeList, PoList);
+            #endregion
+
+            #region 移位
+            int Step = 0;
+
+            while (Step < 300)
+            {
+                #region 构建MST+npg refine
+                ProxiGraph pg = new ProxiGraph();
+                pg.CreateProxiGByDT(Map.PolygonList);
+                pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
+                pg.PgRefined(Map.PolygonList);//依据重叠关系refined          
+                #endregion
+                DM.DorlingBeams(pg, Map, 1, 10, 1, 1, 1, 0, 0.05, 1000, 1, true, 0.2);
+                Step++;
+                Console.WriteLine(Step);
+                if (!DM.continueLable)
+                {
+                    break;
+                }
+            }
+
+
+            while (Step < 400)
+            {
+                #region 构建MST+npg refine
+                ProxiGraph pg = new ProxiGraph();
+                pg.CreateProxiGByDT(Map.PolygonList);
+                pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
+                pg.PgRefined(Map.PolygonList);//依据重叠关系refined          
+                #endregion
+                DM.DorlingBeams(pg, Map, 1, 10, 1, 1, 1, 0, 0.05, 1000, 0, true, 0.2);
+                Step++;
+                Console.WriteLine(Step);
+                if (!DM.continueLable)
+                {
+                    break;
+                }
+            }
+            Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+            #endregion
+        }
+
     }
 }

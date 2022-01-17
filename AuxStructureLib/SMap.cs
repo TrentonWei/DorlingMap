@@ -1280,6 +1280,30 @@ namespace AuxStructureLib
             pFieldsEdit.AddField(pField1);
             #endregion
 
+            #region 创建属性字段Value
+            //属性字段1
+            IField pField2;
+            IFieldEdit pFieldEdit2;
+            pField2 = new FieldClass();
+            pFieldEdit2 = pField2 as IFieldEdit;
+            pFieldEdit2.Length_2 = 30;//Length_2与Length的区别是一个是只读的，一个是可写的，以下Name_2,Type_2也是一样
+            pFieldEdit2.Name_2 = "Value";
+            pFieldEdit2.Type_2 = esriFieldType.esriFieldTypeDouble;
+            pFieldsEdit.AddField(pField2);
+            #endregion
+
+            #region 创建属性字段Name
+            //属性字段1
+            IField pField3;
+            IFieldEdit pFieldEdit3;
+            pField3 = new FieldClass();
+            pFieldEdit3 = pField3 as IFieldEdit;
+            pFieldEdit3.Length_2 = 30;//Length_2与Length的区别是一个是只读的，一个是可写的，以下Name_2,Type_2也是一样
+            pFieldEdit3.Name_2 = "Name";
+            pFieldEdit3.Type_2 = esriFieldType.esriFieldTypeString;
+            pFieldsEdit.AddField(pField3);
+            #endregion
+
             #region 创建要素类
             IFeatureClass pFeatClass;
             pFeatClass = pFWS.CreateFeatureClass(strName, pFields, null, null, esriFeatureType.esriFTSimple, strShapeFieldName, "");
@@ -1344,7 +1368,8 @@ namespace AuxStructureLib
                     pointSet.AddPoint(curResultPoint, ref missing1, ref missing2);
                     feature.Shape = shp;
                     feature.set_Value(2, this.PolygonList[i].ID);//编号 
-
+                    feature.set_Value(3, this.PolygonList[i].Value);//数值
+                    feature.set_Value(4, this.PolygonList[i].Name);//数值
 
                     feature.Store();//保存IFeature对象  
                     fr.WriteFeature(feature);//将IFeature对象，添加到当前图层上     

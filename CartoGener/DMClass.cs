@@ -38,6 +38,7 @@ namespace CartoGener
         ///Parameters       
         public AxESRI.ArcGIS.Controls.AxMapControl pMapControl;
         DMSupport DMS = new DMSupport();
+        public bool continueLable = true;
 
         /// <summary>
         /// 获取已经无冲突的Circle群
@@ -316,7 +317,54 @@ namespace CartoGener
         /// </summary>
         /// <param name="pFeatureClass"></param>
         /// <returns></returns>
-        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, ProxiGraph Pg, string ValueField, double MinR, double MaxR, double scale, int RType,double CCTd,double Percent)
+        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, ProxiGraph Pg, string ValueField, string NameField, double MinR, double MaxR, double scale, int RType,double CCTd,double Percent)
+        {
+            int i = 0;
+            List<Circle> InitialCircleList = new List<Circle>();
+            List<double> ValueList = new List<double>();
+
+            #region Circles without R
+            IFeatureCursor pFeatureCursor = pFeatureClass.Update(null, true);
+            IFeature pFeature = pFeatureCursor.NextFeature();
+            while (pFeature != null)
+            {
+                Circle CacheCircle = new Circle(i);
+                double Value = DMS.GetValue(pFeature, ValueField);
+                ValueList.Add(Value);
+                CacheCircle.Value = Value;
+                CacheCircle.scale = scale;
+
+                string Name = DMS.GetStringValue(pFeature, NameField);
+                CacheCircle.Name = Name;
+
+                IArea pArea = pFeature.Shape as IArea;
+                CacheCircle.CenterX = pArea.Centroid.X;
+                CacheCircle.CenterY = pArea.Centroid.Y;
+                InitialCircleList.Add(CacheCircle);
+
+                i++;
+                pFeature = pFeatureCursor.NextFeature();
+            }
+            #endregion
+
+            #region assign R for circles
+            List<double> RList = this.GetFinalListR(Pg, ValueList, MinR, MaxR, scale, RType, CCTd,Percent);
+
+            for (int j = 0; j < InitialCircleList.Count; j++)
+            {
+                InitialCircleList[j].Radius = RList[j];
+            }
+            #endregion
+
+            return InitialCircleList;
+        }
+
+        /// <summary>
+        /// Get the initial Circles with R
+        /// </summary>
+        /// <param name="pFeatureClass"></param>
+        /// <returns></returns>
+        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, ProxiGraph Pg, string ValueField, double MinR, double MaxR, double scale, int RType, double CCTd, double Percent)
         {
             int i = 0;
             List<Circle> InitialCircleList = new List<Circle>();
@@ -344,7 +392,7 @@ namespace CartoGener
             #endregion
 
             #region assign R for circles
-            List<double> RList = this.GetFinalListR(Pg, ValueList, MinR, MaxR, scale, RType, CCTd,Percent);
+            List<double> RList = this.GetFinalListR(Pg, ValueList, MinR, MaxR, scale, RType, CCTd, Percent);
 
             for (int j = 0; j < InitialCircleList.Count; j++)
             {
@@ -354,6 +402,7 @@ namespace CartoGener
 
             return InitialCircleList;
         }
+
 
         /// <summary>
         /// Circles to PolygonObjects
@@ -392,7 +441,10 @@ namespace CartoGener
                 DMS.pMapControl = pMapControl;
                 PolygonObject pPo = DMS.CircleToPo(CircleList[i]);
                 pPo.ID = i;
+                pPo.TargetID = i;
                 pPo.R = CircleList[i].Radius;
+                pPo.Value = CircleList[i].Value;
+                pPo.Name = CircleList[i].Name;
 
                 PoList.Add(pPo);
             }
@@ -438,13 +490,14 @@ namespace CartoGener
                 Console.WriteLine(i.ToString());//标识
                           
                 algBeams.DoDisplacePgDorling(pMap,StopT,MaxTd,ForceType,WeightConsi,InterDis);// 调用Beams算法 
-                pg.OverlapDelete();
+                //pg.OverlapDelete();
                 pg.PgRefined(pMap.PolygonList);//每次处理完都需要更新Pg
                 //pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
                 //pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
                 //pg.DeleteCrossEdge(pg.EdgeList, pMap.PolygonList);//删除穿过的边                
                 //pg.PgRefined(pg.MSTEdgeList);//MSTrefine
 
+                this.continueLable = algBeams.isContinue;
                 if (algBeams.isContinue == false)
                 {
                     break;

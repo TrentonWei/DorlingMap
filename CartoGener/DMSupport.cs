@@ -142,6 +142,23 @@ namespace CartoGener
         }
 
         /// <summary>
+        /// 获取给定Feature的属性
+        /// </summary>
+        /// <param name="CurFeature"></param>
+        /// <param name="FieldString"></param>
+        /// <returns></returns>
+        public string GetStringValue(IFeature curFeature, string FieldString)
+        {
+            string Value = null;
+
+            IFields pFields = curFeature.Fields;
+            int field1 = pFields.FindField(FieldString);
+            Value = Convert.ToString(curFeature.get_Value(field1));
+
+            return Value;
+        }
+
+        /// <summary>
         /// 将建筑物转化为IPolygon
         /// </summary>
         /// <param name="pPolygonObject"></param>
@@ -293,6 +310,9 @@ namespace CartoGener
                     {
                         PolygonObject CachePo = new PolygonObject(PoList.Count, Po.PointList);
                         CachePo.R = Po.R;
+                        CachePo.Value = Po.Value;
+                        CachePo.Name = Po.Name;
+
                         PoList.Add(CachePo);
                     }
                 }

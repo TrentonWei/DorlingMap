@@ -1190,35 +1190,39 @@ namespace AlgEMLib
                 #endregion
 
                 #region 更新坐标
-                for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
+                if (ForceList.Count > 0)
                 {
-                    int Cachei = -1;
-
-                    if (i == 0)
+                    for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
                     {
-                        Cachei = 1;
+                        int Cachei = -1;
 
-                    }
-                    else
-                    {
-                        Cachei = 0;
-                    }
+                        if (i == 0)
+                        {
+                            Cachei = 1;
 
-                    ProxiNode curNode = this.ProxiGraph.NodeList[Cachei];
-                    curNode.X += ForceList[Cachei].Fx;//更新邻近图
-                    curNode.Y += ForceList[Cachei].Fy;
+                        }
+                        else
+                        {
+                            Cachei = 0;
+                        }
 
-                    PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
-                    foreach (TriNode curPoint in po.PointList)
-                    {
-                        curPoint.X += ForceList[Cachei].Fx;
-                        curPoint.Y += ForceList[Cachei].Fy;
+                        ProxiNode curNode = this.ProxiGraph.NodeList[Cachei];
+                        curNode.X += ForceList[Cachei].Fx;//更新邻近图
+                        curNode.Y += ForceList[Cachei].Fy;
+
+                        PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
+                        foreach (TriNode curPoint in po.PointList)
+                        {
+                            curPoint.X += ForceList[Cachei].Fx;
+                            curPoint.Y += ForceList[Cachei].Fy;
+                        }
                     }
                 }
                 #endregion
 
                 MaxF = 0;
                 this.isContinue = false;
+                return;
             }
 
             else
