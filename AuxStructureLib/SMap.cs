@@ -2350,6 +2350,18 @@ namespace AuxStructureLib
             TXTHelper.ExportToTxt(tableforce, strPath + @"\" +strFileName+ @".txt");
         
         }
+
+        /// <summary>
+        /// 将MapObject中Polygon按顺序编号
+        /// </summary>
+        public void MapObjectRegulation()
+        {
+            for (int i = 0; i < this.PolygonList.Count; i++)
+            {
+                this.PolygonList[i].ID = i;
+                this.PolygonList[i].TargetID = i;
+            }
+        }
     }
 }
 

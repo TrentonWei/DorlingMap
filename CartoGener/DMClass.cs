@@ -475,6 +475,7 @@ namespace CartoGener
         /// <param name="E">弹性模量</param>
         /// <param name="I">惯性力矩</param>
         /// <param name="A">横切面积</param>
+        /// MaxTd:吸引力作用的最大范围，若距离超过一定数值，就没有吸引力
         /// <param name="Iterations">迭代次数</param>
         public void DorlingBeams(ProxiGraph pg, SMap pMap, double scale, double E, double I, double A, int Iterations,int algType,double StopT,double MaxTd,int ForceType,bool WeightConsi,double InterDis)
         {

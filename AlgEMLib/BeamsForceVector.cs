@@ -450,7 +450,7 @@ namespace AlgEMLib
                 PolygonObject Po1 = this.GetPoByID(sNode.TagID, PoList);
                 PolygonObject Po2 = this.GetPoByID(eNode.TagID, PoList);
 
-                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType,curEdge.adajactLable,MaxTd,WeigthConsi,curEdge.MSTLable,InterDis);//考虑引力
+                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType,curEdge.adajactLable,curEdge.LongEdge,MaxTd,WeigthConsi,curEdge.MSTLable,InterDis);//考虑引力
 
                 if (ForceList.Count > 0)
                 {
@@ -765,7 +765,7 @@ namespace AlgEMLib
         /// WeightConsi=false 不考虑权重；WeightConsi 考虑权重
         /// Adj=true 邻接；Adj=false 不邻接
         /// MaxTd 考虑的邻近条件
-        public List<Force> GetForce(ProxiNode sNode, ProxiNode eNode, PolygonObject sPo1, PolygonObject ePo2, int ForceType, bool Adj, double MaxTd, bool WeigthConsi, bool MSTLable, double InterDis)
+        public List<Force> GetForce(ProxiNode sNode, ProxiNode eNode, PolygonObject sPo1, PolygonObject ePo2, int ForceType, bool Adj,bool LongLabel,double MaxTd, bool WeigthConsi, bool MSTLable, double InterDis)
         {
             //ProxiNode tNode1 = sPo1.CalProxiNode();
             //ProxiNode tNode2 = ePo2.CalProxiNode();
@@ -816,6 +816,7 @@ namespace AlgEMLib
                 double fx = 0.5 * curForce * c;
                 double fy = 0.5 * curForce * s;
 
+                #region 第一类力
                 //if (ForceType == 1 && Adj && !WeigthConsi)
                 if (ForceType == 1 && !WeigthConsi)
                 {
@@ -835,6 +836,9 @@ namespace AlgEMLib
                     ForceList.Add(sForce);
                     ForceList.Add(eForce);
                 }
+                #endregion
+
+                #region 第二类力
                 else if (ForceType == 2 && !WeigthConsi)
                 {
                     if (Adj || MSTLable)
@@ -858,6 +862,33 @@ namespace AlgEMLib
                         ForceList.Add(eForce);
                     }
                 }
+                #endregion
+
+                #region 第三类力
+                else if (ForceType == 3 && !WeigthConsi)
+                {
+                    if (Adj && !LongLabel)
+                    {
+                        Force eForce = new Force(eNode.ID, fx * (-1), fy * (-1), s * (-1), c * (-1), curForce * 0.5);
+                        Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce * 0.5);
+                        ForceList.Add(sForce);
+                        ForceList.Add(eForce);
+                    }
+                }
+                else if (ForceType == 3 && WeigthConsi)
+                {
+                    if (Adj && !LongLabel)
+                    {
+                        double w1 = ePo2.R / RSDis; double w2 = sPo1.R / RSDis;
+
+                        Force eForce = new Force(eNode.ID, curForce * c * w1 * (-1), curForce * s * w1 * (-1), s * (-1), c * (-1), curForce * w1);
+                        Force sForce = new Force(sNode.ID, curForce * c * w2, curForce * s * w2, s, c, curForce * w2);
+
+                        ForceList.Add(sForce);
+                        ForceList.Add(eForce);
+                    }
+                }
+                #endregion
             }
 
             return ForceList;

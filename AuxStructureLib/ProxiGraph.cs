@@ -18,6 +18,14 @@ namespace AuxStructureLib
     [Serializable]
     public class ProxiGraph
     {
+        //RNG(最短距离)
+        public List<ProxiNode> RNGBuildingNodesListShortestDistance = new List<ProxiNode>();
+        public List<ProxiEdge> RNGBuildingEdgesListShortestDistance = new List<ProxiEdge>();
+
+        //ForKG
+        public List<ProxiNode> KGNodesList = new List<ProxiNode>();
+        public List<ProxiEdge> KGEdgesList = new List<ProxiEdge>();
+
         /// <summary>
         /// 点列表
         /// </summary>
@@ -727,6 +735,80 @@ namespace AuxStructureLib
             }
             #endregion
         }
+
+        /// 创建点集的RNG图（最短距离）
+        ///RNG计算(找到邻近图中每一个三角形，删除三角形中的最长边)
+        ///说明：对于任意一条边，找到对应的三角形；如果是最长边，则删除（如果是一条边，保留；如果是两条边，若是最长边，删除）
+        /// </summary>
+        public void CreateRNG(List<ProxiNode> PnList, List<ProxiEdge> PeList)
+        {
+            #region 找到潜在RNG对应的每条边，判断是否是邻近图中三角形对应的最长边，如果是，删除
+            for (int i = 0; i < PeList.Count; i++)
+            {
+                ProxiEdge TinLine = PeList[i];
+
+                #region 获取边的属性，即节点和对应的最短距离
+                ProxiNode Pn1 = TinLine.Node1;
+                ProxiNode Pn2 = TinLine.Node2;
+                double Distance = this.GetDis(Pn1, Pn2);
+                #endregion
+
+                #region 判断边是否为三角形对应的最长边
+                bool SingleEdgeLabel = false;
+                for (int j = 0; j < PnList.Count; j++)
+                {
+                    bool Label1 = false; bool Label2 = false;
+                    double Distance1 = 0; double Distance2 = 0;
+                    ProxiNode mPn = PnList[j];
+                    if (mPn.X != Pn1.X && mPn.X != Pn2.X)
+                    {
+                        for (int m = 0; m < PeList.Count; m++)
+                        {
+                            #region mPn与Pn1是否为边
+                            if ((mPn.TagID == PeList[m].Node1.TagID && Pn1.TagID == PeList[m].Node2.TagID) || mPn.TagID == PeList[m].Node2.TagID && Pn1.TagID == PeList[m].Node1.TagID)
+                            {
+                                Label1 = true;
+                                Distance1 = this.GetDis(PeList[m].Node1, PeList[m].Node2);
+                            }
+                            #endregion
+
+                            #region mPn与Pn2是否为边
+                            if ((mPn.TagID == PeList[m].Node1.TagID && Pn2.TagID == PeList[m].Node2.TagID) || mPn.TagID == PeList[m].Node2.TagID && Pn2.TagID == PeList[m].Node1.TagID)
+                            {
+                                Label2 = true;
+                                Distance2 = this.GetDis(PeList[m].Node1, PeList[m].Node2);
+                            }
+                            #endregion
+                        }
+                    }
+
+                    #region 存在三角形
+                    if (Label1 && Label2)
+                    {
+                        SingleEdgeLabel = true;
+                        if (Distance <= Distance1 || Distance <= Distance2)
+                        {
+                            this.RNGBuildingEdgesListShortestDistance.Add(PeList[i]);
+                            break;
+                        }
+                    }
+                    #endregion
+                }
+
+                if (!SingleEdgeLabel)
+                {
+                    this.RNGBuildingEdgesListShortestDistance.Add(PeList[i]);
+                }
+                #endregion
+            }
+            #endregion
+
+            this.RNGBuildingNodesListShortestDistance = PnList;
+
+            this.KGNodesList = this.RNGBuildingNodesListShortestDistance;
+            this.KGEdgesList = this.RNGBuildingEdgesListShortestDistance;
+        }
+
 
         /// <summary>
         /// 从骨架线构造邻近图
@@ -1537,6 +1619,7 @@ namespace AuxStructureLib
                             if (pPolyline.Length / iPo.Length > Td || pPolyline.Length / jPo.Length > Td)
                             {
                                 ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
+                                CacheEdge.adajactLable = true;//表示是由邻近产生的边
                                 this.EdgeList.Add(CacheEdge);
                             }
                         }
@@ -1547,7 +1630,7 @@ namespace AuxStructureLib
         }
 
         /// <summary>
-        /// 创建ProxiG
+        /// 创建ProxiG（依据三角网构图）
         /// </summary>
         /// <param name="pFeatureClass">原始图层</param>
         public void CreateProxiGByDT(IFeatureClass pFeatureClass)
@@ -1622,7 +1705,7 @@ namespace AuxStructureLib
         }
 
         /// <summary>
-        /// 创建ProxiG
+        /// 创建ProxiG(依据拓扑邻近关系构建的邻近图)
         /// </summary>
         /// <param name="pFeatureClass">原始图层</param>
         public void CreateProxiGByDTConsiTop(IFeatureClass pFeatureClass)
@@ -1777,6 +1860,29 @@ namespace AuxStructureLib
                 if ((EdgeDis-RSDis) > Td)
                 {
                     EdgeList.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>
+        /// /// <summary>
+        /// 删除较长的边(距离计算考虑了圆的半径)
+        /// </summary>EdgeList=邻近图的边
+        /// </summary>PoList=circles
+        /// <param name="Td">边的阈值条件</param>
+        public void LabelLongerEdges(List<ProxiEdge> EdgeList, List<PolygonObject> PoList, double Td)
+        {
+            for (int i = EdgeList.Count - 1; i >= 0; i--)
+            {
+                ProxiNode Node1 = EdgeList[i].Node1;
+                ProxiNode Node2 = EdgeList[i].Node2;
+
+                double EdgeDis = this.GetDis(Node1, Node2);
+                double RSDis = this.GetObjectByID(PoList, Node1.ID).R + this.GetObjectByID(PoList, Node2.ID).R;
+
+                if ((EdgeDis - RSDis) > Td)
+                {
+                    EdgeList[i].LongEdge = true;
                 }
             }
         }
@@ -1947,6 +2053,7 @@ namespace AuxStructureLib
                 if (!this.repeatEdge(rPe, this.EdgeList))
                 {
                     ProxiEdge cachePe = new ProxiEdge(this.EdgeList.Count, this.NodeList[rPe.Node1.ID], this.NodeList[rPe.Node2.ID]);
+                    cachePe.MSTLable = true;//是考虑MST添加的边（即不邻近）
                     this.EdgeList.Add(cachePe);
                 }
             }

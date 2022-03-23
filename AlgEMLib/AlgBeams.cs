@@ -1186,7 +1186,7 @@ namespace AlgEMLib
                 BeamsForceVector BFV = new BeamsForceVector();
                 PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, pMap.PolygonList);
                 PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, pMap.PolygonList);
-                List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable,InterDis);//考虑引力
+                List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge,MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
                 #endregion
 
                 #region 更新坐标
@@ -1288,6 +1288,7 @@ namespace AlgEMLib
                 this.isContinue = false;
             }
         }
+
 
         /// <summary>
         /// DorlingDisplace
