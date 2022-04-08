@@ -81,3 +81,4 @@ C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\ESRI.ArcGIS.Net
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AxInterop.esriControls.dll
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.exe
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.pdb
+C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.StableDorlingMapFrm.resources

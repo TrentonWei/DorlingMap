@@ -26,7 +26,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CartoGener
 {
-    public partial class DorlingMapFrm : Form
+    //DorlingMap production 
+    public partial class DorlingMapFrm : Form 
     {
         public DorlingMapFrm(AxESRI.ArcGIS.Controls.AxMapControl axMapControl)
         {

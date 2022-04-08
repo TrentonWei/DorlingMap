@@ -97,7 +97,57 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// Compute the radius for each Circle
+        /// Compute the radius for each Circle（Only consider the minR）
+        /// </summary>
+        /// <param name="ValueList"></param>
+        /// <param name="MinR"></param>
+        /// <param name="Rate"></param>a unit for 100
+        /// <param name="RType">=0 linear R</param>=1 SinR；=2 sqrt
+        /// <returns></returns>
+        public List<Double> GetR(List<double> ValueList, double MinR, double scale, int RType,double DefaultMin)
+        {
+            double MinValue = ValueList.Min();//Get the minValue
+            if (MinValue < DefaultMin)
+            {
+                MinValue = DefaultMin;
+            }
+            List<double> RList = new List<double>();//Return R
+
+            #region Linear R
+            if (RType == 0)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = ValueList[i] / MinValue * MinR * scale;
+                    RList.Add(R);
+                }
+            }
+            #endregion
+
+            #region SinR
+            else if (RType == 1)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = Math.Sin(ValueList[i] / MinValue) *  MinR * scale;
+                    RList.Add(R);
+                }
+            }
+            else if (RType == 2)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = Math.Sqrt(ValueList[i] / MinValue)* MinR * scale;
+                    RList.Add(R);
+                }
+            }
+            #endregion
+
+            return RList;
+        }
+
+        /// <summary>
+        /// Compute the radius for each Circle （consider minR and maxR）
         /// </summary>
         /// <param name="ValueList"></param>
         /// <param name="MinR"></param>
@@ -403,6 +453,42 @@ namespace CartoGener
             return InitialCircleList;
         }
 
+        /// <summary>
+        /// Get the initial Circles with R
+        /// </summary>
+        /// <param name="pFeatureClass"></param>
+        /// <returns></returns>
+        public List<Circle> GetInitialCircle(Dictionary<IPolygon, double> TimeSeriesData, double MinR, double scale, int RType,double DefaultMin)
+        {
+            List<Circle> InitialCircleList = new List<Circle>();
+            List<double> ValueList = new List<double>();
+
+            #region Circles without R
+            for (int i = 0; i < TimeSeriesData.Keys.ToList().Count; i++)
+            {
+                Circle CacheCircle = new Circle(i);
+                ValueList.Add(TimeSeriesData[TimeSeriesData.Keys.ToList()[i]]);
+                CacheCircle.Value = TimeSeriesData[TimeSeriesData.Keys.ToList()[i]];
+                CacheCircle.scale = scale;
+
+                IArea pArea = TimeSeriesData.Keys.ToList()[i] as IArea;
+                CacheCircle.CenterX = pArea.Centroid.X;
+                CacheCircle.CenterY = pArea.Centroid.Y;
+                InitialCircleList.Add(CacheCircle);
+            }
+            #endregion
+
+            #region assign R for circles
+            List<double> RList = this.GetR(ValueList, MinR, scale, RType,DefaultMin);
+
+            for (int j = 0; j < InitialCircleList.Count; j++)
+            {
+                InitialCircleList[j].Radius = RList[j];
+            }
+            #endregion
+
+            return InitialCircleList;
+        }
 
         /// <summary>
         /// Circles to PolygonObjects
@@ -450,6 +536,49 @@ namespace CartoGener
             }
 
             return PoList;
+        }
+
+        /// <summary>
+        /// Circles to PolygonObjects
+        /// </summary>
+        /// <param name="CircleList"></param>
+        /// <returns></returns>
+        public List<List<PolygonObject>> GetInitialPolygonObjectForStableDorling(List<Dictionary<IPolygon, double>> TimeSeriesData,double MinValue)
+        {
+            #region 获得最小值
+            double CacheMinValue = 100000000;
+            for (int i = 0; i < TimeSeriesData.Count; i++)
+            {
+                if (TimeSeriesData[i].Values.ToList().Min() < MinValue)
+                {
+                    CacheMinValue = TimeSeriesData[i].Values.ToList().Min();
+                }
+            }
+            #endregion
+
+            #region 比较获取圆赋值最小值
+            if (CacheMinValue > MinValue)
+            {
+                MinValue = CacheMinValue;
+            }
+            #endregion
+
+            #region 生成圆
+            List<List<Circle>> CircleLists = new List<List<Circle>>();
+            for (int i = 0; i < TimeSeriesData.Count; i++)
+            {
+                List<Circle> CircleList = this.GetInitialCircle(TimeSeriesData[i], 1, 1, 0, MinValue);
+                CircleLists.Add(CircleList);
+            }
+            List<List<PolygonObject>> CircleObjectList = new List<List<PolygonObject>>();
+            for (int i = 0; i < CircleLists.Count; i++)
+            {
+                List<PolygonObject> PoList = this.GetInitialPolygonObject2(CircleLists[i]);
+                CircleObjectList.Add(PoList);
+            }
+            #endregion
+
+            return CircleObjectList;
         }
 
         /// <summary>
@@ -539,6 +668,47 @@ namespace CartoGener
                 pg.WriteProxiGraph2Shp("C:\\Users\\10988\\Desktop\\ex", "邻近图" + j.ToString()+i.ToString(), pMapControl.Map.SpatialReference);
                 pMap.WriteResult2Shp("C:\\Users\\10988\\Desktop\\ex",j.ToString()+i.ToString(), pMapControl.Map.SpatialReference);    
 
+                if (algBeams.isContinue == false)
+                {
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Beams Displace
+        /// </summary>
+        /// <param name="pg">邻近图</param>
+        /// <param name="pMap">Dorling图层</param>
+        /// SubMaps 基于pMap进行更新的图层
+        /// <param name="scale">比例尺</param>
+        /// <param name="E">弹性模量</param>
+        /// <param name="I">惯性力矩</param>
+        /// <param name="A">横切面积</param>
+        /// MaxTd:吸引力作用的最大范围，若距离超过一定数值，就没有吸引力
+        /// <param name="Iterations">迭代次数</param>
+        public void StableDorlingBeams(ProxiGraph pg, SMap pMap,List<SMap> SubMaps, double scale, double E, double I, double A, int Iterations, int algType, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        {
+            AlgBeams algBeams = new AlgBeams(pg, pMap, E, I, A);
+            //求吸引力-2014-3-20所用
+
+            ProxiGraph CopyG = Clone((object)pg) as ProxiGraph;
+            algBeams.OriginalGraph = CopyG;
+            algBeams.Scale = scale;
+            algBeams.AlgType = algType;
+            for (int i = 0; i < Iterations; i++)//迭代计算
+            {
+                Console.WriteLine(i.ToString());//标识
+
+                algBeams.DoDisplacePgStableDorling(pMap, SubMaps, StopT, MaxTd, ForceType, WeightConsi, InterDis);// 调用Beams算法 
+                //pg.OverlapDelete();
+                pg.PgRefined(pMap.PolygonList);//每次处理完都需要更新Pg
+                //pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
+                //pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
+                //pg.DeleteCrossEdge(pg.EdgeList, pMap.PolygonList);//删除穿过的边                
+                //pg.PgRefined(pg.MSTEdgeList);//MSTrefine
+
+                this.continueLable = algBeams.isContinue;
                 if (algBeams.isContinue == false)
                 {
                     break;

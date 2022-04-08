@@ -91,6 +91,46 @@ namespace CartoGener
         }
 
         /// <summary>
+        /// 获得时序数据
+        /// </summary>
+        /// <param name="pMap"></param>
+        /// <param name="LayerName"></param>
+        /// <returns></returns>
+        public List<Dictionary<IPolygon, double>> GetTimeSeriesData(IMap pMap, String LayerName)
+        {
+            FeatureHandle pFeatureHandle = new FeatureHandle();
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, LayerName);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            IFields pFields = pFeatureClass.Fields;
+
+            List<Dictionary<IPolygon, double>> TimeSeriesData = new List<Dictionary<IPolygon, double>>();
+            for (int m = 0; m < pFields.FieldCount; m++)
+            {
+                if (pFields.get_Field(m).Name.Substring(0, 5) == "Time_")
+                {
+                    Dictionary<IPolygon, double> TimeData = new Dictionary<IPolygon, double>();//Dic for a specific time
+
+                    IFeatureCursor pFeatureCursor = pFeatureClass.Update(null, false);
+                    int Testint = 0;
+                    IFeature pFeature = pFeatureCursor.NextFeature();
+                    while (pFeature != null && Testint <= pFeatureClass.FeatureCount(null))
+                    {
+                        IPolygon pPolygon = pFeature.Shape as IPolygon;
+                        double Value = Convert.ToDouble(pFeature.get_Value(m));
+                        TimeData.Add(pPolygon, Value);
+
+                        pFeatureCursor.UpdateFeature(pFeature);
+                        pFeature = pFeatureCursor.NextFeature();
+                    }
+
+                    TimeSeriesData.Add(TimeData);
+                }
+            }
+
+            return TimeSeriesData;
+        }
+
+        /// <summary>
         /// 计算给定的两个圆的距离
         /// </summary>
         /// <param name="C1"></param>

@@ -430,7 +430,7 @@ namespace AlgEMLib
         }
 
         /// <summary>
-        /// 由邻近图计算外力
+        /// 由邻近图计算外力(DorlingMap)
         /// </summary>
         /// <param name="proxiGraph">邻近图</param>
         /// <param name="disThreshold">阈值</param>
@@ -514,6 +514,119 @@ namespace AlgEMLib
             //    }
             //    //foreach(Node cur Node )
             //}
+            #endregion
+
+            #region 求合力
+            //先求最大力，以该力的方向为X轴方向建立局部坐标系，求四个主方向上的最大力，最后就合力
+            List<Force> rforceList = new List<Force>();
+            foreach (VertexForce vForce in vForceList)
+            {
+                if (vForce.forceList.Count == 1)//当只受一个力作用时
+                {
+                    rforceList.Add(vForce.forceList[0]);
+
+                }
+                else if (vForce.forceList.Count > 1)
+                {
+                    int index = 0;
+                    double maxFx = 0;
+                    double minFx = 0;
+                    double maxFy = 0;
+                    double minFy = 0;
+                    Force maxF = GetMaxForce(out index, vForce.forceList);
+                    maxFx = maxF.F;
+                    double s = maxF.Sin;
+                    double c = maxF.Cos;
+
+                    for (int i = 0; i < vForce.forceList.Count; i++)
+                    {
+
+                        if (i != index)
+                        {
+                            Force F = vForce.forceList[i];
+                            double fx = F.Fx * c + F.Fy * s;
+                            double fy = F.Fy * c - F.Fx * s;
+
+                            if (minFx > fx) minFx = fx;
+                            if (maxFy < fy) maxFy = fy;
+                            if (minFy > fy) minFy = fy;
+                        }
+                    }
+                    double FFx = maxFx + minFx;
+                    double FFy = maxFy + minFy;
+                    double Fx = FFx * c - FFy * s;
+                    double Fy = FFx * s + FFy * c;
+                    double f = Math.Sqrt(Fx * Fx + Fy * Fy);
+                    Force rForce = new Force(vForce.ID, Fx, Fy, f);
+                    rforceList.Add(rForce);
+                }
+            }
+
+            #endregion
+
+            return rforceList;
+        }
+
+        /// <summary>
+        /// 由邻近图计算外力(DorlingMap)
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="disThreshold">阈值</param>
+        /// <returns>是否成功</returns>
+        public List<Force> CreateStableDorlingForceVectorfrmGraph(List<SMap> SubMaps,double MaxTd, int ForceType, bool WeigthConsi, double InterDis)
+        {
+            #region 计算受力
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return null;
+
+            InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            List<VertexForce> vForceList = new List<VertexForce>();
+
+            foreach (ProxiEdge curEdge in ProxiGraph.EdgeList)
+            {
+                ProxiNode sNode = curEdge.Node1; ProxiNode eNode = curEdge.Node2;
+
+                double eSumFx = 0; double eSumFy = 0; double eSum = 0;
+                double sSumFx = 0; double sSumFy = 0; double sSum = 0;
+                double s = 0; double c = 0;
+                for (int i = 0; i < SubMaps.Count; i++)
+                {
+                    PolygonObject Po1 = this.GetPoByID(sNode.TagID, SubMaps[i].PolygonList);
+                    PolygonObject Po2 = this.GetPoByID(eNode.TagID, SubMaps[i].PolygonList);
+
+                    List<Force> CacheForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType, curEdge.adajactLable, curEdge.LongEdge, MaxTd, WeigthConsi, curEdge.MSTLable, InterDis);//考虑引力
+                    eSumFx = CacheForceList[0].Fx + eSumFx; eSumFy = CacheForceList[0].Fy + eSumFy; eSum = CacheForceList[0].F + eSum;
+                    sSumFx = CacheForceList[1].Fx + sSumFx; sSumFy = CacheForceList[1].Fy + sSumFy; sSum = CacheForceList[1].F + sSum;
+                    s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
+                }
+
+                List<Force> ForceList = new List<Force>();
+                Force eForce = new Force(eNode.ID, eSumFx/SubMaps.Count, eSumFy/SubMaps.Count, s, c, eSum/SubMaps.Count);
+                Force sForce = new Force(sNode.ID, sSumFx / SubMaps.Count, sSumFy / SubMaps.Count, s * (-1), c * (-1), sSum / SubMaps.Count);
+                ForceList.Add(sForce);
+                ForceList.Add(eForce);
+
+                if (ForceList.Count > 0)
+                {
+                    #region 添加Force
+                    VertexForce svForce = this.GetvForcebyIndex(sNode.ID, vForceList);
+                    if (svForce == null)
+                    {
+                        svForce = new VertexForce(sNode.ID);
+                        vForceList.Add(svForce);
+                    }
+                    svForce.forceList.Add(ForceList[0]);//将当前的受力加入VertexForce数组
+
+                    VertexForce evForce = this.GetvForcebyIndex(eNode.ID, vForceList);
+                    if (evForce == null)
+                    {
+                        evForce = new VertexForce(eNode.ID);
+                        vForceList.Add(evForce);
+                    }
+                    evForce.forceList.Add(ForceList[1]);//将当前的受力加入VertexForce数组
+                    #endregion
+                }
+            }
             #endregion
 
             #region 求合力
@@ -755,7 +868,7 @@ namespace AlgEMLib
         }
 
         /// <summary>
-        /// 计算两个建筑物的受力
+        /// 计算两个建筑物的受力(返回的是两个建筑物的受力)
         /// </summary>
         /// <param name="Po1"></param>
         /// <param name="Po2"></param>
@@ -2563,7 +2676,7 @@ namespace AlgEMLib
         }
 
         /// <summary>
-        /// 
+        /// CreateForceVectorForDorling DorlingMap力计算
         /// </summary>
         /// <returns></returns>
         public bool CreateForceVectorForDorling(List<PolygonObject> PoList,double MaxTd,int ForceType,bool WeigthConsi,double InterDis)
@@ -2573,6 +2686,23 @@ namespace AlgEMLib
 
             // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
             this.ForceList = CreateForceVectorfrmGraph(PoList,MaxTd,ForceType,WeigthConsi,InterDis);//ForceList
+
+            if (MakeForceVectorfrmGraphNew())
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// CreateForceVectorForDorling StableDorlingMap力计算
+        /// </summary>
+        /// <returns></returns>
+        public bool CreateForceVectorForStableDorling(List<SMap> SubMaps, double MaxTd, int ForceType, bool WeigthConsi, double InterDis)
+        {
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+
+            // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            this.ForceList = CreateStableDorlingForceVectorfrmGraph(SubMaps, MaxTd, ForceType, WeigthConsi, InterDis);//ForceList
 
             if (MakeForceVectorfrmGraphNew())
                 return true;

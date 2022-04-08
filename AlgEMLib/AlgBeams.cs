@@ -1289,6 +1289,135 @@ namespace AlgEMLib
             }
         }
 
+        /// <summary>
+        /// DorlingDisplace
+        /// MaxTd 吸力的作用范围
+        /// </summary>
+        public void DoDisplacePgStableDorling(SMap pMap, List<SMap> SubMaps,double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        {
+            fV = new BeamsForceVector(this.ProxiGraph);
+            //求吸引力-2014-3-20所用
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.isDragForce = this.isDragF;
+            fV.CreateForceVectorForStableDorling(SubMaps, MaxTd, ForceType, WeightConsi, InterDis);//ForceList
+            this.F = fV.Vector_F;
+
+            double MaxD;
+            double MaxF;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            if (this.ProxiGraph.NodeList.Count <= 2)
+            {
+                #region 基本几何算法（直接移位）
+                BeamsForceVector BFV = new BeamsForceVector();
+                PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, pMap.PolygonList);
+                PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, pMap.PolygonList);
+                List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
+                #endregion
+
+                #region 更新坐标
+                if (ForceList.Count > 0)
+                {
+                    for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
+                    {
+                        int Cachei = -1;
+
+                        if (i == 0)
+                        {
+                            Cachei = 1;
+
+                        }
+                        else
+                        {
+                            Cachei = 0;
+                        }
+
+                        ProxiNode curNode = this.ProxiGraph.NodeList[Cachei];
+                        curNode.X += ForceList[Cachei].Fx;//更新邻近图
+                        curNode.Y += ForceList[Cachei].Fy;
+
+                        PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
+                        foreach (TriNode curPoint in po.PointList)
+                        {
+                            curPoint.X += ForceList[Cachei].Fx;
+                            curPoint.Y += ForceList[Cachei].Fy;
+                        }
+                    }
+                }
+                #endregion
+
+                MaxF = 0;
+                this.isContinue = false;
+                return;
+            }
+
+            else
+            {
+                //计算刚度矩阵
+                bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                this.K = bM.Matrix_K;
+
+                this.SetBoundPointParamforPG();//设置边界条件
+                try
+                {
+                    this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                }
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.E *= k;
+                    //再次计算刚度矩阵
+                    bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                    this.K = bM.Matrix_K;
+                    SetBoundPointParamforPG();//设置边界条件
+                    try
+                    {
+                        this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                    }
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPGDorling();      //更新坐标
+            }
+
+            ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
+
+            if (MaxF <= StopT)
+            {
+                this.isContinue = false;
+            }
+        }
 
         /// <summary>
         /// DorlingDisplace

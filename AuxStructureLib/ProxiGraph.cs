@@ -652,7 +652,6 @@ namespace AuxStructureLib
 
         /// <summary>
         /// 创建点集的RNG图（最短距离）
-        ///
         ///RNG计算(找到邻近图中每一个三角形，删除三角形中的最长边)
         ///说明：对于任意一条边，找到对应的三角形；如果是最长边，则删除（如果是一条边，保留；如果是两条边，若是最长边，删除）
         /// </summary>
@@ -808,7 +807,6 @@ namespace AuxStructureLib
             this.KGNodesList = this.RNGBuildingNodesListShortestDistance;
             this.KGEdgesList = this.RNGBuildingEdgesListShortestDistance;
         }
-
 
         /// <summary>
         /// 从骨架线构造邻近图
@@ -1868,7 +1866,7 @@ namespace AuxStructureLib
         /// /// <summary>
         /// 删除较长的边(距离计算考虑了圆的半径)
         /// </summary>EdgeList=邻近图的边
-        /// </summary>PoList=circles
+        /// </summary>PoList=circles 圆集合
         /// <param name="Td">边的阈值条件</param>
         public void LabelLongerEdges(List<ProxiEdge> EdgeList, List<PolygonObject> PoList, double Td)
         {
@@ -1883,6 +1881,38 @@ namespace AuxStructureLib
                 if ((EdgeDis - RSDis) > Td)
                 {
                     EdgeList[i].LongEdge = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 标识边是否表示了对应Regions的邻近关系
+        /// </summary>
+        /// <param name="EdgeList">边集合</param>
+        /// <param name="pFeatureClass">regions集合</param>
+        /// <param name="Td"></param>
+        public void LabelAdjEdges(List<ProxiEdge> EdgeList,IFeatureClass pFeatureClass,double Td)
+        {
+            for (int i = EdgeList.Count - 1; i >= 0; i--)
+            {
+                ProxiNode Node1 = EdgeList[i].Node1;
+                ProxiNode Node2 = EdgeList[i].Node2;
+
+                IGeometry iGeo = pFeatureClass.GetFeature(Node1.TagID).Shape;
+                IGeometry jGeo = pFeatureClass.GetFeature(Node2.TagID).Shape;
+
+                IRelationalOperator iRo = iGeo as IRelationalOperator;
+                if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
+                {
+                    ITopologicalOperator iTo = iGeo as ITopologicalOperator;
+                    IGeometry pGeo = iTo.Intersect(jGeo, esriGeometryDimension.esriGeometry1Dimension) as IGeometry;
+                    IPolyline pPolyline = pGeo as IPolyline;
+
+                    IPolygon iPo = iGeo as IPolygon; IPolygon jPo = jGeo as IPolygon;
+                    if (pPolyline.Length / iPo.Length > Td || pPolyline.Length / jPo.Length > Td)
+                    {
+                        EdgeList[i].adajactLable = true;
+                    }
                 }
             }
         }
