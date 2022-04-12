@@ -475,47 +475,6 @@ namespace AlgEMLib
             }
             #endregion
 
-            #region 吸引力
-            //if (this.isDragForce == true || this.isDragForce == false)
-            //{
-            //    int n = this.ProxiGraph.NodeList.Count;
-            //    for (int i = 0; i < n; i++)
-            //    {
-
-            //        ProxiNode curNode = this.ProxiGraph.NodeList[i];
-
-            //        int id = curNode.ID;
-            //        //  int tagID = curNode.TagID;
-            //        FeatureType type = curNode.FeatureType;
-            //        ProxiNode originalNode = this.OrigialProxiGraph.GetNodebyID(id);
-            //        if (originalNode == null)
-            //        {
-            //            continue;
-            //        }
-            //        double distance = ComFunLib.CalLineLength(curNode, originalNode);
-            //        if (distance > RMSE && (type != FeatureType.PolylineType))
-            //        {
-            //            //右边
-            //            double f = distance - RMSE;
-            //            double s = (originalNode.Y - curNode.Y) / distance;
-            //            double c = (originalNode.X - curNode.X) / distance;
-            //            //这里将力平分给两个对象
-            //            double fx = f * c;
-            //            double fy = f * s;
-            //            Force force = new Force(id, fx, fy, s, c, f);
-            //            VertexForce vForce = this.GetvForcebyIndex(id, vForceList);
-            //            if (vForce == null)
-            //            {
-            //                vForce = new VertexForce(id);
-            //                vForceList.Add(vForce);
-            //            }
-            //            vForce.forceList.Add(force);
-            //        }
-            //    }
-            //    //foreach(Node cur Node )
-            //}
-            #endregion
-
             #region 求合力
             //先求最大力，以该力的方向为X轴方向建立局部坐标系，求四个主方向上的最大力，最后就合力
             List<Force> rforceList = new List<Force>();
@@ -595,14 +554,17 @@ namespace AlgEMLib
                     PolygonObject Po2 = this.GetPoByID(eNode.TagID, SubMaps[i].PolygonList);
 
                     List<Force> CacheForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType, curEdge.adajactLable, curEdge.LongEdge, MaxTd, WeigthConsi, curEdge.MSTLable, InterDis);//考虑引力
-                    eSumFx = CacheForceList[0].Fx + eSumFx; eSumFy = CacheForceList[0].Fy + eSumFy; eSum = CacheForceList[0].F + eSum;
-                    sSumFx = CacheForceList[1].Fx + sSumFx; sSumFy = CacheForceList[1].Fy + sSumFy; sSum = CacheForceList[1].F + sSum;
-                    s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
+                    if (CacheForceList.Count > 0)
+                    {
+                        sSumFx = CacheForceList[0].Fx + sSumFx; sSumFy = CacheForceList[0].Fy + sSumFy; sSum = CacheForceList[0].F + sSum;
+                        eSumFx = CacheForceList[1].Fx + eSumFx; eSumFy = CacheForceList[1].Fy + eSumFy; eSum = CacheForceList[1].F + eSum;                    
+                        s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
+                    }
                 }
 
                 List<Force> ForceList = new List<Force>();
-                Force eForce = new Force(eNode.ID, eSumFx/SubMaps.Count, eSumFy/SubMaps.Count, s, c, eSum/SubMaps.Count);
-                Force sForce = new Force(sNode.ID, sSumFx / SubMaps.Count, sSumFy / SubMaps.Count, s * (-1), c * (-1), sSum / SubMaps.Count);
+                Force sForce = new Force(sNode.ID, sSumFx / SubMaps.Count, sSumFy / SubMaps.Count, s, c, sSum / SubMaps.Count);
+                Force eForce = new Force(eNode.ID, eSumFx/SubMaps.Count, eSumFy/SubMaps.Count, s*(-1), c*(-1), eSum/SubMaps.Count);
                 ForceList.Add(sForce);
                 ForceList.Add(eForce);
 
@@ -886,7 +848,6 @@ namespace AlgEMLib
             double EdgeDis = this.GetDis(sNode, eNode);
             double RSDis = sPo1.R + ePo2.R;
             List<Force> ForceList = new List<Force>();
-
 
             if (EdgeDis < RSDis)
             {

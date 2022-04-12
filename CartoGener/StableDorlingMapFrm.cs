@@ -110,7 +110,7 @@ namespace CartoGener
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
-            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData(pMap, this.comboBox1.Text);
+            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData_2(pMap, this.comboBox1.Text);
         }
 
         /// <summary>
@@ -120,8 +120,8 @@ namespace CartoGener
         /// <param name="e"></param>
         private void button3_Click(object sender, EventArgs e)
         {
-            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData(pMap, this.comboBox1.Text);//GetTimeSeriesData
-            Dictionary<int, Dictionary<int, List<int>>> Hierarchy = SDMS.GetHierarchy(TimeSeriesData, 0);//获得分组
+            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData_2(pMap, this.comboBox1.Text);//GetTimeSeriesData
+            Dictionary<int, Dictionary<int, List<int>>> Hierarchy = SDMS.GetHierarchy_2(TimeSeriesData, 0);//获得分组
         }
 
         /// <summary>
@@ -140,6 +140,10 @@ namespace CartoGener
 
             npg.CreateRNG(npg.NodeList, npg.EdgeList);//考虑要素之间的重心距离构建RNG
             npg.LabelAdjEdges(npg.EdgeList, pFeatureClass,0);//表示邻近的边
+
+            #region 输出
+            if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
+            #endregion
         }
 
         /// <summary>
@@ -149,8 +153,14 @@ namespace CartoGener
         /// <param name="e"></param>
         private void button5_Click(object sender, EventArgs e)
         {
-            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData(pMap, this.comboBox1.Text);//GetTimeSeriesData
-            List<List<PolygonObject>> CircleLists = DM.GetInitialPolygonObjectForStableDorling(TimeSeriesData, 10);//Circle generalization
+            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData_2(pMap, this.comboBox1.Text);//GetTimeSeriesData
+            List<List<PolygonObject>> CircleLists = DM.GetInitialPolygonObjectForStableDorling(TimeSeriesData, 0.5, 1, 2, 10);//Circle generalization
+            for (int i = 0; i < CircleLists.Count; i++)
+            {
+                SMap Map = new SMap();
+                Map.PolygonList = CircleLists[i];
+                Map.WriteResult2Shp(OutFilePath, i.ToString(), pMap.SpatialReference);
+            }
         }
 
         /// <summary>
@@ -161,12 +171,19 @@ namespace CartoGener
         private void button6_Click(object sender, EventArgs e)
         {
             #region 获得数据并分组
-            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData(pMap, this.comboBox1.Text);//GetTimeSeriesData
-            Dictionary<int, Dictionary<int, List<int>>> Hierarchy = SDMS.GetHierarchy(TimeSeriesData, 0);//获得分组
+            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData_2(pMap, this.comboBox1.Text);//GetTimeSeriesData
+            Dictionary<int, Dictionary<int, List<int>>> Hierarchy = SDMS.GetHierarchy_2(TimeSeriesData, 0);//获得分组
             #endregion
 
             #region 获得圆形
-            List<List<PolygonObject>> CircleLists = DM.GetInitialPolygonObjectForStableDorling(TimeSeriesData, 10);//Circle generalization
+            List<List<PolygonObject>> CircleLists = DM.GetInitialPolygonObjectForStableDorling(TimeSeriesData, 0.5, 1, 2, 10);//Circle generalization
+            List<SMap> MapList = new List<SMap>();
+            for (int i = 0; i < CircleLists.Count; i++)
+            {
+                SMap Map = new SMap();
+                Map.PolygonList = CircleLists[i];
+                MapList.Add(Map);
+            }
             #endregion
 
             #region 构建基础邻近关系
@@ -179,7 +196,39 @@ namespace CartoGener
             #endregion
 
             #region 层次移位操作
-             
+            List<int> LevelLabel = Hierarchy.Keys.ToList();
+            for (int i = LevelLabel.Count - 1; i >= 0; i--)
+            {
+                #region 获取每一层的Maps
+                Dictionary<int, List<int>> LevelMap = Hierarchy[i];
+                List<List<SMap>> MapLists = new List<List<SMap>>();
+                foreach (KeyValuePair<int, List<int>> kv in LevelMap)
+                {
+                    List<SMap> CacheMapList = new List<SMap>();
+                    for (int j = 0; j < kv.Value.Count; j++)
+                    {
+                        CacheMapList.Add(MapList[kv.Value[j]]);
+                    }
+                    MapLists.Add(CacheMapList);
+                }
+                #endregion
+
+                #region
+                for (int j = 0; j < MapLists.Count; j++)
+                {
+                    int Testk = Convert.ToInt16(2 * pFeatureClass.FeatureCount(null) / TimeSeriesData.Count);
+                    DM.StableDorlingBeams(npg, MapLists[j], 1, 10, 1, 1, Convert.ToInt16(2 * pFeatureClass.FeatureCount(null)/TimeSeriesData.Count), 0, 0.05, 20, 3, true, 0.2);
+                }
+                #endregion
+            }
+            #endregion
+
+            #region 输出
+            for (int i = 0; i < MapList.Count; i++)
+            {
+                MapList[i].WriteResult2Shp(OutFilePath,i.ToString(), pMap.SpatialReference);
+            }
+            if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
             #endregion
         }
     }

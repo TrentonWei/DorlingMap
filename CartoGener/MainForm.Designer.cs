@@ -35,6 +35,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.dorlingMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.StableDorlingMapForToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -43,7 +44,6 @@
             this.axMapControl1 = new AxESRI.ArcGIS.Controls.AxMapControl();
             this.axTOCControl1 = new AxESRI.ArcGIS.Controls.AxTOCControl();
             this.axToolbarControl1 = new AxESRI.ArcGIS.Controls.AxToolbarControl();
-            this.StableDorlingMapForToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axLicenseControl2)).BeginInit();
@@ -70,6 +70,13 @@
             this.dorlingMapToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.dorlingMapToolStripMenuItem.Text = "DorlingMap";
             this.dorlingMapToolStripMenuItem.Click += new System.EventHandler(this.dorlingMapToolStripMenuItem_Click);
+            // 
+            // StableDorlingMapForToolStripMenuItem
+            // 
+            this.StableDorlingMapForToolStripMenuItem.Name = "StableDorlingMapForToolStripMenuItem";
+            this.StableDorlingMapForToolStripMenuItem.Size = new System.Drawing.Size(158, 24);
+            this.StableDorlingMapForToolStripMenuItem.Text = "Stable DorlingMap";
+            this.StableDorlingMapForToolStripMenuItem.Click += new System.EventHandler(this.StableDorlingMapForToolStripMenuItem_Click);
             // 
             // splitter1
             // 
@@ -144,12 +151,6 @@
             this.axToolbarControl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axToolbarControl1.OcxState")));
             this.axToolbarControl1.Size = new System.Drawing.Size(1141, 28);
             this.axToolbarControl1.TabIndex = 12;
-            // 
-            // StableDorlingMapForToolStripMenuItem
-            // 
-            this.StableDorlingMapForToolStripMenuItem.Name = "StableDorlingMapForToolStripMenuItem";
-            this.StableDorlingMapForToolStripMenuItem.Size = new System.Drawing.Size(158, 24);
-            this.StableDorlingMapForToolStripMenuItem.Text = "Stable DorlingMap";
             // 
             // MainForm
             // 

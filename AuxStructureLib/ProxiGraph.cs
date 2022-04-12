@@ -803,9 +803,10 @@ namespace AuxStructureLib
             #endregion
 
             this.RNGBuildingNodesListShortestDistance = PnList;
-
             this.KGNodesList = this.RNGBuildingNodesListShortestDistance;
             this.KGEdgesList = this.RNGBuildingEdgesListShortestDistance;
+
+            this.EdgeList = this.RNGBuildingEdgesListShortestDistance;
         }
 
         /// <summary>

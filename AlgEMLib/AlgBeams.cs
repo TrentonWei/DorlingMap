@@ -69,6 +69,25 @@ namespace AlgEMLib
         /// <param name="e">弹性模量</param>
         /// <param name="i">惯性力矩</param>
         /// <param name="a">横截面积</param>
+        /// <param name="disThresholdPP">邻近冲突距离阈值</param>
+        public AlgBeams(ProxiGraph proxiGraph, List<SMap> maps, double e, double i, double a)
+        {
+            this.E = e;
+            this.I = i;
+            this.A = a;
+            this.ProxiGraph = proxiGraph;
+            this.MapLists = maps;
+        }
+
+
+        /// <summary>
+        /// 构造函数-从建筑物群邻近图构建Beams模型
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="map">地图对象</param>
+        /// <param name="e">弹性模量</param>
+        /// <param name="i">惯性力矩</param>
+        /// <param name="a">横截面积</param>
         /// <param name="disThresholdLP">线-面邻近冲突距离阈值</param>
         /// <param name="disThresholdPP">面-面邻近冲突距离阈值</param>
         public AlgBeams(ProxiGraph proxiGraph, SMap map, double e, double i, double a, 
@@ -1166,7 +1185,6 @@ namespace AlgEMLib
         public void DoDisplacePgDorling(SMap pMap, double StopT,double MaxTd,int ForceType,bool WeightConsi,double InterDis)
         {
             fV = new BeamsForceVector(this.ProxiGraph);
-            //求吸引力-2014-3-20所用
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
@@ -1293,10 +1311,9 @@ namespace AlgEMLib
         /// DorlingDisplace
         /// MaxTd 吸力的作用范围
         /// </summary>
-        public void DoDisplacePgStableDorling(SMap pMap, List<SMap> SubMaps,double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        public void DoDisplacePgStableDorling(List<SMap> SubMaps,double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
         {
             fV = new BeamsForceVector(this.ProxiGraph);
-            //求吸引力-2014-3-20所用
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
@@ -1304,19 +1321,39 @@ namespace AlgEMLib
             this.F = fV.Vector_F;
 
             double MaxD;
-            double MaxF;
+            double MaxF = 0;
             double MaxDF;
             double MaxFD;
             int indexMaxD = -1;
             int indexMaxF = -1;
 
-            if (this.ProxiGraph.NodeList.Count <= 2)
+            if (this.ProxiGraph.NodeList.Count == 2)
             {
-                #region 基本几何算法（直接移位）
-                BeamsForceVector BFV = new BeamsForceVector();
-                PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, pMap.PolygonList);
-                PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, pMap.PolygonList);
-                List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
+                #region 力计算
+                double eSumFx = 0; double eSumFy = 0; double eSum = 0;
+                double sSumFx = 0; double sSumFy = 0; double sSum = 0;
+                double s = 0; double c = 0;
+                for (int i = 0; i < SubMaps.Count; i++)
+                {
+                    #region 基本几何算法（直接移位）
+                     BeamsForceVector BFV = new BeamsForceVector();
+                     PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, SubMaps[i].PolygonList);
+                     PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, SubMaps[i].PolygonList);
+                     List<Force> CacheForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
+                     if (CacheForceList.Count > 0)
+                     {
+                         eSumFx = CacheForceList[0].Fx + eSumFx; eSumFy = CacheForceList[0].Fy + eSumFy; eSum = CacheForceList[0].F + eSum;
+                         sSumFx = CacheForceList[1].Fx + sSumFx; sSumFy = CacheForceList[1].Fy + sSumFy; sSum = CacheForceList[1].F + sSum;
+                         s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
+                     }
+                     #endregion
+                }
+
+                List<Force> ForceList = new List<Force>();
+                Force eForce = new Force(this.ProxiGraph.NodeList[1].TagID, eSumFx / SubMaps.Count, eSumFy / SubMaps.Count, s, c, eSum / SubMaps.Count);
+                Force sForce = new Force(this.ProxiGraph.NodeList[0].TagID, sSumFx / SubMaps.Count, sSumFy / SubMaps.Count, s * (-1), c * (-1), sSum / SubMaps.Count);
+                ForceList.Add(sForce);
+                ForceList.Add(eForce);
                 #endregion
 
                 #region 更新坐标
@@ -1340,11 +1377,14 @@ namespace AlgEMLib
                         curNode.X += ForceList[Cachei].Fx;//更新邻近图
                         curNode.Y += ForceList[Cachei].Fy;
 
-                        PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
-                        foreach (TriNode curPoint in po.PointList)
+                        for (int j = 0; j < SubMaps.Count; j++)
                         {
-                            curPoint.X += ForceList[Cachei].Fx;
-                            curPoint.Y += ForceList[Cachei].Fy;
+                            PolygonObject po = this.GetPoByID(curNode.TagID, SubMaps[j].PolygonList);
+                            foreach (TriNode curPoint in po.PointList)
+                            {
+                                curPoint.X += ForceList[Cachei].Fx;
+                                curPoint.Y += ForceList[Cachei].Fy;
+                            }
                         }
                     }
                 }
@@ -1355,7 +1395,7 @@ namespace AlgEMLib
                 return;
             }
 
-            else
+            else if (this.ProxiGraph.NodeList.Count >2)
             {
                 //计算刚度矩阵
                 bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
@@ -1371,7 +1411,6 @@ namespace AlgEMLib
                     this.isContinue = false;
                     return;
                 }
-
 
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
 
@@ -1408,7 +1447,7 @@ namespace AlgEMLib
                     return;
                 }
 
-                UpdataCoordsforPGDorling();      //更新坐标
+                UpdataCoordsforPGDorling(SubMaps);      //更新坐标
             }
 
             ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
@@ -1768,6 +1807,62 @@ namespace AlgEMLib
                         curPoint.X += curDx;
                         curPoint.Y += curDy;
                     }
+                }
+                else
+                {
+                    this.D[3 * index, 0] = curDx;
+                    this.D[3 * index + 1, 0] = curDy;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 更新群组坐标位置
+        /// </summary>
+        private void UpdataCoordsforPGDorling(List<SMap> Maps)
+        {
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                int index = curNode.ID;
+                int tagID = curNode.TagID;
+                FeatureType fType = curNode.FeatureType;
+                VoronoiPolygon vp = null;
+                Force force = fV.GetForcebyIndex(index);
+
+
+                double curDx0 = 0;
+                double curDy0 = 0;
+                double curDx = 0;
+                double curDy = 0;
+                if (force != null)
+                {
+                    curDx0 = this.fV.GetForcebyIndex(index).Fx;
+                    curDy0 = this.fV.GetForcebyIndex(index).Fy;
+                    curDx = this.fV.GetForcebyIndex(index).Fx;
+                    curDy = this.fV.GetForcebyIndex(index).Fy;
+                    if (this.IsTopCos == true)
+                    {
+                        vp = this.VD.GetVPbyIDandType(tagID, fType);
+                        vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+                        this.D[3 * index, 0] = curDx;
+                        this.D[3 * index + 1, 0] = curDy;
+                    }
+                    //纠正拓扑错误
+                    curNode.X += curDx;//更新邻近图
+                    curNode.Y += curDy;
+
+                    #region 更新Polygons
+                    for (int i = 0; i < Maps.Count; i++)
+                    {
+                        PolygonObject po = this.GetPoByID(tagID, Maps[i].PolygonList);
+                        foreach (TriNode curPoint in po.PointList)
+                        {
+                            curPoint.X += curDx;
+                            curPoint.Y += curDy;
+                        }
+                    }
+                    #endregion
                 }
                 else
                 {

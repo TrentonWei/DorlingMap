@@ -870,6 +870,7 @@ namespace CartoGener
                 pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
                 pg.PgRefined(Map.PolygonList);//依据重叠关系refined          
                 #endregion
+
                 DM.DorlingBeams(pg, Map, 1, 10, 1, 1, 1, 0, 0.05, 1000, 1, true, 0.2);
                 Step++;
                 Console.WriteLine(Step);
@@ -1333,6 +1334,7 @@ namespace CartoGener
             DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
             DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+            if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
             #endregion
 
             oTime.Stop(); //记录结束时间

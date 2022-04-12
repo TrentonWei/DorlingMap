@@ -40,7 +40,7 @@ namespace CartoGener
         ILayer pLayer;
 
         /// <summary>
-        /// DorlingMap Create From
+        /// DorlingMap Create Form
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -116,6 +116,17 @@ namespace CartoGener
             {
                 this.contextMenuStrip1.Show(axTOCControl1, e.x, e.y);
             }
+        }
+
+        /// <summary>
+        /// Stable DorlingMap Create Form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StableDorlingMapForToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StableDorlingMapFrm SDMF=new StableDorlingMapFrm(this.axMapControl1);
+            SDMF.Show();
         }
     }
 }

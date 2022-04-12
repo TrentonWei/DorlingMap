@@ -37,9 +37,9 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -121,15 +121,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Experimental use";
             // 
-            // button4
+            // button6
             // 
-            this.button4.Location = new System.Drawing.Point(16, 115);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(187, 23);
-            this.button4.TabIndex = 7;
-            this.button4.Text = "PgConstruction";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.button6.Location = new System.Drawing.Point(16, 145);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(187, 23);
+            this.button6.TabIndex = 9;
+            this.button6.Text = "StableDorling";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button5
             // 
@@ -141,21 +141,21 @@
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
-            // button6
+            // button4
             // 
-            this.button6.Location = new System.Drawing.Point(16, 145);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(187, 23);
-            this.button6.TabIndex = 9;
-            this.button6.Text = "StableDorling";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
+            this.button4.Location = new System.Drawing.Point(16, 115);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(187, 23);
+            this.button4.TabIndex = 7;
+            this.button4.Text = "PgConstruction";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // StableDorlingMapFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(703, 577);
+            this.ClientSize = new System.Drawing.Size(703, 216);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.comboBox2);

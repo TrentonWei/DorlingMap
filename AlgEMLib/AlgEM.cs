@@ -28,6 +28,7 @@ namespace AlgEMLib
         public ProxiGraph Truss = null; //Truss
 
         public SMap Map = null;            //地图
+        public List<SMap> MapLists = null; //地图集合
 
         public List<GroupofMapObject> Groups = null;
 
