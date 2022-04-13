@@ -25,6 +25,8 @@ namespace AlgEMLib
         public PolylineObject Polyline = null;//线对象
 
         public ProxiGraph ProxiGraph = null; //邻近图
+        public List<ProxiGraph> PgList = null;//邻近图群组
+
         public ProxiGraph Truss = null; //Truss
 
         public SMap Map = null;            //地图

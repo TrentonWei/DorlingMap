@@ -915,5 +915,46 @@ namespace CartoGener
                 }
             }
         }
+
+        /// <summary>
+        /// Beams Displace
+        /// </summary>
+        /// <param name="pg">邻近图</param>
+        /// <param name="pMap">Dorling图层</param>
+        /// SubMaps 基于pMap进行更新的图层
+        /// <param name="scale">比例尺</param>
+        /// <param name="E">弹性模量</param>
+        /// <param name="I">惯性力矩</param>
+        /// <param name="A">横切面积</param>
+        /// MaxTd:吸引力作用的最大范围，若距离超过一定数值，就没有吸引力
+        /// InterDis=定义Touch的距离
+        /// <param name="Iterations">迭代次数</param>
+        public void StableDorlingBeams(List<ProxiGraph> PgList, List<SMap> SubMaps, double scale, double E, double I, double A, int Iterations, int algType, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        {
+            AlgBeams algBeams = new AlgBeams(PgList, SubMaps, I, E, A);
+
+            ProxiGraph CopyG = Clone((object)PgList[0]) as ProxiGraph;
+            algBeams.OriginalGraph = CopyG;
+            algBeams.Scale = scale;
+            algBeams.AlgType = algType;
+            for (int i = 0; i < Iterations; i++)//迭代计算
+            {
+                Console.WriteLine(i.ToString());//标识
+
+                algBeams.DoDisplacePgStableDorling(SubMaps, StopT, MaxTd, ForceType, WeightConsi, InterDis);// 调用Beams算法 
+                //pg.OverlapDelete();
+                //pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
+                //pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
+                //pg.DeleteCrossEdge(pg.EdgeList, pMap.PolygonList);//删除穿过的边                
+                //pg.PgRefined(pg.MSTEdgeList);//MSTrefine
+                PgList[0].PgRefined(SubMaps);
+
+                this.continueLable = algBeams.isContinue;
+                if (algBeams.isContinue == false)
+                {
+                    break;
+                }
+            }
+        }
     }
 }

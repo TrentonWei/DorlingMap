@@ -164,7 +164,7 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// StableDorlingMap
+        /// StableDorlingMap_RNG
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -187,37 +187,48 @@ namespace CartoGener
             #endregion
 
             #region 构建基础邻近关系
-            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
-            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
-            ProxiGraph npg = new ProxiGraph();
-            npg.CreateProxiGByDT(pFeatureClass);//依据三角网构建邻近图
-            npg.CreateRNG(npg.NodeList, npg.EdgeList);//考虑要素之间的重心距离构建RNG
-            npg.LabelAdjEdges(npg.EdgeList, pFeatureClass, 0);//表示邻近的边
+            List<ProxiGraph> PgList = new List<ProxiGraph>();
+            for (int i = 0; i < CircleLists.Count; i++)
+            {
+                IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+                IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+                ProxiGraph npg = new ProxiGraph();
+                npg.CreateProxiGByDT(pFeatureClass);//依据三角网构建邻近图
+                npg.CreateRNG(npg.NodeList, npg.EdgeList);//考虑要素之间的重心距离构建RNG
+                npg.LabelAdjEdges(npg.EdgeList, pFeatureClass, 0);//表示邻近的边
+
+                PgList.Add(npg);
+            }
             #endregion
 
             #region 层次移位操作
             List<int> LevelLabel = Hierarchy.Keys.ToList();
+            int CircleCount = TimeSeriesData[0].Keys.Count;
+            int TimeSeriesCount = TimeSeriesData.Count;
             for (int i = LevelLabel.Count - 1; i >= 0; i--)
             {
                 #region 获取每一层的Maps
                 Dictionary<int, List<int>> LevelMap = Hierarchy[i];
                 List<List<SMap>> MapLists = new List<List<SMap>>();
+                List<List<ProxiGraph>> PgLists = new List<List<ProxiGraph>>();
                 foreach (KeyValuePair<int, List<int>> kv in LevelMap)
                 {
                     List<SMap> CacheMapList = new List<SMap>();
+                    List<ProxiGraph> CachePgList = new List<ProxiGraph>();
                     for (int j = 0; j < kv.Value.Count; j++)
                     {
                         CacheMapList.Add(MapList[kv.Value[j]]);
+                        CachePgList.Add(PgList[kv.Value[j]]);
                     }
                     MapLists.Add(CacheMapList);
+                    PgLists.Add(CachePgList);
                 }
                 #endregion
 
-                #region
+                #region Dorling Displacement
                 for (int j = 0; j < MapLists.Count; j++)
                 {
-                    int Testk = Convert.ToInt16(2 * pFeatureClass.FeatureCount(null) / TimeSeriesData.Count);
-                    DM.StableDorlingBeams(npg, MapLists[j], 1, 10, 1, 1, Convert.ToInt16(2 * pFeatureClass.FeatureCount(null)/TimeSeriesData.Count), 0, 0.05, 20, 3, true, 0.2);
+                    DM.StableDorlingBeams(PgLists[j], MapLists[j], 1, 10, 1, 1, Convert.ToInt16(2 * CircleCount / TimeSeriesCount), 0, 0.05, 20, 3, true, 0.2);
                 }
                 #endregion
             }
@@ -227,8 +238,103 @@ namespace CartoGener
             for (int i = 0; i < MapList.Count; i++)
             {
                 MapList[i].WriteResult2Shp(OutFilePath,i.ToString(), pMap.SpatialReference);
+                if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图"+i.ToString(), pMap.SpatialReference); }
+            }         
+            #endregion
+        }
+
+        /// <summary>
+        /// StableDorlingMap_Adjacent (考虑了重叠和吸引力删除的方法)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button7_Click(object sender, EventArgs e)
+        {
+            #region 获得数据并分组
+            List<Dictionary<IPolygon, double>> TimeSeriesData = DMS.GetTimeSeriesData_2(pMap, this.comboBox1.Text);//GetTimeSeriesData
+            Dictionary<int, Dictionary<int, List<int>>> Hierarchy = SDMS.GetHierarchy_2(TimeSeriesData, 0);//获得分组
+            #endregion
+
+            #region 获得圆形
+            List<List<PolygonObject>> CircleLists = DM.GetInitialPolygonObjectForStableDorling(TimeSeriesData, 0.5, 1, 2, 10);//Circle generalization
+            List<SMap> MapList = new List<SMap>();
+            for (int i = 0; i < CircleLists.Count; i++)
+            {
+                SMap Map = new SMap();
+                Map.PolygonList = CircleLists[i];
+                MapList.Add(Map);
             }
-            if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
+            #endregion
+
+            #region 构建基础邻近关系
+            List<ProxiGraph> PgList = new List<ProxiGraph>();
+            for (int i = 0; i < CircleLists.Count; i++)
+            {
+                IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+                IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+                ProxiGraph npg = new ProxiGraph();
+                npg.CreateProxiG(pFeatureClass, 0);
+                PgList.Add(npg);
+            }
+            #endregion
+
+            #region 层次移位操作
+            List<int> LevelLabel = Hierarchy.Keys.ToList();
+            int CircleCount = TimeSeriesData[0].Keys.Count;
+            int TimeSeriesCount = TimeSeriesData.Count;
+
+            for (int i = LevelLabel.Count - 1; i >= 0; i--)
+            {
+                #region 获取每一层的Maps
+                Dictionary<int, List<int>> LevelMap = Hierarchy[i];
+                List<List<SMap>> MapLists = new List<List<SMap>>();
+                List<List<ProxiGraph>> PgLists = new List<List<ProxiGraph>>();
+                foreach (KeyValuePair<int, List<int>> kv in LevelMap)
+                {
+                    List<SMap> CacheMapList = new List<SMap>();
+                    List<ProxiGraph> CachePgList = new List<ProxiGraph>();
+                    for (int j = 0; j < kv.Value.Count; j++)
+                    {
+                        CacheMapList.Add(MapList[kv.Value[j]]);
+                        CachePgList.Add(PgList[kv.Value[j]]);
+                    }
+                    MapLists.Add(CacheMapList);
+                    PgLists.Add(CachePgList);
+                }
+                #endregion
+
+                #region 依据圆之间的重叠程度更新
+                for (int j = 0; j < PgLists.Count; j++)
+                {
+                    PgLists[j][0].PgRefined(MapLists[j]);
+                }
+                #endregion
+
+                #region Dorling Displacement
+                if (i >= LevelLabel.Count / 2)
+                {
+                    for (int j = 0; j < MapLists.Count; j++)
+                    {
+                        DM.StableDorlingBeams(PgLists[j], MapLists[j], 1, 10, 1, 1, Convert.ToInt16(4 * CircleCount / TimeSeriesCount), 0, 0.05, 20, 3, true, 0.2);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < MapLists.Count; j++)
+                    {
+                        DM.StableDorlingBeams(PgLists[j], MapLists[j], 1, 10, 1, 1, Convert.ToInt16(4 * CircleCount / TimeSeriesCount), 0, 0.05, 20, 0, true, 0.2);
+                    }
+                }
+                #endregion
+            }
+            #endregion
+
+            #region 输出
+            for (int i = 0; i < MapList.Count; i++)
+            {
+                MapList[i].WriteResult2Shp(OutFilePath, i.ToString(), pMap.SpatialReference);
+                if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString(), pMap.SpatialReference); }
+            }
             #endregion
         }
     }

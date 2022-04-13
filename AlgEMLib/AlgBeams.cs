@@ -62,6 +62,25 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// 构造函数-Stable DorlingBeams
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="map">地图对象</param>
+        /// <param name="e">弹性模量</param>
+        /// <param name="i">惯性力矩</param>
+        /// <param name="a">横截面积</param>
+        /// <param name="disThresholdPP">邻近冲突距离阈值</param>
+        public AlgBeams(List<ProxiGraph> PgList, List<SMap> maps, double e, double i, double a)
+        {
+            this.E = e;
+            this.I = i;
+            this.A = a;
+            this.PgList = PgList;
+            this.MapLists = maps;
+            this.ProxiGraph = PgList[0];
+        }
+
+        /// <summary>
         /// 构造函数-从建筑物群邻近图构建Beams模型
         /// </summary>
         /// <param name="proxiGraph">邻近图</param>
@@ -972,7 +991,6 @@ namespace AlgEMLib
             }
         }
 
-
         /// <summary>
         /// 更新坐标位置
         /// </summary>
@@ -1848,9 +1866,17 @@ namespace AlgEMLib
                         this.D[3 * index, 0] = curDx;
                         this.D[3 * index + 1, 0] = curDy;
                     }
-                    //纠正拓扑错误
-                    curNode.X += curDx;//更新邻近图
-                    curNode.Y += curDy;
+
+                    #region 更新群组邻近图
+                    for (int i = 0; i < this.PgList.Count; i++)
+                    {
+                        ProxiNode CacheCurNode = this.GetPointByID(index, this.PgList[i].NodeList);
+
+                        //纠正拓扑错误
+                        CacheCurNode.X += curDx;
+                        CacheCurNode.Y += curDy;
+                    }
+                    #endregion
 
                     #region 更新Polygons
                     for (int i = 0; i < Maps.Count; i++)
@@ -1945,6 +1971,27 @@ namespace AlgEMLib
             }
 
             return Po;
+        }
+
+        /// <summary>
+        /// GetPointByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public ProxiNode GetPointByID(int ID, List<ProxiNode> NodeList)
+        {
+            ProxiNode No = null;
+            foreach (ProxiNode CacheNo in NodeList)
+            {
+                if (CacheNo.ID == ID)
+                {
+                    No = CacheNo;
+                    break;
+                }
+            }
+
+            return No;
         }
 
         /// <summary>

@@ -1959,6 +1959,7 @@ namespace AuxStructureLib
         /// <summary>
         /// 依据冲突refine proximity graph
         /// 虽然不邻接，但是冲突的Circles
+        /// 依据重叠Refine 邻近图(不删除原有的重叠边)
         /// </summary>
         /// <param name="PoList"></param>
         public void PgRefined(List<PolygonObject> PoList)
@@ -1984,6 +1985,98 @@ namespace AuxStructureLib
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 依据冲突refine proximity graph
+        /// 虽然不邻接，但是冲突的Circles
+        /// 依据重叠Refine 邻近图(删除原有的重叠边)
+        /// </summary>
+        /// <param name="PoList"></param>
+        public void PgRefined_2(List<PolygonObject> PoList)
+        {
+            #region 首先删除邻近图中原有的Overlap边
+            for (int i = this.EdgeList.Count - 1; i >= 0; i--)
+            {
+                ProxiEdge Pe = this.EdgeList[i];
+                if (Pe.StepOverLap)
+                {
+                    this.EdgeList.Remove(Pe);
+                }
+            }
+            #endregion
+
+            #region 更新
+            for (int i = 0; i < PoList.Count - 1; i++)
+            {
+                for (int j = i + 1; j < PoList.Count; j++)
+                {
+                    ProxiNode Node1 = this.NodeList[PoList[i].ID];
+                    ProxiNode Node2 = this.NodeList[PoList[j].ID];
+
+                    double EdgeDis = this.GetDis(Node1, Node2);
+                    double RSDis = PoList[i].R + PoList[j].R;
+
+                    if (EdgeDis < RSDis)
+                    {
+                        ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
+                        if (!this.repeatEdge(rPe, this.EdgeList))
+                        {
+                            rPe.StepOverLap = true;
+                            this.EdgeList.Add(rPe);
+                        }
+                    }
+                }
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// 依据冲突refine proximity graph
+        /// 虽然不邻接，但是冲突的Circles
+        /// 依据重叠Refine 邻近图
+        /// </summary>
+        /// <param name="PoList"></param>
+        public void PgRefined(List<SMap> MapList)
+        {
+            #region 首先删除邻近图中原有的Overlap边
+            for (int i = this.EdgeList.Count - 1; i >= 0; i--)
+            {
+                ProxiEdge Pe = this.EdgeList[i];
+                if (Pe.StepOverLap)
+                {
+                    this.EdgeList.Remove(Pe);
+                }
+            }
+            #endregion
+
+            #region 更新
+            for (int k = 0; k < MapList.Count; k++)
+            {
+                List<PolygonObject> PoList = MapList[k].PolygonList;
+                for (int i = 0; i < PoList.Count - 1; i++)
+                {
+                    for (int j = i + 1; j < PoList.Count; j++)
+                    {
+                        ProxiNode Node1 = this.NodeList[PoList[i].ID];
+                        ProxiNode Node2 = this.NodeList[PoList[j].ID];
+
+                        double EdgeDis = this.GetDis(Node1, Node2);
+                        double RSDis = PoList[i].R + PoList[j].R;
+
+                        if (EdgeDis < RSDis)
+                        {
+                            ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
+                            if (!this.repeatEdge(rPe, this.EdgeList))
+                            {
+                                rPe.StepOverLap = true;
+                                this.EdgeList.Add(rPe);
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion
         }
 
         /// <summary>
