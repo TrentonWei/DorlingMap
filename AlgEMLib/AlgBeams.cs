@@ -1329,13 +1329,14 @@ namespace AlgEMLib
         /// DorlingDisplace
         /// MaxTd 吸力的作用范围
         /// </summary>
-        public void DoDisplacePgStableDorling(List<SMap> SubMaps,double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        /// GroupForceType=0 平均力；GroupForceType=1最大力；GroupForceType=0 最小力；
+        public void DoDisplacePgStableDorling(List<SMap> SubMaps,double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis,int GroupForceType)
         {
             fV = new BeamsForceVector(this.ProxiGraph);
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
-            fV.CreateForceVectorForStableDorling(SubMaps, MaxTd, ForceType, WeightConsi, InterDis);//ForceList
+            fV.CreateForceVectorForStableDorling(SubMaps, MaxTd, ForceType, WeightConsi, InterDis,GroupForceType);//ForceList
             this.F = fV.Vector_F;
 
             double MaxD;

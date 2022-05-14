@@ -314,7 +314,7 @@
             this.button17.Name = "button17";
             this.button17.Size = new System.Drawing.Size(281, 28);
             this.button17.TabIndex = 4;
-            this.button17.Text = "TDD+RT+RMS";
+            this.button17.Text = "TDD+RT+RMS+NumO";
             this.button17.UseVisualStyleBackColor = true;
             this.button17.Click += new System.EventHandler(this.button17_Click);
             // 

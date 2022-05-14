@@ -192,6 +192,26 @@ namespace CartoGener
         }
 
         /// <summary>
+        /// 获取群组的Name
+        /// </summary>
+        /// <returns></returns>
+        public List<String> GetNames(IFeatureClass pFeatureClass, String NameField)
+        {
+            List<string> NameList = new List<string>();
+
+            IFeatureCursor pFeatureCursor = pFeatureClass.Update(null, true);
+            IFeature pFeature = pFeatureCursor.NextFeature();
+            while (pFeature != null)
+            {
+                string Name = this.GetStringValue(pFeature, NameField);
+                NameList.Add(Name);
+                pFeature = pFeatureCursor.NextFeature();
+            }
+
+            return NameList;
+        }
+
+        /// <summary>
         /// 计算给定的两个圆的距离
         /// </summary>
         /// <param name="C1"></param>

@@ -887,8 +887,9 @@ namespace CartoGener
         /// <param name="A">横切面积</param>
         /// MaxTd:吸引力作用的最大范围，若距离超过一定数值，就没有吸引力
         /// InterDis=定义Touch的距离
+        /// /// GroupForceType=0 平均力；GroupForceType=1最大力；GroupForceType=0 最小力；
         /// <param name="Iterations">迭代次数</param>
-        public void StableDorlingBeams(ProxiGraph pg, List<SMap> SubMaps, double scale, double E, double I, double A, int Iterations, int algType, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        public void StableDorlingBeams(ProxiGraph pg, List<SMap> SubMaps, double scale, double E, double I, double A, int Iterations, int algType, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis,int GroupForceType)
         {
             AlgBeams algBeams = new AlgBeams(pg, SubMaps, E, I, A);
             //求吸引力-2014-3-20所用
@@ -901,7 +902,7 @@ namespace CartoGener
             {
                 Console.WriteLine(i.ToString());//标识
 
-                algBeams.DoDisplacePgStableDorling(SubMaps, StopT, MaxTd, ForceType, WeightConsi, InterDis);// 调用Beams算法 
+                algBeams.DoDisplacePgStableDorling(SubMaps, StopT, MaxTd, ForceType, WeightConsi, InterDis,GroupForceType);// 调用Beams算法 
                 //pg.OverlapDelete();
                 //pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
                 //pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
@@ -929,7 +930,8 @@ namespace CartoGener
         /// MaxTd:吸引力作用的最大范围，若距离超过一定数值，就没有吸引力
         /// InterDis=定义Touch的距离
         /// <param name="Iterations">迭代次数</param>
-        public void StableDorlingBeams(List<ProxiGraph> PgList, List<SMap> SubMaps, double scale, double E, double I, double A, int Iterations, int algType, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        /// /// GroupForceType=0 平均力；GroupForceType=1最大力；GroupForceType=0 最小力；
+        public void StableDorlingBeams(List<ProxiGraph> PgList, List<SMap> SubMaps, double scale, double E, double I, double A, int Iterations, int algType, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis,int GroupForceType)
         {
             AlgBeams algBeams = new AlgBeams(PgList, SubMaps, I, E, A);
 
@@ -941,7 +943,7 @@ namespace CartoGener
             {
                 Console.WriteLine(i.ToString());//标识
 
-                algBeams.DoDisplacePgStableDorling(SubMaps, StopT, MaxTd, ForceType, WeightConsi, InterDis);// 调用Beams算法 
+                algBeams.DoDisplacePgStableDorling(SubMaps, StopT, MaxTd, ForceType, WeightConsi, InterDis, GroupForceType);// 调用Beams算法 
                 //pg.OverlapDelete();
                 //pg.CreateMSTRevise(pg.NodeList, pg.EdgeList, pMap.PolygonList);//构建MST，保证群组是连接的
                 //pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边

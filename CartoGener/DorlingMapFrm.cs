@@ -1075,7 +1075,7 @@ namespace CartoGener
             }
             #endregion
 
-            #region 读取对应的建筑物
+            #region 读取对应的Circles
             IFeatureClass sFeatureClass = sBuildingLayer.FeatureClass;
             IFeatureClass aFeatureClass = aBuildingLayer.FeatureClass;
             Dictionary<string, IPolygon> sDic = new Dictionary<string, IPolygon>();//基准
@@ -1262,7 +1262,23 @@ namespace CartoGener
 
             #endregion
 
-            MessageBox.Show("TDD=" + DisSum.ToString() + ";" + "RT=" + Count.ToString() + "/" + TouchedList.Count.ToString() + "=" + Rate.ToString() + ";" + "RMS=" + RMS.ToString() + ";");
+            #region 计算NumO
+            double NumO = 0;
+            List<IPolygon> PoList = aDic.Values.ToList();
+            for (int i = 0; i < PoList.Count - 1; i++)
+            {
+                IRelationalOperator iRo = PoList[i] as IRelationalOperator;
+                for (int j = i + 1; j < PoList.Count; j++)
+                {
+                    if(iRo.Overlaps(PoList[j] as IGeometry))
+                    {
+                        NumO++;
+                    }
+                }
+            }
+            #endregion
+
+            MessageBox.Show("TDD=" + DisSum.ToString() + ";" + "RT=" + Count.ToString() + "/" + TouchedList.Count.ToString() + "=" + Rate.ToString() + ";" + "RMS=" + RMS.ToString() + ";" + "NumO=" + NumO.ToString() + ";");
         }
 
         /// <summary>

@@ -532,7 +532,8 @@ namespace AlgEMLib
         /// <param name="proxiGraph">邻近图</param>
         /// <param name="disThreshold">阈值</param>
         /// <returns>是否成功</returns>
-        public List<Force> CreateStableDorlingForceVectorfrmGraph(List<SMap> SubMaps,double MaxTd, int ForceType, bool WeigthConsi, double InterDis)
+        /// GroupForceType=0 平均力；GroupForceType=1最大力；GroupForceType=0 最小力；
+        public List<Force> CreateStableDorlingForceVectorfrmGraph(List<SMap> SubMaps,double MaxTd, int ForceType, bool WeigthConsi, double InterDis,int GroupForceType)
         {
             #region 计算受力
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
@@ -544,29 +545,136 @@ namespace AlgEMLib
             foreach (ProxiEdge curEdge in ProxiGraph.EdgeList)
             {
                 ProxiNode sNode = curEdge.Node1; ProxiNode eNode = curEdge.Node2;
-
-                double eSumFx = 0; double eSumFy = 0; double eSum = 0;
-                double sSumFx = 0; double sSumFy = 0; double sSum = 0;
-                double s = 0; double c = 0;
-                for (int i = 0; i < SubMaps.Count; i++)
-                {
-                    PolygonObject Po1 = this.GetPoByID(sNode.TagID, SubMaps[i].PolygonList);
-                    PolygonObject Po2 = this.GetPoByID(eNode.TagID, SubMaps[i].PolygonList);
-
-                    List<Force> CacheForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType, curEdge.adajactLable, curEdge.LongEdge, MaxTd, WeigthConsi, curEdge.MSTLable, InterDis);//考虑引力
-                    if (CacheForceList.Count > 0)
-                    {
-                        sSumFx = CacheForceList[0].Fx + sSumFx; sSumFy = CacheForceList[0].Fy + sSumFy; sSum = CacheForceList[0].F + sSum;
-                        eSumFx = CacheForceList[1].Fx + eSumFx; eSumFy = CacheForceList[1].Fy + eSumFy; eSum = CacheForceList[1].F + eSum;                    
-                        s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
-                    }
-                }
-
                 List<Force> ForceList = new List<Force>();
-                Force sForce = new Force(sNode.ID, sSumFx / SubMaps.Count, sSumFy / SubMaps.Count, s, c, sSum / SubMaps.Count);
-                Force eForce = new Force(eNode.ID, eSumFx/SubMaps.Count, eSumFy/SubMaps.Count, s*(-1), c*(-1), eSum/SubMaps.Count);
-                ForceList.Add(sForce);
-                ForceList.Add(eForce);
+
+                #region 平均力
+                if (GroupForceType == 0)
+                {
+                    double eSumFx = 0; double eSumFy = 0; double eSum = 0;
+                    double sSumFx = 0; double sSumFy = 0; double sSum = 0;
+                    double s = 0; double c = 0;
+                    for (int i = 0; i < SubMaps.Count; i++)
+                    {
+                        PolygonObject Po1 = this.GetPoByID(sNode.TagID, SubMaps[i].PolygonList);
+                        PolygonObject Po2 = this.GetPoByID(eNode.TagID, SubMaps[i].PolygonList);
+
+                        List<Force> CacheForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType, curEdge.adajactLable, curEdge.LongEdge, MaxTd, WeigthConsi, curEdge.MSTLable, InterDis);//考虑引力
+                        if (CacheForceList.Count > 0)
+                        {
+                            sSumFx = CacheForceList[0].Fx + sSumFx; sSumFy = CacheForceList[0].Fy + sSumFy; sSum = CacheForceList[0].F + sSum;
+                            eSumFx = CacheForceList[1].Fx + eSumFx; eSumFy = CacheForceList[1].Fy + eSumFy; eSum = CacheForceList[1].F + eSum;
+                            s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
+                        }
+                    }
+                    
+                    Force sForce = new Force(sNode.ID, sSumFx / SubMaps.Count, sSumFy / SubMaps.Count, s, c, sSum / SubMaps.Count);
+                    Force eForce = new Force(eNode.ID, eSumFx / SubMaps.Count, eSumFy / SubMaps.Count, s * (-1), c * (-1), eSum / SubMaps.Count);
+                    ForceList.Add(sForce);
+                    ForceList.Add(eForce);
+                }
+                #endregion
+
+                #region 最大力
+                else if (GroupForceType == 1)
+                {
+                    double eMaxFx = 0; double eMaxFy = 0; double eMax = 0;
+                    double sMaxFx = 0; double sMaxFy = 0; double sMax = 0;
+                    double s = 0; double c = 0;
+                    for (int i = 0; i < SubMaps.Count; i++)
+                    {
+                        PolygonObject Po1 = this.GetPoByID(sNode.TagID, SubMaps[i].PolygonList);
+                        PolygonObject Po2 = this.GetPoByID(eNode.TagID, SubMaps[i].PolygonList);
+
+                        List<Force> CacheForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType, curEdge.adajactLable, curEdge.LongEdge, MaxTd, WeigthConsi, curEdge.MSTLable, InterDis);//考虑引力
+                        if (CacheForceList.Count > 0)
+                        {
+                            if (Math.Abs(sMaxFx) < Math.Abs(CacheForceList[0].Fx))
+                            {
+                                sMaxFx = CacheForceList[0].Fx;
+                            }
+                            if (Math.Abs(sMaxFy) < Math.Abs(CacheForceList[0].Fy))
+                            {
+                                sMaxFy = CacheForceList[0].Fy;
+                            }
+                            if (Math.Abs(sMax) < Math.Abs(CacheForceList[0].F))
+                            {
+                                sMax = CacheForceList[0].F;
+                            }
+                            if (Math.Abs(eMaxFx) < Math.Abs(CacheForceList[1].Fx))
+                            {
+                                eMaxFx = CacheForceList[1].Fx;
+                            }
+                            if (Math.Abs(eMaxFy) < Math.Abs(CacheForceList[1].Fy))
+                            {
+                                eMaxFy = CacheForceList[1].Fy;
+                            }
+                            if (Math.Abs(eMax) < Math.Abs(CacheForceList[1].F))
+                            {
+                                eMax = CacheForceList[1].F;
+                            }
+
+                            s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
+                        }
+                    }
+
+
+                    Force sForce = new Force(sNode.ID, sMaxFx, sMaxFy, s, c, sMax);
+                    Force eForce = new Force(eNode.ID, eMaxFx, eMaxFy, s * (-1), c * (-1), eMax);
+                    ForceList.Add(sForce);
+                    ForceList.Add(eForce);
+                }
+                #endregion
+
+                #region 最小力
+                else if (GroupForceType == 2)
+                {
+                    double eMaxFx = 1000000; double eMaxFy = 10000000; double eMax = 10000000;
+                    double sMaxFx = 1000000; double sMaxFy = 10000000; double sMax = 10000000;
+                    double s = 0; double c = 0;
+                    for (int i = 0; i < SubMaps.Count; i++)
+                    {
+                        PolygonObject Po1 = this.GetPoByID(sNode.TagID, SubMaps[i].PolygonList);
+                        PolygonObject Po2 = this.GetPoByID(eNode.TagID, SubMaps[i].PolygonList);
+
+                        List<Force> CacheForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType, curEdge.adajactLable, curEdge.LongEdge, MaxTd, WeigthConsi, curEdge.MSTLable, InterDis);//考虑引力
+                        if (CacheForceList.Count > 0)
+                        {
+                            if (Math.Abs(sMaxFx) > Math.Abs(CacheForceList[0].Fx))
+                            {
+                                sMaxFx = CacheForceList[0].Fx;
+                            }
+                            if (Math.Abs(sMaxFy) > Math.Abs(CacheForceList[0].Fy))
+                            {
+                                sMaxFy = CacheForceList[0].Fy;
+                            }
+                            if (Math.Abs(sMax) > Math.Abs(CacheForceList[0].F))
+                            {
+                                sMax = CacheForceList[0].F;
+                            }
+                            if (Math.Abs(eMaxFx) > Math.Abs(CacheForceList[1].Fx))
+                            {
+                                eMaxFx = CacheForceList[1].Fx;
+                            }
+                            if (Math.Abs(eMaxFy) > Math.Abs(CacheForceList[1].Fy))
+                            {
+                                eMaxFy = CacheForceList[1].Fy;
+                            }
+                            if (Math.Abs(eMax) > Math.Abs(CacheForceList[1].F))
+                            {
+                                eMax = CacheForceList[1].F;
+                            }
+
+                            s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
+                        }
+                    }
+
+
+                    Force sForce = new Force(sNode.ID, sMaxFx, sMaxFy, s, c, sMax);
+                    Force eForce = new Force(eNode.ID, eMaxFx, eMaxFy, s * (-1), c * (-1), eMax);
+                    ForceList.Add(sForce);
+                    ForceList.Add(eForce);
+                }
+                #endregion
 
                 if (ForceList.Count > 0)
                 {
@@ -969,7 +1077,7 @@ namespace AlgEMLib
         }
 
         /// <summary>
-        /// 计算两个建筑物的受力
+        /// 计算两个建筑物的受力（考虑可能潜在的多个Pairs）
         /// </summary>
         /// <param name="Po1"></param>
         /// <param name="Po2"></param>
@@ -2657,13 +2765,14 @@ namespace AlgEMLib
         /// CreateForceVectorForDorling StableDorlingMap力计算
         /// </summary>
         /// <returns></returns>
-        public bool CreateForceVectorForStableDorling(List<SMap> SubMaps, double MaxTd, int ForceType, bool WeigthConsi, double InterDis)
+        /// /// GroupForceType=0 平均力；GroupForceType=1最大力；GroupForceType=0 最小力；
+        public bool CreateForceVectorForStableDorling(List<SMap> SubMaps, double MaxTd, int ForceType, bool WeigthConsi, double InterDis, int GroupForceType)
         {
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
                 return false;
 
             // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
-            this.ForceList = CreateStableDorlingForceVectorfrmGraph(SubMaps, MaxTd, ForceType, WeigthConsi, InterDis);//ForceList
+            this.ForceList = CreateStableDorlingForceVectorfrmGraph(SubMaps, MaxTd, ForceType, WeigthConsi, InterDis,GroupForceType);//ForceList
 
             if (MakeForceVectorfrmGraphNew())
                 return true;
