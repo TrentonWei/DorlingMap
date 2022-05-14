@@ -6,6 +6,7 @@ Two automatic algorithm for generation of a circular cartogram, namely DorlingMa
 #The tools were implemented in C# on ArcGIS 10.2 software (ESRI, USA). And the tool has a separate form to set the input, output and parameters for the algorithms.
 
 (1) The DorlingMap for static data
+
 #The principle: an elastic beam algorithm based on minimum energy principle. For more details see our up-coming paper.
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/Principle-1.png)
 
@@ -21,6 +22,7 @@ Dataset:
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/American.png)
 
 (2) The DorlingMap for time-varying data
+
 #The principle: an improved elastic beam algorithm with hierarchical optimization. For more details see our up-coming paper.
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/Principle-2.png)
 
