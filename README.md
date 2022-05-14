@@ -1,7 +1,7 @@
 # DorlingMap for static data and time-varying data
 Two automatic algorithm for generation of a circular cartogram, namely DorlingMap, start coding~
 
-#The Code is developed to support the findings of our submitted paper entitled “Cartogram is also a map Circular cartograms: via the elastic beam algorithm originated from cartographic generalization"，for more details see the pdf file as: waiting for our update 
+#The Code is developed to support the findings of our two submitted paper，for more details see the pdf file as: waiting for our update 
 
 #The tools were implemented in C# on ArcGIS 10.2 software (ESRI, USA). And the tool has a separate form to set the input, output and parameters for the algorithms.
 
