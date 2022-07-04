@@ -13,7 +13,7 @@ Two automatic algorithm for generation of a circular cartogram, namely DorlingMa
 #The interface
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/Interface-1.png)
 
-#The result_1:The circular cartogram generated using the proposed approach for the population of each state in the United States of America (excluding Alaska and Hawaii). 
+#The result_1:The circular cartogram generated using the proposed approach for the population of each state in the United States of America (excluding Alaska and Hawaii)
 DataSet:https://github.com/TrentonWei/DorlingMap/tree/master/Experiment%20Data%20Circular%20cartogram
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/USA-1.png)
 

@@ -44,6 +44,7 @@
             this.axMapControl1 = new AxESRI.ArcGIS.Controls.AxMapControl();
             this.axTOCControl1 = new AxESRI.ArcGIS.Controls.AxTOCControl();
             this.axToolbarControl1 = new AxESRI.ArcGIS.Controls.AxToolbarControl();
+            this.centralTPMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axLicenseControl2)).BeginInit();
@@ -56,7 +57,8 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.dorlingMapToolStripMenuItem,
-            this.StableDorlingMapForToolStripMenuItem});
+            this.StableDorlingMapForToolStripMenuItem,
+            this.centralTPMapToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
@@ -152,6 +154,13 @@
             this.axToolbarControl1.Size = new System.Drawing.Size(1141, 28);
             this.axToolbarControl1.TabIndex = 12;
             // 
+            // centralTPMapToolStripMenuItem
+            // 
+            this.centralTPMapToolStripMenuItem.Name = "centralTPMapToolStripMenuItem";
+            this.centralTPMapToolStripMenuItem.Size = new System.Drawing.Size(136, 24);
+            this.centralTPMapToolStripMenuItem.Text = "Central-TP-Map";
+            this.centralTPMapToolStripMenuItem.Click += new System.EventHandler(this.centralTPMapToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -195,6 +204,7 @@
         private AxESRI.ArcGIS.Controls.AxMapControl axMapControl1;
         private AxESRI.ArcGIS.Controls.AxLicenseControl axLicenseControl2;
         private System.Windows.Forms.ToolStripMenuItem StableDorlingMapForToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem centralTPMapToolStripMenuItem;
     }
 }
 

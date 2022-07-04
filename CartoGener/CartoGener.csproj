@@ -139,7 +139,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Central-TP-MapFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Central-TP-MapFrm.Designer.cs">
+      <DependentUpon>Central-TP-MapFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Circle.cs" />
+    <Compile Include="CTPSupport.cs" />
     <Compile Include="DMClass.cs" />
     <Compile Include="DMSupport.cs" />
     <Compile Include="DorlingMapFrm.cs">
@@ -165,6 +172,9 @@
       <DependentUpon>StableDorlingMapFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Symbolization.cs" />
+    <EmbeddedResource Include="Central-TP-MapFrm.resx">
+      <DependentUpon>Central-TP-MapFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DorlingMapFrm.resx">
       <DependentUpon>DorlingMapFrm.cs</DependentUpon>
     </EmbeddedResource>

@@ -19,6 +19,8 @@ namespace AuxStructureLib
        // public double Y;        //坐标
        // public int ID;         //编号
         public int TagValue;   //标识值,1、道路网：当为端点是为-1，否则为所属线目标的ID
+
+        public double MoveDis = 0;
         /// <summary>
         /// 要素类型
         /// </summary>
@@ -370,6 +372,15 @@ namespace AuxStructureLib
             pFieldEdit4.Name_2 = "tagValue";
             pFieldEdit4.Type_2 = esriFieldType.esriFieldTypeInteger;
             pFieldsEdit.AddField(pField4);
+
+            IField pField5;
+            IFieldEdit pFieldEdit5;
+            pField5 = new FieldClass();
+            pFieldEdit5 = pField5 as IFieldEdit;
+            pFieldEdit5.Length_2 = 30;
+            pFieldEdit5.Name_2 = "MoveDis";
+            pFieldEdit5.Type_2 = esriFieldType.esriFieldTypeDouble;
+            pFieldsEdit.AddField(pField5);
             #endregion
 
             #region 创建要素类
@@ -428,6 +439,7 @@ namespace AuxStructureLib
                     feature.set_Value(3, TriNodeList[i].X);
                     feature.set_Value(4, TriNodeList[i].Y);
                     feature.set_Value(5, TriNodeList[i].TagValue);
+                    feature.set_Value(6, TriNodeList[i].MoveDis);
 
                     feature.Store();//保存IFeature对象  
                     fr.WriteFeature(feature);//将IFeature对象，添加到当前图层上     

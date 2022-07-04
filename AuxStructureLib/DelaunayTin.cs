@@ -27,6 +27,10 @@ namespace AuxStructureLib
         public List<Triangle> TriangleList = null;  //三角形列表
         public List<TriEdge> TriEdgeList = null;    //边列表
         public List<TriNode> TriNodeList = null;    //节点列表
+
+        public List<TriEdge> RNGEdgeList = new List<TriEdge>();
+        public List<TriNode> RNGNodeList = new List<TriNode>();
+
         private SMap map = null;
         /// <summary>
         /// 三角形个数
@@ -82,8 +86,6 @@ namespace AuxStructureLib
             TriangleList = new List<Triangle>();
             TriEdgeList = new List<TriEdge>();
         }
-
-
 
         //List<TriPoint> triPoint = new List<TriPoint>();
        // List<TriEdge> triEdgeTemp = new List<TriEdge>();
@@ -544,6 +546,47 @@ namespace AuxStructureLib
 
 
         #endregion
+
+
+        /// 创建点集的RNG图（最短距离）
+        ///RNG计算(找到邻近图中每一个三角形，删除三角形中的最长边)
+        ///说明：对于任意一条边，找到对应的三角形；如果是最长边，则删除（如果是一条边，保留；如果是两条边，若是最长边，删除）
+        /// </summary>
+        public void CreateRNG()
+        {
+            #region 找到潜在RNG对应的每条边，判断是否是邻近图中三角形对应的最长边，如果是，删除
+            for (int i = 0; i < this.TriEdgeList.Count; i++)
+            {
+                TriEdge TinLine = this.TriEdgeList[i];
+
+                Triangle LeftTri = TinLine.leftTriangle;
+                Triangle RightTri = TinLine.rightTriangle;
+                double MaxRight = 1000000000;
+                double MaxLeft = 1000000000;
+
+                if (LeftTri != null)
+                {
+                    List<double> LeftList = new List<double>();
+                    LeftList.Add(LeftTri.edge1.Length); LeftList.Add(LeftTri.edge2.Length); LeftList.Add(LeftTri.edge3.Length);
+                    MaxLeft = LeftList.Max();
+                }
+
+                if (RightTri != null)
+                {
+                    List<double> RightList = new List<double>();
+                    RightList.Add(RightTri.edge1.Length); RightList.Add(RightTri.edge2.Length); RightList.Add(RightTri.edge3.Length);
+                    MaxRight = RightList.Max();
+                }
+
+                if (TinLine.Length < MaxLeft && TinLine.Length < MaxRight)
+                {
+                    this.RNGEdgeList.Add(TinLine);
+                }
+            }
+            #endregion
+
+            this.RNGNodeList = this.TriNodeList;
+        }
 
         /// <summary>
         /// 写ID

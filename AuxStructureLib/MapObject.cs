@@ -13,6 +13,7 @@ namespace AuxStructureLib
         public double SylWidth =0;
         public int TypeID = 1;//1线要素，2边界
         public int SomeValue=-1;
+        public double TT = -1;
 
         public int ConflictCount = 0;
         

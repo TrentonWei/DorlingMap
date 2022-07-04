@@ -225,6 +225,19 @@ namespace AuxStructureLib
                                 shp = curFeature.Shape;
                                 //pID = curFeature.OID;
                                 IPoint point = null;
+                                double TT = 0;
+
+                                #region 读取Travel Time
+                                try
+                                {
+                                    IFields pFields = curFeature.Fields;
+                                    int field1 = pFields.FindField("TTD");
+                                    TT = Convert.ToInt16(curFeature.get_Value(field1));
+                                }
+
+                                catch { }
+                                #endregion
+
                                 //几何图形
                                 if (shp.GeometryType == esriGeometryType.esriGeometryPoint)
                                 {
@@ -238,6 +251,9 @@ namespace AuxStructureLib
                                     curY = point.Y;
                                     curVextex = new TriNode((float)curX, (float)curY, vextexID, pID, FeatureType.PointType);
                                     curPoint = new PointObject(pID, curVextex);
+
+                                    curPoint.TT = TT;
+
                                     curPoint.SylWidth = sylSize;
                                     TriNodeList.Add(curVextex);
                                     PointList.Add(curPoint);
@@ -609,7 +625,7 @@ namespace AuxStructureLib
                 }
             }
 
-            this.InterpretatePoint(2);
+            //this.InterpretatePoint(2);
 
             vextexID = this.TriNodeList.Count;
 
@@ -977,6 +993,7 @@ namespace AuxStructureLib
                 }
             }
         }
+
         /// <summary>
         /// 加密顶点
         /// </summary>
@@ -988,6 +1005,7 @@ namespace AuxStructureLib
             this.PolylineList = Inter.PLList;
             this.PolygonList = Inter.PPList;
         }
+
         /// <summary>
         /// 获取地图对象
         /// </summary>
@@ -1384,9 +1402,7 @@ namespace AuxStructureLib
                 MessageBox.Show("异常信息" + ex.Message);
             }
             #endregion
-        }
-
-      
+        }  
 
         /// <summary>
         /// 将线写入Shp文件+
@@ -1627,8 +1643,8 @@ namespace AuxStructureLib
                     IPointCollection pointSet = shp as IPointCollection;
                     //IPoint curResultPoint = null;
                     TriNode curPoint = null;
-                    if (TriNodeList[i] == null)
-                        continue;
+                    //if (TriNodeList[i] == null)
+                    //    continue;
 
                     curPoint = this.PointList[i].Point; ;
                     ((PointClass)shp).PutCoords(curPoint.X, curPoint.Y);

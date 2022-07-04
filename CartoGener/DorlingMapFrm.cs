@@ -1322,6 +1322,12 @@ namespace CartoGener
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
             List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);
+
+            for (int i = 0; i < CircleList.Count; i++) //输出半径
+            {
+                Console.WriteLine(CircleList[i].Radius);
+            }
+
             //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
@@ -1385,6 +1391,12 @@ namespace CartoGener
             npg.CreateProxiG(pFeatureClass, 0);
             //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);
             List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);
+
+            for (int i = 0; i < CircleList.Count; i++) //输出半径
+            {
+                Console.WriteLine(CircleList[i].Radius);
+            }
+
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
@@ -1419,6 +1431,212 @@ namespace CartoGener
             //输出运行时间
             Console.WriteLine("程序的运行时间：{0} 秒", oTime.Elapsed.Seconds);
 
+            Console.WriteLine("程序的运行时间：{0} 毫秒", oTime.Elapsed.Milliseconds);
+        }
+
+        /// <summary>
+        /// Linear size for USA Data
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button18_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Stopwatch oTime = new System.Diagnostics.Stopwatch();
+            oTime.Start(); //记录开始时间
+
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region 构建邻近关系
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass, 0);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "STATE_ABBR", 1, 1, 2);
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);
+
+            for (int i = 0; i < CircleList.Count; i++) //输出半径
+            {
+                Console.WriteLine(CircleList[i].Radius);
+            }
+
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            //npg.CreateRNG(npg.NodeList, npg.EdgeList, PoList);
+            #endregion
+
+            #region 构建MST+npg refine
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiGByDT(pFeatureClass);
+            pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
+            npg.PgRefined(pg.EdgeList);//MSTrefine （添加非邻近的边,将所有图形构成一个整体）
+            npg.PgRefined(Map.PolygonList);//重叠边refine  （添加重叠的边）
+            //npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
+            npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
+            #endregion
+
+            #region 移位
+            int PNum = Map.PolygonList.Count;
+            if (Map.PolygonList.Count < 10)
+            {
+                PNum = 10;
+            }
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+            if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
+            #endregion
+
+            oTime.Stop(); //记录结束时间
+
+            //输出运行时间
+            Console.WriteLine("程序的运行时间：{0} 秒", oTime.Elapsed.Seconds);
+            Console.WriteLine("程序的运行时间：{0} 毫秒", oTime.Elapsed.Milliseconds);
+        }
+
+        /// <summary>
+        /// Linear Size for America Data
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button19_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Stopwatch oTime = new System.Diagnostics.Stopwatch();
+            oTime.Start(); //记录开始时间
+
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region 构建邻近关系
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass, 0);
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "GMI_CNTRY", 1, 1, 2);
+
+            for (int i = 0; i < CircleList.Count; i++) //输出半径
+            {
+                Console.WriteLine(CircleList[i].Radius);
+            }
+
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            //npg.CreateRNG(npg.NodeList, npg.EdgeList, PoList);
+            #endregion
+
+            #region 构建MST+npg refine
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiGByDT(pFeatureClass);
+            pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
+            npg.PgRefined(pg.EdgeList);//MSTrefine （添加非邻近的边,将所有图形构成一个整体）
+            npg.PgRefined(Map.PolygonList);//重叠边refine  （添加重叠的边）
+            //npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
+            npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 10);
+            #endregion
+
+            #region 移位
+            int PNum = Map.PolygonList.Count;
+            if (Map.PolygonList.Count < 10)
+            {
+                PNum = 10;
+            }
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 10, 3, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 10, 0, true, 0.2);
+            Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+            #endregion
+
+            oTime.Stop(); //记录结束时间
+
+            //输出运行时间
+            Console.WriteLine("程序的运行时间：{0} 秒", oTime.Elapsed.Seconds);
+
+            Console.WriteLine("程序的运行时间：{0} 毫秒", oTime.Elapsed.Milliseconds);
+        }
+
+        /// <summary>
+        /// efficiency analysis for US counties
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button20_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Stopwatch oTime = new System.Diagnostics.Stopwatch();
+            oTime.Start(); //记录开始时间
+
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region 构建邻近关系
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass, 0);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "NAME", 0.1, 10, 1, 2, 0.01, 0.1);
+
+            for (int i = 0; i < CircleList.Count; i++) //输出半径
+            {
+                Console.WriteLine(CircleList[i].Radius);
+            }
+
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "NAME", 0.1, 10, 1, 2, 0.01, 0.1);
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            //npg.CreateRNG(npg.NodeList, npg.EdgeList, PoList);
+            #endregion
+
+            #region 构建MST+npg refine
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiGByDT(pFeatureClass);
+            pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
+            npg.PgRefined(pg.EdgeList);//MSTrefine （添加非邻近的边,将所有图形构成一个整体）
+            npg.PgRefined(Map.PolygonList);//重叠边refine  （添加重叠的边）
+            //npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
+            npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
+            #endregion
+
+            #region 移位
+            int PNum = Map.PolygonList.Count;
+            if (Map.PolygonList.Count < 10)
+            {
+                PNum = 10;
+            }
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.02, 20, 3, true, 0.05);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.02, 20, 0, true, 0.05);
+            Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+            if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
+            #endregion
+
+            oTime.Stop(); //记录结束时间
+
+            //输出运行时间
+            Console.WriteLine("程序的运行时间：{0} 时", oTime.Elapsed.Hours);
+            Console.WriteLine("程序的运行时间：{0} 分", oTime.Elapsed.Minutes);
+            Console.WriteLine("程序的运行时间：{0} 秒", oTime.Elapsed.Seconds);
             Console.WriteLine("程序的运行时间：{0} 毫秒", oTime.Elapsed.Milliseconds);
         }
     }

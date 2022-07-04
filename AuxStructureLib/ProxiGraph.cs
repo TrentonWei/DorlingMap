@@ -85,6 +85,39 @@ namespace AuxStructureLib
             NodeList = new List<ProxiNode>();
             EdgeList = new List<ProxiEdge>();
         }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="TriNodeList"></param>
+        /// <param name="TriEdgeList"></param>
+        public ProxiGraph(List<TriNode> TriNodeList, List<TriEdge> TriEdgeList)
+        {
+            List<ProxiNode> ProxiNodeList = new List<ProxiNode>();
+            List<ProxiEdge> ProxiEdgeList = new List<ProxiEdge>();
+            for (int i = 0; i < TriNodeList.Count; i++)
+            {
+                ProxiNode CacheNode = new ProxiNode(TriNodeList[i].X, TriNodeList[i].Y, TriNodeList[i].ID, TriNodeList[i].TagValue);
+                CacheNode.FeatureType = TriNodeList[i].FeatureType;
+                ProxiNodeList.Add(CacheNode);
+            }
+            this.NodeList = ProxiNodeList;
+
+            for (int i = 0; i < TriEdgeList.Count; i++)
+            {
+                ProxiNode CacheNode_1 = this.GetNodebyID(TriEdgeList[i].startPoint.ID);
+                ProxiNode CacheNode_2 = this.GetNodebyID(TriEdgeList[i].endPoint.ID);
+
+                CacheNode_1.FeatureType = TriEdgeList[i].startPoint.FeatureType;
+                CacheNode_2.FeatureType = TriEdgeList[i].endPoint.FeatureType;
+                ProxiEdge CacheProxi = new ProxiEdge(TriEdgeList[i].ID, CacheNode_1, CacheNode_2);
+
+                ProxiEdgeList.Add(CacheProxi);
+            }
+
+            this.EdgeList = ProxiEdgeList;
+        }
+
         /// <summary>
         /// 创建结点列表
         /// </summary>
@@ -126,7 +159,6 @@ namespace AuxStructureLib
                 }
             }
         }
-
 
         /// <summary>
         /// 创建边
@@ -801,11 +833,10 @@ namespace AuxStructureLib
                 #endregion
             }
             #endregion
-
+            
             this.RNGBuildingNodesListShortestDistance = PnList;
             this.KGNodesList = this.RNGBuildingNodesListShortestDistance;
             this.KGEdgesList = this.RNGBuildingEdgesListShortestDistance;
-
             this.EdgeList = this.RNGBuildingEdgesListShortestDistance;
         }
 
@@ -1286,6 +1317,7 @@ namespace AuxStructureLib
                 }
             }
         }
+
         /// <summary>
         /// 拷贝邻近图-   //求吸引力-2014-3-20所用
         /// </summary>

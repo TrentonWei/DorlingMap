@@ -15,6 +15,11 @@ namespace AlgEMLib
         public Matrix K = null;                                            //刚度矩阵
         public Matrix F = null;                                            //受力向量                            
         public Matrix D = null;                                            //移位结果
+
+        public double[,] Test_K = null;                                            //刚度矩阵
+        public double[,] Test_F = null;                                            //受力向量                            
+        public double[,] Test_D = null;                                            //移位结果
+
         public double DisThreshold = -1;
 
         public double DisThresholdLP = -1;//线-面

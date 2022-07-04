@@ -262,6 +262,46 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// 由冲突计算外力向量-不分组
+        /// </summary>
+        /// <param name="conflictList">冲突</param>
+        /// <returns>是否成功</returns>
+        public bool CreateForceVectorfrm_CTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,double MaxForce)
+        {
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+
+            // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            this.ForceList = CalForceforProxiGraph_CTP(NodeList, FinalLocation, MinDis, MaxForce);
+
+            if (MakeForceVectorfrmGraphNew())
+                return true;
+            return false;
+
+        }
+
+        /// <summary>
+        /// 由冲突计算外力向量-不分组
+        /// </summary>
+        /// <param name="conflictList">冲突</param>
+        /// <returns>是否成功</returns>
+        public bool CreateForceVectorfrm_HierCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,out List<int> BoundingPoint,double MaxForce)
+        {
+            BoundingPoint = new List<int>();
+
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+
+            // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            this.ForceList = CalForceforProxiGraph_HierCTP(NodeList, FinalLocation, MinDis, out BoundingPoint, MaxForce);
+
+            if (MakeForceVectorfrmGraphNew())
+                return true;
+            return false;
+
+        }
+
+        /// <summary>
         /// 由邻近图计算外力-带分组
         /// </summary>
         /// <param name="conflictList">冲突</param>

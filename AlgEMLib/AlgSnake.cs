@@ -21,6 +21,8 @@ namespace AlgEMLib
         public Matrix Dy = null;
         SnakesStiffMatrix sM=null;//用于计算刚度矩阵的类
         SnakesForceVector fV = null;//用于计算受力的类
+        public SMap Map;
+
         #region 单条线移位
         /// <summary>
         /// 构造函数
@@ -458,6 +460,38 @@ namespace AlgEMLib
             this.ConflictList = conflictList;
         }
 
+        /// 构造函数-从建筑物群邻近图构建Beams模型
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="map">地图对象</param>
+        /// <param name="e">弹性模量</param>
+        /// <param name="i">惯性力矩</param>
+        /// <param name="a">横截面积</param>
+        /// <param name="conflictList">邻近冲突列表</param>
+        public AlgSnake(ProxiGraph proxiGraph, double a, double b)
+        {
+            this.a = a;
+            this.b = b;
+            this.ProxiGraph = proxiGraph;
+        }
+
+        /// 构造函数-从建筑物群邻近图构建Beams模型
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="map">地图对象</param>
+        /// <param name="e">弹性模量</param>
+        /// <param name="i">惯性力矩</param>
+        /// <param name="a">横截面积</param>
+        /// <param name="conflictList">邻近冲突列表</param>
+        public AlgSnake(ProxiGraph proxiGraph, SMap sMap,double a, double b)
+        {
+            this.a = a;
+            this.b = b;
+            this.ProxiGraph = proxiGraph;
+            this.Map = sMap;
+        }
+
+
         /// <summary>
         /// 邻近图的移位算法实现
         /// </summary>
@@ -545,6 +579,376 @@ namespace AlgEMLib
             OutputTotalDisplacementforProxmityGraph(this.OriginalGraph, this.ProxiGraph, this.Map);
 
             if (MaxF <= DisThresholdPP * 0.01)
+            {
+                this.isContinue = false;
+            }
+        }
+
+        /// <summary>
+        /// 邻近图的移位算法实现
+        /// </summary>
+        public void DoDispacePG_CTP(List<ProxiNode> FinalLocation, double MinDis,double MaxForce)
+        {
+            fV = new SnakesForceVector(this.ProxiGraph);
+            //求吸引力-2014-3-20所用
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.IsDragForce = this.isDragF;
+            fV.CreateForceVectorfrm_CTP(this.ProxiGraph.NodeList, FinalLocation, MinDis, MaxForce);
+
+            this.F = fV.Fx;
+            this.Fy = fV.Fy;
+
+            double MaxD;
+            double MaxF;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            //#region 随机数
+            //Random Random_Gene = new Random();
+            //List<int> SelectedIDs = new List<int>();
+            //for (int i = 0; i < this.ProxiGraph.NodeList.Count * 0.02; i++)
+            //{
+            //    int Random_ID = Random_Gene.Next(0, this.ProxiGraph.NodeList.Count - 1);
+            //    SelectedIDs.Add(Random_ID);
+            //}
+            //#endregion
+
+            if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
+            {
+                //基本几何算法
+                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.UpdataCoordsforPGbyForce_CTP();
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+                if (MaxF > 0)
+                {
+                    this.isContinue = true;
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+            }
+            else
+            {
+                //计算刚度矩阵
+                sM = new SnakesStiffMatrix(this.ProxiGraph, a, b);
+                this.K = sM.Matrix_K;
+
+                //this.SetBoundPointParamforPG_CTP2(SelectedIDs);//设置边界条件
+                this.SetBoundPointParamforPG_CTP();
+
+                try
+                {
+                    this.D = this.K.Inverse() * this.F;
+                    this.Dy = this.K.Inverse() * this.Fy;
+                }
+
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.a *= k;
+                    this.b *= k;
+                    //再次计算刚度矩阵
+                    sM = new SnakesStiffMatrix(this.ProxiGraph, a, b);
+                    this.K = sM.Matrix_K;
+                    //SetBoundPointParamforPG_CTP2(SelectedIDs);//设置边界条件
+                    this.SetBoundPointParamforPG_CTP();
+
+                    try
+                    {
+                        this.D = this.K.Inverse() * this.F;
+                    }
+
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPG_CTP();      //更新坐标
+            }
+            //输出受力点出的受力与当前移位值
+            //O0999999999999999999999999999999999999999999999999999999999999999PO0Lthis.OutputDisplacementandForces(fV.ForceList);
+            //输出各点的移位总和
+            //OutputTotalDisplacementforProxmityGraph(this.OriginalGraph, this.ProxiGraph, this.Map);
+
+            if (MaxF <= 0.001)
+            {
+                this.isContinue = false;
+            }
+        }
+
+        /// <summary>
+        /// 邻近图的移位算法实现
+        /// </summary>
+        public void DoDispacePG_CTP(List<ProxiNode> FinalLocation,SMap sMap, double MinDis,double MaxForce)
+        {
+            fV = new SnakesForceVector(this.ProxiGraph);
+            //求吸引力-2014-3-20所用
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.IsDragForce = this.isDragF;
+            fV.CreateForceVectorfrm_CTP(this.ProxiGraph.NodeList, FinalLocation, MinDis, MaxForce);
+
+            this.F = fV.Fx;
+            this.Fy = fV.Fy;
+
+            double MaxD;
+            double MaxF;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            //#region 随机数
+            //Random Random_Gene = new Random();
+            //List<int> SelectedIDs = new List<int>();
+            //for (int i = 0; i < this.ProxiGraph.NodeList.Count * 0.02; i++)
+            //{
+            //    int Random_ID = Random_Gene.Next(0, this.ProxiGraph.NodeList.Count - 1);
+            //    SelectedIDs.Add(Random_ID);
+            //}
+            //#endregion
+
+            if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
+            {
+                //基本几何算法
+                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.UpdataCoordsforPGbyForce_CTP();
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+                if (MaxF > 0)
+                {
+                    this.isContinue = true;
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+            }
+            else
+            {
+                //计算刚度矩阵
+                sM = new SnakesStiffMatrix(this.ProxiGraph, a, b);
+                this.K = sM.Matrix_K;
+
+                //this.SetBoundPointParamforPG_CTP2(SelectedIDs);//设置边界条件
+                this.SetBoundPointParamforPG_CTP();
+
+                try
+                {
+                    this.D = this.K.Inverse() * this.F;
+                    this.Dy = this.K.Inverse() * this.Fy;
+                }
+
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.a *= k;
+                    this.b *= k;
+                    //再次计算刚度矩阵
+                    sM = new SnakesStiffMatrix(this.ProxiGraph, a, b);
+                    this.K = sM.Matrix_K;
+                    //SetBoundPointParamforPG_CTP2(SelectedIDs);//设置边界条件
+                    this.SetBoundPointParamforPG_CTP();
+
+                    try
+                    {
+                        this.D = this.K.Inverse() * this.F;
+                    }
+
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPG_CTP2();      //更新坐标
+            }
+            //输出受力点出的受力与当前移位值
+            //O0999999999999999999999999999999999999999999999999999999999999999PO0Lthis.OutputDisplacementandForces(fV.ForceList);
+            //输出各点的移位总和
+            //OutputTotalDisplacementforProxmityGraph(this.OriginalGraph, this.ProxiGraph, this.Map);
+
+            Console.WriteLine(MaxF.ToString());
+            if (MaxF <= 0.001)
+            {
+                this.isContinue = false;
+            }
+        }
+
+        /// <summary>
+        /// 邻近图的移位算法实现（层次Snake）
+        /// </summary>
+        public void DoDispacePG_HierCTP(List<ProxiNode> FinalLocation, SMap sMap, double MinDis,double MaxForce)
+        {
+            List<int> BoundingPoint = new List<int>();
+
+            fV = new SnakesForceVector(this.ProxiGraph);
+            //求吸引力-2014-3-20所用
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.IsDragForce = this.isDragF;
+            fV.CreateForceVectorfrm_HierCTP(this.ProxiGraph.NodeList, FinalLocation, MinDis, out BoundingPoint, MaxForce);
+
+            this.F = fV.Fx;
+            this.Fy = fV.Fy;
+
+            double MaxD;
+            double MaxF;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            //#region 随机数
+            //Random Random_Gene = new Random();
+            //List<int> SelectedIDs = new List<int>();
+            //for (int i = 0; i < this.ProxiGraph.NodeList.Count * 0.02; i++)
+            //{
+            //    int Random_ID = Random_Gene.Next(0, this.ProxiGraph.NodeList.Count - 1);
+            //    SelectedIDs.Add(Random_ID);
+            //}
+            //#endregion
+
+            if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
+            {
+                //基本几何算法
+                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.UpdataCoordsforPGbyForce_CTP();
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+                if (MaxF > 0)
+                {
+                    this.isContinue = true;
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+            }
+            else
+            {
+                //计算刚度矩阵
+                sM = new SnakesStiffMatrix(this.ProxiGraph, a, b);
+                this.K = sM.Matrix_K;
+
+                //this.SetBoundPointParamforPG_CTP2(SelectedIDs);//设置边界条件
+                this.SetBoundPointParamforPG_CTP();
+
+                try
+                {
+                    this.D = this.K.Inverse() * this.F;
+                    this.Dy = this.K.Inverse() * this.Fy;
+                }
+
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.a *= k;
+                    this.b *= k;
+                    //再次计算刚度矩阵
+                    sM = new SnakesStiffMatrix(this.ProxiGraph, a, b);
+                    this.K = sM.Matrix_K;
+                    //SetBoundPointParamforPG_CTP2(SelectedIDs);//设置边界条件
+                    this.SetBoundPointParamforPG_CTP();
+
+                    try
+                    {
+                        this.D = this.K.Inverse() * this.F;
+                    }
+
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPG_CTP2();      //更新坐标
+            }
+            //输出受力点出的受力与当前移位值
+            //O0999999999999999999999999999999999999999999999999999999999999999PO0Lthis.OutputDisplacementandForces(fV.ForceList);
+            //输出各点的移位总和
+            //OutputTotalDisplacementforProxmityGraph(this.OriginalGraph, this.ProxiGraph, this.Map);
+
+            Console.WriteLine(MaxF.ToString());
+            if (MaxF <= 0.1)
             {
                 this.isContinue = false;
             }
@@ -655,6 +1059,191 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// 更新坐标位置
+        /// </summary>
+        private void UpdataCoordsforPG_CTP()
+        {
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                int index = curNode.ID;
+                int tagID = curNode.TagID;
+                //FeatureType fType = curNode.FeatureType;
+                //VoronoiPolygon vp = null;
+
+                double curDx0 = this.D[2 * index, 0];
+                double curDy0 = this.Dy[2 * index, 0];
+                double curDx = this.D[2 * index, 0];
+                double curDy = this.Dy[2 * index, 0];
+
+                if (this.IsTopCos == true)
+                {
+                    //vp = this.VD.GetVPbyIDandType(tagID, fType);
+                    //vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+                    curDx = this.D[2 * index, 0] = curDx;
+                    curDy = this.Dy[2 * index, 0] = curDy;
+                }
+
+                //纠正拓扑错误
+                curNode.X += curDx;
+                curNode.Y += curDy;
+
+            }
+        }
+
+        /// <summary>
+        /// 更新坐标位置(更新了Map中要素的信息)
+        /// </summary>
+        private void UpdataCoordsforPG_CTP2()
+        {
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                int index = curNode.ID;
+                int tagID = curNode.TagID;
+                //FeatureType fType = curNode.FeatureType;
+                //VoronoiPolygon vp = null;
+
+                double curDx0 = this.D[2 * index, 0];
+                double curDy0 = this.Dy[2 * index, 0];
+                double curDx = this.D[2 * index, 0];
+                double curDy = this.Dy[2 * index, 0];
+
+                if (this.IsTopCos == true)
+                {
+                    //vp = this.VD.GetVPbyIDandType(tagID, fType);
+                    //vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+                    curDx = this.D[2 * index, 0] = curDx;
+                    curDy = this.Dy[2 * index, 0] = curDy;
+                }
+
+                //纠正拓扑错误
+                curNode.X += curDx;
+                curNode.Y += curDy;
+
+                #region 更新TriNodeList
+                TriNode CacheTriNode = this.GetPointByID(curNode.ID, this.Map.TriNodeList);
+                if (CacheTriNode != null)
+                {
+                    CacheTriNode.X += curDx;
+                    CacheTriNode.Y += curDy;
+                }
+                #endregion
+
+                #region 更新PointList
+                //if (curNode.FeatureType == FeatureType.PointType)
+                //{
+                //    PointObject CachePoint = this.GetPointObjectByID(curNode.TagID, this.Map.PointList);
+                //    if (CachePoint != null)
+                //    {
+                //        CachePoint.Point.X += curDx;
+                //        CachePoint.Point.Y += curDy;
+                //    }
+                //}
+                #endregion
+
+                #region 更新PolygonList
+                //if (curNode.FeatureType == FeatureType.PolygonType)
+                //{
+                //    PolygonObject Po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
+                //    TriNode CachePoint = this.GetPointByID(curNode.ID, Po.PointList);
+
+                //    if (CachePoint != null)
+                //    {
+                //        CachePoint.X += curDx;
+                //        CachePoint.Y += curDy;
+                //    }
+                //}
+                #endregion
+            }
+        }
+
+
+
+        /// <summary>
+        /// GetPoByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public PolygonObject GetPoByID(int ID, List<PolygonObject> PoList)
+        {
+            PolygonObject Po = null;
+            foreach (PolygonObject CachePo in PoList)
+            {
+                if (CachePo.ID == ID)
+                {
+                    Po = CachePo;
+                    break;
+                }
+            }
+
+            return Po;
+        }
+
+        /// <summary>
+        /// GetPointByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public ProxiNode GetPointByID(int ID, List<ProxiNode> NodeList)
+        {
+            ProxiNode No = null;
+            foreach (ProxiNode CacheNo in NodeList)
+            {
+                if (CacheNo.ID == ID)
+                {
+                    No = CacheNo;
+                    break;
+                }
+            }
+
+            return No;
+        }
+
+        /// <summary>
+        /// GetPointByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public TriNode GetPointByID(int ID, List<TriNode> NodeList)
+        {
+            TriNode No = null;
+            foreach (TriNode CacheNo in NodeList)
+            {
+                if (CacheNo.ID == ID)
+                {
+                    No = CacheNo;
+                    break;
+                }
+            }
+
+            return No;
+        }
+
+        /// <summary>
+        /// GetPointByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public PointObject GetPointObjectByID(int ID, List<PointObject> PointObjectList)
+        {
+            PointObject No = null;
+            foreach (PointObject CacheNo in PointObjectList)
+            {
+                if (CacheNo.ID == ID)
+                {
+                    No = CacheNo;
+                    break;
+                }
+            }
+
+            return No;
+        }
+
+
+        /// <summary>
         /// 直接采用受力更新坐标位置
         /// </summary>
         private void UpdataCoordsforPGbyForce()
@@ -704,6 +1293,50 @@ namespace AlgEMLib
                         this.D[2 * index, 0] = curDx;
                         this.Dy[2 * index, 0] = curDy;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 直接采用受力更新坐标位置
+        /// </summary>
+        private void UpdataCoordsforPGbyForce_CTP()
+        {
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                int index = curNode.ID;
+                int tagID = curNode.TagID;
+                FeatureType fType = curNode.FeatureType;
+                VoronoiPolygon vp = null;
+
+                Force force = fV.GetForcebyIndex(index);
+                double curDx0 = 0;
+                double curDy0 = 0;
+                double curDx = 0;
+                double curDy = 0;
+                if (force != null)
+                {
+
+                    curDx0 = this.fV.GetForcebyIndex(index).Fx;
+                    curDy0 = this.fV.GetForcebyIndex(index).Fy;
+                    curDx = this.fV.GetForcebyIndex(index).Fx;
+                    curDy = this.fV.GetForcebyIndex(index).Fy;
+                    if (this.IsTopCos == true)
+                    {
+                        vp = this.VD.GetVPbyIDandType(tagID, fType);
+                        vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+                        this.D[2 * index, 0] = curDx;
+                        this.Dy[2 * index, 0] = curDy;
+                    }
+                    //纠正拓扑错误
+                    curNode.X += curDx;
+                    curNode.Y += curDy;
+
+                }
+                else
+                {
+                    this.D[2 * index, 0] = curDx;
+                    this.Dy[2 * index, 0] = curDy;
                 }
             }
         }
@@ -874,6 +1507,55 @@ namespace AlgEMLib
             foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
             {
                 if (curNode.FeatureType == FeatureType.PolylineType)
+                {
+                    int index = curNode.ID;
+                    this.SetBoundPointParamsBigNumber(index, 0, 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 设置邻近图的边界点2014-3-2
+        /// </summary>
+        private void SetBoundPointParamforPG_CTP()
+        {
+            Force curForce = null;
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                if (curNode.FeatureType == FeatureType.PointType && curNode.TagID == 0)
+                {
+                    int index = curNode.ID;
+                    this.SetBoundPointParamsBigNumber(index, 0, 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 设置邻近图的边界点2014-3-2
+        /// </summary>
+        private void SetBoundPointParamforPG_CTP(List<int> BoundingPoint)
+        {
+            Force curForce = null;
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                if (curNode.FeatureType == FeatureType.PointType && (curNode.TagID == 0 || BoundingPoint.Contains(curNode.ID)))
+                {
+                    int index = curNode.ID;
+                    this.SetBoundPointParamsBigNumber(index, 0, 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 设置邻近图的边界点2014-3-2 每一轮选10%的点作为边界点来控制
+        /// </summary>
+        private void SetBoundPointParamforPG_CTP2(List<int> SelectedIDs)
+        {
+            Force curForce = null;
+          
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                if ((curNode.FeatureType == FeatureType.PointType && curNode.TagID == 0) || (SelectedIDs.Contains(curNode.ID)))
                 {
                     int index = curNode.ID;
                     this.SetBoundPointParamsBigNumber(index, 0, 0);

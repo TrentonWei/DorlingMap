@@ -59,9 +59,11 @@ C:\WorkFiles\06 代码集合\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\Cart
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.csprojResolveAssemblyReference.cache
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\AxInterop.esriControls.dll
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.csproj.ResolveComReference.cache
+C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.Central_TP_MapFrm.resources
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.DorlingMapFrm.resources
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.MainForm.resources
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.Properties.Resources.resources
+C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.StableDorlingMapFrm.resources
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.csproj.GenerateResource.Cache
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\CartoGener.exe
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\CartoGener.pdb
@@ -81,4 +83,3 @@ C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\ESRI.ArcGIS.Net
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\bin\x86\Debug\AxInterop.esriControls.dll
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.exe
 C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.pdb
-C:\WorkFiles\06 代码集合\DorlingMap\CartoGener\obj\x86\Debug\CartoGener.StableDorlingMapFrm.resources

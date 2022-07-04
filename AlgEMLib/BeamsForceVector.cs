@@ -21,7 +21,7 @@ namespace AlgEMLib
         public ProxiGraph ProxiGraph = null;
         public ProxiGraph OrigialProxiGraph = null;
 
-        public bool isDragForce=false;
+        public bool isDragForce = false;
 
         public double RMSE = 0.5;
 
@@ -30,6 +30,8 @@ namespace AlgEMLib
         private Matrix vector_F = null;
 
         public Matrix Vector_F { get { return vector_F; } }
+
+        public double[,] test_Vector_F = null;
 
         /// <summary>
         /// z判断是否还有冲突
@@ -52,7 +54,7 @@ namespace AlgEMLib
         /// <summary>
         /// 受力向量-线对象，读文件中的力
         /// </summary>
-        public BeamsForceVector(PolylineObject polyline,string forcefile)
+        public BeamsForceVector(PolylineObject polyline, string forcefile)
         {
             ForceList = ReadForceListfrmFile(forcefile);
             MakeForceVectorfrmPolyline(polyline);
@@ -63,7 +65,7 @@ namespace AlgEMLib
         /// </summary>
         public BeamsForceVector()
         {
-            
+
         }
 
         /// <summary>
@@ -106,10 +108,10 @@ namespace AlgEMLib
             int index0 = -1;
             int index1 = -1;
 
-            for(int i=0;i<n-1;i++) 
+            for (int i = 0; i < n - 1; i++)
             {
                 fromPoint = polyline.PointList[i];
-                nextPoint = polyline.PointList[i+1];
+                nextPoint = polyline.PointList[i + 1];
 
                 index0 = fromPoint.ID;
                 index1 = nextPoint.ID;
@@ -129,21 +131,21 @@ namespace AlgEMLib
                     //vector_F[3 * index0+ 2, 0] += -1.0 * L * (force0.Fx * sin + force0.Fy * cos);
 
 
-                    vector_F[3 * index0, 0] +=0.5*L* force0.Fx;
+                    vector_F[3 * index0, 0] += 0.5 * L * force0.Fx;
                     vector_F[3 * index0 + 1, 0] += 0.5 * L * force0.Fy;
-                    vector_F[3 * index0 + 2, 0] += 1.0 * L * L*(force0.Fx * sin + force0.Fy * cos)/12;
+                    vector_F[3 * index0 + 2, 0] += 1.0 * L * L * (force0.Fx * sin + force0.Fy * cos) / 12;
 
                 }
 
                 if (force1 != null)
                 {
-                   // vector_F[3 * index1, 0] += force1.Fx;
-                   // vector_F[3 * index1 + 1, 0] += force1.Fy;
-                   //vector_F[3 * index1 + 2, 0] += +1.0 * L * (force1.Fx * sin + force1.Fy * cos);
+                    // vector_F[3 * index1, 0] += force1.Fx;
+                    // vector_F[3 * index1 + 1, 0] += force1.Fy;
+                    //vector_F[3 * index1 + 2, 0] += +1.0 * L * (force1.Fx * sin + force1.Fy * cos);
 
                     vector_F[3 * index1, 0] += 0.5 * L * force1.Fx;
                     vector_F[3 * index1 + 1, 0] += 0.5 * L * force1.Fy;
-                    vector_F[3 * index1 + 2, 0] +=-1.0 * L * L * (force1.Fx * sin + force1.Fy * cos) / 12;
+                    vector_F[3 * index1 + 2, 0] += -1.0 * L * L * (force1.Fx * sin + force1.Fy * cos) / 12;
 
                 }
             }
@@ -211,8 +213,8 @@ namespace AlgEMLib
                 double curForce = 0;
                 NearestPoint point1 = null;
                 NearestPoint point2 = null;
-                int id1=-1;
-                int id2=-1;
+                int id1 = -1;
+                int id2 = -1;
                 if (distance < disThreshold)
                 {
                     curForce = disThreshold - distance;
@@ -223,17 +225,17 @@ namespace AlgEMLib
                     Cal_Accumulate_Force(curForce, point1, point2, id1, id2);
                 }
             }
-           //计算最终的受力大小
+            //计算最终的受力大小
             foreach (Force curForce in this.ForceList)
             {
-                curForce.F=Math.Sqrt(curForce.Fx*curForce.Fx+curForce.Fy*curForce.Fy);
+                curForce.F = Math.Sqrt(curForce.Fx * curForce.Fx + curForce.Fy * curForce.Fy);
                 if (curForce.QanSumF != 0)//数量和不为零，说明参与冲突
                 {
                     curForce.RF = curForce.F / curForce.QanSumF;//越大说明越该优先移位
                 }
                 else
                 {
-                    curForce.RF=-1;
+                    curForce.RF = -1;
                 }
             }
 
@@ -256,7 +258,7 @@ namespace AlgEMLib
                 }
                 else if (ForceList[i].RF == 0)
                 {
-                    ForceList[i].SID=-1;
+                    ForceList[i].SID = -1;
                 }
                 else if (ForceList[i].RF == -1)
                 {
@@ -305,9 +307,9 @@ namespace AlgEMLib
                         linePoint = curEdge.NearestEdge.Point1;
                         unLinePoint = curEdge.NearestEdge.Point2;
 
-                        id1 = curEdge.Node1.ID; 
+                        id1 = curEdge.Node1.ID;
                         id2 = curEdge.Node2.ID;
-          
+
                         //if (unLineNode.TagID == curEdge.NearestEdge.Point1.ID)
                         //{
                         //    linePoint = curEdge.NearestEdge.Point2;
@@ -324,46 +326,46 @@ namespace AlgEMLib
                         lineNode = curEdge.Node2;
                         unLineNode = curEdge.Node1;
 
-                       id1 = curEdge.Node2.ID;
-                       id2 = curEdge.Node1.ID;
+                        id1 = curEdge.Node2.ID;
+                        id2 = curEdge.Node1.ID;
 
-                       linePoint = curEdge.NearestEdge.Point2;
-                       unLinePoint = curEdge.NearestEdge.Point1;
+                        linePoint = curEdge.NearestEdge.Point2;
+                        unLinePoint = curEdge.NearestEdge.Point1;
 
-                       //if (unLineNode.TagID == curEdge.NearestEdge.Point1.ID )
-                       //{
-                       //    if (curEdge.Node1.FeatureType != FeatureType.PolylineType)
-                       //    {
-                       //        linePoint = curEdge.NearestEdge.Point2;
-                       //        unLinePoint = curEdge.NearestEdge.Point1;
-                       //    }
-                       //    else
-                       //    {
-                       //        linePoint = curEdge.NearestEdge.Point2;
-                       //        unLinePoint = curEdge.NearestEdge.Point1;
-                       //    }
-                       //}
-                       //else if (unLineNode.TagID == curEdge.NearestEdge.Point2.ID && curEdge.Node1.FeatureType != FeatureType.PolylineType)
-                       //{
-                       //    linePoint = curEdge.NearestEdge.Point1;
-                       //    unLinePoint = curEdge.NearestEdge.Point2;
-                       //}
-                       //else
-                       //{
-                       //    linePoint = curEdge.NearestEdge.Point1;
-                       //    unLinePoint = curEdge.NearestEdge.Point2;
-                       //}
+                        //if (unLineNode.TagID == curEdge.NearestEdge.Point1.ID )
+                        //{
+                        //    if (curEdge.Node1.FeatureType != FeatureType.PolylineType)
+                        //    {
+                        //        linePoint = curEdge.NearestEdge.Point2;
+                        //        unLinePoint = curEdge.NearestEdge.Point1;
+                        //    }
+                        //    else
+                        //    {
+                        //        linePoint = curEdge.NearestEdge.Point2;
+                        //        unLinePoint = curEdge.NearestEdge.Point1;
+                        //    }
+                        //}
+                        //else if (unLineNode.TagID == curEdge.NearestEdge.Point2.ID && curEdge.Node1.FeatureType != FeatureType.PolylineType)
+                        //{
+                        //    linePoint = curEdge.NearestEdge.Point1;
+                        //    unLinePoint = curEdge.NearestEdge.Point2;
+                        //}
+                        //else
+                        //{
+                        //    linePoint = curEdge.NearestEdge.Point1;
+                        //    unLinePoint = curEdge.NearestEdge.Point2;
+                        //}
                     }
-  
+
 
                     if (distance < disThresholdLP)
                     {
                         curForce = disThresholdLP - distance;
                         Cal_Accumulate_Force_LP(curForce, linePoint, unLinePoint, id1, id2);
-               
+
                     }
                 }
-               //处理点-点或面-面的情况
+                //处理点-点或面-面的情况
                 else
                 {
                     NearestPoint point1 = null;
@@ -382,7 +384,7 @@ namespace AlgEMLib
                 }
 
 
-               
+
             }
             //计算最终的受力大小
             foreach (Force curForce in this.ForceList)
@@ -435,7 +437,7 @@ namespace AlgEMLib
         /// <param name="proxiGraph">邻近图</param>
         /// <param name="disThreshold">阈值</param>
         /// <returns>是否成功</returns>
-        public List<Force> CreateForceVectorfrmGraph(List<PolygonObject> PoList,double MaxTd,int ForceType,bool WeigthConsi,double InterDis)
+        public List<Force> CreateForceVectorfrmGraph(List<PolygonObject> PoList, double MaxTd, int ForceType, bool WeigthConsi, double InterDis)
         {
             #region 计算受力
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
@@ -450,7 +452,7 @@ namespace AlgEMLib
                 PolygonObject Po1 = this.GetPoByID(sNode.TagID, PoList);
                 PolygonObject Po2 = this.GetPoByID(eNode.TagID, PoList);
 
-                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType,curEdge.adajactLable,curEdge.LongEdge,MaxTd,WeigthConsi,curEdge.MSTLable,InterDis);//考虑引力
+                List<Force> ForceList = this.GetForce(sNode, eNode, Po1, Po2, ForceType, curEdge.adajactLable, curEdge.LongEdge, MaxTd, WeigthConsi, curEdge.MSTLable, InterDis);//考虑引力
 
                 if (ForceList.Count > 0)
                 {
@@ -532,8 +534,102 @@ namespace AlgEMLib
         /// <param name="proxiGraph">邻近图</param>
         /// <param name="disThreshold">阈值</param>
         /// <returns>是否成功</returns>
+        public List<Force> CreateForceVectorfrmGraphCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis)
+        {
+            #region 计算受力
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return null;
+
+            InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            List<VertexForce> vForceList = new List<VertexForce>();
+
+            foreach (ProxiNode sNode in NodeList)
+            {
+                if (sNode.FeatureType == FeatureType.PointType)
+                {
+                    ProxiNode eNode = this.GetPNodeByID(sNode.TagID, FinalLocation);//获得对应的FinalLocation中的Points（TagValue=ID）
+                    int TestID = sNode.ID;
+
+                    if (eNode != null) //只计算给定目的地的受力
+                    {
+                        List<Force> ForceList = this.GetForceCTP(sNode, eNode, MinDis);//获的起点到终点的力
+
+                        if (ForceList.Count > 0)
+                        {
+                            #region 添加Force
+                            VertexForce svForce = this.GetvForcebyIndex(sNode.ID, vForceList);//受力的标志还是用的ID来标识
+                            if (svForce == null)
+                            {
+                                svForce = new VertexForce(sNode.ID);
+                                vForceList.Add(svForce);
+                            }
+                            svForce.forceList.Add(ForceList[0]);//将当前的受力加入VertexForce数组
+                            #endregion
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            #region 求合力
+            //先求最大力，以该力的方向为X轴方向建立局部坐标系，求四个主方向上的最大力，最后就合力
+            List<Force> rforceList = new List<Force>();
+            foreach (VertexForce vForce in vForceList)
+            {
+                if (vForce.forceList.Count == 1)//当只受一个力作用时
+                {
+                    rforceList.Add(vForce.forceList[0]);
+
+                }
+                else if (vForce.forceList.Count > 1)
+                {
+                    int index = 0;
+                    double maxFx = 0;
+                    double minFx = 0;
+                    double maxFy = 0;
+                    double minFy = 0;
+                    Force maxF = GetMaxForce(out index, vForce.forceList);
+                    maxFx = maxF.F;
+                    double s = maxF.Sin;
+                    double c = maxF.Cos;
+
+                    for (int i = 0; i < vForce.forceList.Count; i++)
+                    {
+
+                        if (i != index)
+                        {
+                            Force F = vForce.forceList[i];
+                            double fx = F.Fx * c + F.Fy * s;
+                            double fy = F.Fy * c - F.Fx * s;
+
+                            if (minFx > fx) minFx = fx;
+                            if (maxFy < fy) maxFy = fy;
+                            if (minFy > fy) minFy = fy;
+                        }
+                    }
+                    double FFx = maxFx + minFx;
+                    double FFy = maxFy + minFy;
+                    double Fx = FFx * c - FFy * s;
+                    double Fy = FFx * s + FFy * c;
+                    double f = Math.Sqrt(Fx * Fx + Fy * Fy);
+                    Force rForce = new Force(vForce.ID, Fx, Fy, f);
+                    rforceList.Add(rForce);
+                }
+            }
+
+            #endregion
+
+            return rforceList;
+        }
+
+        /// <summary>
+        /// 由邻近图计算外力(DorlingMap)
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="disThreshold">阈值</param>
+        /// <returns>是否成功</returns>
         /// GroupForceType=0 平均力；GroupForceType=1最大力；GroupForceType=0 最小力；
-        public List<Force> CreateStableDorlingForceVectorfrmGraph(List<SMap> SubMaps,double MaxTd, int ForceType, bool WeigthConsi, double InterDis,int GroupForceType)
+        public List<Force> CreateStableDorlingForceVectorfrmGraph(List<SMap> SubMaps, double MaxTd, int ForceType, bool WeigthConsi, double InterDis, int GroupForceType)
         {
             #region 计算受力
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
@@ -566,7 +662,7 @@ namespace AlgEMLib
                             s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
                         }
                     }
-                    
+
                     Force sForce = new Force(sNode.ID, sSumFx / SubMaps.Count, sSumFy / SubMaps.Count, s, c, sSum / SubMaps.Count);
                     Force eForce = new Force(eNode.ID, eSumFx / SubMaps.Count, eSumFy / SubMaps.Count, s * (-1), c * (-1), eSum / SubMaps.Count);
                     ForceList.Add(sForce);
@@ -893,14 +989,14 @@ namespace AlgEMLib
         /// <param name="ID"></param>
         /// <param name="?"></param>
         /// <returns></returns>
-        public PolygonObject GetPoByID(int ID,List<PolygonObject> PoList)
+        public PolygonObject GetPoByID(int ID, List<PolygonObject> PoList)
         {
             PolygonObject Po = null;
             foreach (PolygonObject CachePo in PoList)
             {
                 if (CachePo.ID == ID)
                 {
-                    Po=CachePo;
+                    Po = CachePo;
                     break;
                 }
             }
@@ -909,11 +1005,32 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// GetPoByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public ProxiNode GetPNodeByID(int ID, List<ProxiNode> NodeList)
+        {
+            ProxiNode eNode = null;
+            foreach (ProxiNode CacheNode in NodeList)
+            {
+                if (CacheNode.TagID == ID)
+                {
+                    eNode = CacheNode;
+                    break;
+                }
+            }
+
+            return eNode;
+        }
+
+        /// <summary>
         /// 获取PoList
         /// </summary>
         /// <param name="Node"></param>
         /// <returns></returns>
-        public List<PolygonObject> GetPoList(ProxiNode Node,List<PolygonObject> PoList)
+        public List<PolygonObject> GetPoList(ProxiNode Node, List<PolygonObject> PoList)
         {
             List<PolygonObject> OutPoList = new List<PolygonObject>();
             for (int i = 0; i < Node.TagIds.Count; i++)
@@ -948,7 +1065,7 @@ namespace AlgEMLib
         /// WeightConsi=false 不考虑权重；WeightConsi 考虑权重
         /// Adj=true 邻接；Adj=false 不邻接
         /// MaxTd 考虑的邻近条件
-        public List<Force> GetForce(ProxiNode sNode, ProxiNode eNode, PolygonObject sPo1, PolygonObject ePo2, int ForceType, bool Adj,bool LongLabel,double MaxTd, bool WeigthConsi, bool MSTLable, double InterDis)
+        public List<Force> GetForce(ProxiNode sNode, ProxiNode eNode, PolygonObject sPo1, PolygonObject ePo2, int ForceType, bool Adj, bool LongLabel, double MaxTd, bool WeigthConsi, bool MSTLable, double InterDis)
         {
             //ProxiNode tNode1 = sPo1.CalProxiNode();
             //ProxiNode tNode2 = ePo2.CalProxiNode();
@@ -1077,6 +1194,37 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// 计算起点到终点的力
+        /// </summary>
+        /// <param name="sNode">起点</param>
+        /// <param name="eNode">终点</param>
+        /// <param name="MinDis">最小距离</param>
+        /// <returns></returns>
+        public List<Force> GetForceCTP(ProxiNode sNode, ProxiNode eNode, double MinDis)
+        {
+            //ProxiNode tNode1 = sPo1.CalProxiNode();
+            //ProxiNode tNode2 = ePo2.CalProxiNode();
+
+            double EdgeDis = this.GetDis(sNode, eNode);
+            List<Force> ForceList = new List<Force>();
+
+            if (EdgeDis > MinDis)
+            {
+                double curForce = EdgeDis;
+                double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));
+                double s = (eNode.Y - sNode.Y) / r;
+                double c = (eNode.X - sNode.X) / r;
+
+                double fx = curForce * c;
+                double fy = curForce * s;
+                Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce);//力的ID就是Node的ID
+                ForceList.Add(sForce);
+            }
+
+            return ForceList;
+        }
+
+        /// <summary>
         /// 计算两个建筑物的受力（考虑可能潜在的多个Pairs）
         /// </summary>
         /// <param name="Po1"></param>
@@ -1090,7 +1238,7 @@ namespace AlgEMLib
         public List<Force> GetForceGroup(ProxiNode sNodeP, ProxiNode eNodeP, List<PolygonObject> sPoList1, List<PolygonObject> ePoList2, int ForceType, double MaxTd, bool WeigthConsi)
         {
             #region 获取最小力
-            double MinForce = 100000; ProxiNode eNode = null; ProxiNode sNode = null ;
+            double MinForce = 100000; ProxiNode eNode = null; ProxiNode sNode = null;
             for (int i = 0; i < sPoList1.Count; i++)
             {
                 for (int j = 0; j < ePoList2.Count; j++)
@@ -1112,7 +1260,7 @@ namespace AlgEMLib
             #endregion
 
             List<Force> ForceList = new List<Force>();
-            if (MinForce<0)
+            if (MinForce < 0)
             {
                 double curForce = -MinForce;
                 double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));
@@ -1213,13 +1361,13 @@ namespace AlgEMLib
             double c = (p2.X - p1.X) / r;
             //这里将力仅给面对象
             //这里将力平分给两个对象
-            double fx =  forceValue * c;
-            double fy =  forceValue * s;
-          //  Force force1 = this.GetForce(tagID1);
+            double fx = forceValue * c;
+            double fy = forceValue * s;
+            //  Force force1 = this.GetForce(tagID1);
             Force force = this.GetForce(ID2);
             //受力数量和
 
-            force.QanSumF +=  forceValue;
+            force.QanSumF += forceValue;
 
 
             if (force != null)
@@ -1229,8 +1377,7 @@ namespace AlgEMLib
             }
         }
 
-
-        private void Cal_Accumulate_Force_LP(int ID,double forceValue, NearestPoint p1, NearestPoint p2, int ID1, int ID2)
+        private void Cal_Accumulate_Force_LP(int ID, double forceValue, NearestPoint p1, NearestPoint p2, int ID1, int ID2)
         {
             double r = Math.Sqrt((p2.Y - p1.Y) * (p2.Y - p1.Y) + (p2.X - p1.X) * (p2.X - p1.X));
             double s = (p2.Y - p1.Y) / r;
@@ -1249,7 +1396,7 @@ namespace AlgEMLib
             if (force != null)
             {
                 force.Fx += fx;
-                force.Fy+= fy;
+                force.Fy += fy;
             }
         }
 
@@ -1265,7 +1412,7 @@ namespace AlgEMLib
         /// <param name="p2">点2</param>
         private void Cal_Accumulate_Force(double forceValue, NearestPoint p1, NearestPoint p2, int ID1, int ID2)
         {
-            double r =Math.Sqrt((p2.Y-p1.Y)*(p2.Y-p1.Y)+(p2.X-p1.X)*(p2.X-p1.X));
+            double r = Math.Sqrt((p2.Y - p1.Y) * (p2.Y - p1.Y) + (p2.X - p1.X) * (p2.X - p1.X));
             double s = (p2.Y - p1.Y) / r;
             double c = (p2.X - p1.X) / r;
             //这里将力平分给两个对象
@@ -1279,13 +1426,13 @@ namespace AlgEMLib
 
             if (force1 != null)
             {
-                force1.Fx -=  fx;
-                force1.Fy -=  fy;
+                force1.Fx -= fx;
+                force1.Fy -= fy;
             }
             if (force2 != null)
             {
-                force2.Fx +=  fx;
-                force2.Fy +=  fy;
+                force2.Fx += fx;
+                force2.Fy += fy;
             }
         }
 
@@ -1439,7 +1586,7 @@ namespace AlgEMLib
             pFieldEdit3.Type_2 = esriFieldType.esriFieldTypeSingle;
             pFieldsEdit.AddField(pField3);
 
-  
+
             IField pField4;
             IFieldEdit pFieldEdit4;
             pField4 = new FieldClass();
@@ -1448,7 +1595,7 @@ namespace AlgEMLib
             pFieldEdit4.Name_2 = "Fy";
             pFieldEdit4.Type_2 = esriFieldType.esriFieldTypeSingle;
             pFieldsEdit.AddField(pField4);
-    
+
             IField pField5;
             IFieldEdit pFieldEdit5;
             pField5 = new FieldClass();
@@ -1516,7 +1663,7 @@ namespace AlgEMLib
                     //线目标
                     else
                     {
-                       node= this.Map.TriNodeList[this.ForceList[i].ID];
+                        node = this.Map.TriNodeList[this.ForceList[i].ID];
                     }
 
                     curResultPoint = new PointClass();
@@ -1524,7 +1671,7 @@ namespace AlgEMLib
                     pointSet.AddPoint(curResultPoint, ref missing1, ref missing2);
 
                     curResultPoint = new PointClass();
-                    curResultPoint.PutCoords(node.X + 5*this.ForceList[i].Fx, node.Y + 5*this.ForceList[i].Fy);
+                    curResultPoint.PutCoords(node.X + 5 * this.ForceList[i].Fx, node.Y + 5 * this.ForceList[i].Fy);
                     pointSet.AddPoint(curResultPoint, ref missing1, ref missing2);
 
                     feature.Shape = shp;
@@ -1553,7 +1700,7 @@ namespace AlgEMLib
         /// </summary>
         /// <param name="filePath">文件名</param>
         /// <param name="">受力向量列表</param>
-        public void Create_WriteForceVector2Shp(string filePath, string fileName, esriSRProjCS4Type prj,double  k)
+        public void Create_WriteForceVector2Shp(string filePath, string fileName, esriSRProjCS4Type prj, double k)
         {
             #region 创建一个线的shape文件
             string Folderpathstr = filePath;
@@ -1891,7 +2038,7 @@ namespace AlgEMLib
                     pointSet.AddPoint(curResultPoint, ref missing1, ref missing2);
 
                     curResultPoint = new PointClass();
-                    curResultPoint.PutCoords(node.X + times * this.ForceList[i].Fx, node.Y + times*this.ForceList[i].Fy);
+                    curResultPoint.PutCoords(node.X + times * this.ForceList[i].Fx, node.Y + times * this.ForceList[i].Fy);
                     pointSet.AddPoint(curResultPoint, ref missing1, ref missing2);
 
                     feature.Shape = shp;
@@ -2048,7 +2195,7 @@ namespace AlgEMLib
             }
             catch (Exception ex)
             {
-               // MessageBox.Show("异常信息" + ex.Message);
+                // MessageBox.Show("异常信息" + ex.Message);
             }
             #endregion
         }
@@ -2058,11 +2205,11 @@ namespace AlgEMLib
         /// <summary>
         /// 受力向量-线对象，读文件中的力
         /// </summary>
-        public BeamsForceVector(SMap map,List <ConflictBase> conflictList)
+        public BeamsForceVector(SMap map, List<ConflictBase> conflictList)
         {
-               this.Map = map;
-               ForceList = CalForcefrmConflicts(conflictList);
-               MakeForceVectorfrmPolylineList();
+            this.Map = map;
+            ForceList = CalForcefrmConflicts(conflictList);
+            MakeForceVectorfrmPolylineList();
         }
         /// <summary>
         /// 构造函数
@@ -2078,7 +2225,7 @@ namespace AlgEMLib
         /// </summary>
         /// <param name="map">地图对象</param>
         /// <param name="forceList">受力向量列表</param>
-        public BeamsForceVector(SMap map,List<Force> forceList)
+        public BeamsForceVector(SMap map, List<Force> forceList)
         {
             this.Map = map;
             this.ForceList = forceList;
@@ -2091,8 +2238,8 @@ namespace AlgEMLib
         /// <returns>受力列表</returns>
         public List<Force> CalForcefrmConflicts(List<ConflictBase> conflictList)
         {
-            bool isp=true;
-            Node nearestPoint=null;
+            bool isp = true;
+            Node nearestPoint = null;
             List<VertexForce> vForceList = null;
             vForceList = new List<VertexForce>();
             double d = -1;
@@ -2105,11 +2252,11 @@ namespace AlgEMLib
                 if (curConflict != null)
                 {
                     //以地图符号的宽度作为受力的权值
-                    double w2=curConflict.Skel_arc.RightMapObj.SylWidth;                
-                    double w1=curConflict.Skel_arc.LeftMapObj.SylWidth;
+                    double w2 = curConflict.Skel_arc.RightMapObj.SylWidth;
+                    double w1 = curConflict.Skel_arc.LeftMapObj.SylWidth;
 
                     double g1 = ComFunLib.getGrade(w1);
-                    double g2 =ComFunLib.getGrade(w2);
+                    double g2 = ComFunLib.getGrade(w2);
 
                     double w = w1 + w2;
                     double g = g1 + g2;
@@ -2149,8 +2296,8 @@ namespace AlgEMLib
                             }
                         }
                     }
-                         //右边
-                    if (curConflict.RightPointList != null&&curConflict.RightPointList.Count>0)
+                    //右边
+                    if (curConflict.RightPointList != null && curConflict.RightPointList.Count > 0)
                     {
                         foreach (TriNode point in curConflict.RightPointList)
                         {
@@ -2167,14 +2314,14 @@ namespace AlgEMLib
                                 double fx = f * c;
                                 double fy = f * s;
                                 int ID = point.ID;
-                                Force force = new Force(ID, fx, fy,s,c ,f);
-                               VertexForce  vForce =this.GetvForcebyIndex(ID, vForceList);
-                               if (vForce == null)
-                               {
-                                   vForce = new VertexForce(ID);
-                                   vForceList.Add(vForce);
-                               }
-                               vForce.forceList.Add(force);//将当前的受力加入VertexForce数组
+                                Force force = new Force(ID, fx, fy, s, c, f);
+                                VertexForce vForce = this.GetvForcebyIndex(ID, vForceList);
+                                if (vForce == null)
+                                {
+                                    vForce = new VertexForce(ID);
+                                    vForceList.Add(vForce);
+                                }
+                                vForce.forceList.Add(force);//将当前的受力加入VertexForce数组
                             }
                         }
                     }
@@ -2193,7 +2340,7 @@ namespace AlgEMLib
                 }
                 else if (vForce.forceList.Count > 1)
                 {
-                    int index=0;
+                    int index = 0;
                     double maxFx = 0;
                     double minFx = 0;
                     double maxFy = 0;
@@ -2205,10 +2352,10 @@ namespace AlgEMLib
 
                     for (int i = 0; i < vForce.forceList.Count; i++)
                     {
-                        
+
                         if (i == index)
-                        {  
-                            Force F=vForce.forceList[i];
+                        {
+                            Force F = vForce.forceList[i];
                             double fx = F.Fx * c + F.Fy * s;
                             double fy = F.Fy * c - F.Fx * s;
 
@@ -2217,17 +2364,17 @@ namespace AlgEMLib
                             if (minFy > fy) minFy = fy;
                         }
                     }
-                    double FFx=maxFx+minFx;
-                    double FFy=maxFy+minFy;
-                    double Fx=FFx*c-FFy*s;
-                    double Fy=FFx*s+FFy*c;
-                    double f=Math.Sqrt(Fx*Fx+Fy*Fy);
+                    double FFx = maxFx + minFx;
+                    double FFy = maxFy + minFy;
+                    double Fx = FFx * c - FFy * s;
+                    double Fy = FFx * s + FFy * c;
+                    double f = Math.Sqrt(Fx * Fx + Fy * Fy);
                     Force rForce = new Force(vForce.ID, Fx, Fy, f);
                     rforceList.Add(rForce);
                 }
             }
 
-            #endregion 
+            #endregion
             return rforceList;
         }
 
@@ -2270,7 +2417,7 @@ namespace AlgEMLib
                         if (!pointList.Contains(t.point2)) pointList.Add(t.point2);
                         if (!pointList.Contains(t.point3)) pointList.Add(t.point3);
                     }
-                    List<TriNode> removeRange = null;          
+                    List<TriNode> removeRange = null;
                     //左边
                     if (curConflict.LeftPointList != null && curConflict.LeftPointList.Count > 0)
                     {
@@ -2412,7 +2559,7 @@ namespace AlgEMLib
         /// <param name="conflictList">冲突列表</param>
         /// <param name="isLog">是否采用对数衰减</param>
         /// <returns>受力列表</returns>
-        public List<Force> CalInitDisVectorsfrmConflicts_LinearorLog(List<ConflictBase> conflictList,bool isLog)
+        public List<Force> CalInitDisVectorsfrmConflicts_LinearorLog(List<ConflictBase> conflictList, bool isLog)
         {
             bool isp = true;
             Node nearestPoint = null;
@@ -2467,7 +2614,7 @@ namespace AlgEMLib
                         {
                             curConflict.LeftPointList.Remove(p);
                         }
-                       
+
                         foreach (TriNode point in curConflict.LeftPointList)
                         {
                             nearestPoint = AuxStructureLib.ComFunLib.MinDisPoint2Polyline(point, (curConflict.Skel_arc.RightMapObj as PolylineObject).PointList, out isp);//isp是否垂直
@@ -2478,7 +2625,7 @@ namespace AlgEMLib
                                 {
                                     minDis = distance;
                                 }
-                               // double f = lw * (d - distance); 
+                                // double f = lw * (d - distance); 
                                 double r = Math.Sqrt((nearestPoint.Y - point.Y) * (nearestPoint.Y - point.Y) + (nearestPoint.X - point.X) * (nearestPoint.X - point.X));
                                 double s = (point.Y - nearestPoint.Y) / r;
                                 double c = (point.X - nearestPoint.X) / r;
@@ -2517,7 +2664,7 @@ namespace AlgEMLib
                         }
                         foreach (TriNode point in curConflict.RightPointList)
                         {
-                            nearestPoint = AuxStructureLib.ComFunLib.MinDisPoint2Polyline(point,(curConflict.Skel_arc.LeftMapObj as PolylineObject).PointList, out isp);
+                            nearestPoint = AuxStructureLib.ComFunLib.MinDisPoint2Polyline(point, (curConflict.Skel_arc.LeftMapObj as PolylineObject).PointList, out isp);
 
                             double distance = AuxStructureLib.ComFunLib.CalLineLength(nearestPoint, point);
                             if (distance < d)
@@ -2553,7 +2700,7 @@ namespace AlgEMLib
                     {
                         if (isLog == true)
                         {
-                            curForce.F = curForce.w * ((Math.Log((curForce.distance / minDis))+1) * d - curForce.distance);//线性比例函数取对数
+                            curForce.F = curForce.w * ((Math.Log((curForce.distance / minDis)) + 1) * d - curForce.distance);//线性比例函数取对数
                         }
                         else
                         {
@@ -2620,6 +2767,7 @@ namespace AlgEMLib
             #endregion
             return rforceList;
         }
+
         /// <summary>
         /// 通过索引号获取受力值
         /// </summary>
@@ -2639,6 +2787,7 @@ namespace AlgEMLib
             }
             return ForceList[index];
         }
+
         /// <summary>
         /// 根据线对象建立受力向量
         /// </summary>
@@ -2717,7 +2866,7 @@ namespace AlgEMLib
                 return false;
 
             // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
-            this.ForceList= CalForceforProxiGraph(conflictList);
+            this.ForceList = CalForceforProxiGraph(conflictList);
 
             if (MakeForceVectorfrmGraphNew())
                 return true;
@@ -2748,15 +2897,49 @@ namespace AlgEMLib
         /// CreateForceVectorForDorling DorlingMap力计算
         /// </summary>
         /// <returns></returns>
-        public bool CreateForceVectorForDorling(List<PolygonObject> PoList,double MaxTd,int ForceType,bool WeigthConsi,double InterDis)
+        public bool CreateForceVectorForDorling(List<PolygonObject> PoList, double MaxTd, int ForceType, bool WeigthConsi, double InterDis)
         {
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
                 return false;
 
             // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
-            this.ForceList = CreateForceVectorfrmGraph(PoList,MaxTd,ForceType,WeigthConsi,InterDis);//ForceList
+            this.ForceList = CreateForceVectorfrmGraph(PoList, MaxTd, ForceType, WeigthConsi, InterDis);//ForceList
 
             if (MakeForceVectorfrmGraphNew())
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// CreateForceVectorForDorling DorlingMap力计算
+        /// </summary>
+        /// <returns></returns>
+        public bool CreateForceVectorForCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis)
+        {
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+
+            // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            this.ForceList = CreateForceVectorfrmGraphCTP(NodeList, FinalLocation, MinDis);//ForceList
+
+            if (MakeForceVectorfrmGraphNew())
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// CreateForceVectorForDorling DorlingMap力计算
+        /// </summary>
+        /// <returns></returns>
+        public bool CreateForceVectorForCTP_2(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis)
+        {
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+
+            // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            this.ForceList = CreateForceVectorfrmGraphCTP(NodeList, FinalLocation, MinDis);//ForceList
+
+            if (MakeForceVectorfrmGraphNew_2())
                 return true;
             return false;
         }
@@ -2772,7 +2955,7 @@ namespace AlgEMLib
                 return false;
 
             // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
-            this.ForceList = CreateStableDorlingForceVectorfrmGraph(SubMaps, MaxTd, ForceType, WeigthConsi, InterDis,GroupForceType);//ForceList
+            this.ForceList = CreateStableDorlingForceVectorfrmGraph(SubMaps, MaxTd, ForceType, WeigthConsi, InterDis, GroupForceType);//ForceList
 
             if (MakeForceVectorfrmGraphNew())
                 return true;
@@ -2800,68 +2983,124 @@ namespace AlgEMLib
         /// 计算力向量
         /// </summary>
         /// <returns></returns>
-     public bool MakeForceVectorfrmGraphNew()
-    {
-        if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
-            return false;
-        int n = ProxiGraph.NodeList.Count;
-        vector_F = new Matrix(3 * n, 1);
-
-        double L = 0.0;
-        double sin = 0.0;
-        double cos = 0.0;
-
-        //WriteForce(@"E:\map\实验数据\network", "F.txt", forceList);
-        Node fromPoint = null;
-        Node nextPoint = null;
-        int index0 = -1;
-        int index1 = -1;
-        foreach (ProxiEdge edge in ProxiGraph.EdgeList)
+        public bool MakeForceVectorfrmGraphNew()
         {
-            for (int i = 0; i < n - 1; i++)
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+            int n = ProxiGraph.NodeList.Count;
+            vector_F = new Matrix(3 * n, 1);
+
+            double L = 0.0;
+            double sin = 0.0;
+            double cos = 0.0;
+
+            //WriteForce(@"E:\map\实验数据\network", "F.txt", forceList);
+            Node fromPoint = null;
+            Node nextPoint = null;
+            int index0 = -1;
+            int index1 = -1;
+            foreach (ProxiEdge edge in ProxiGraph.EdgeList)
             {
-                fromPoint = edge.Node1;
-                nextPoint = edge.Node2;
-
-                index0 = fromPoint.ID;
-                index1 = nextPoint.ID;
-                //获得受力
-                Force force0 = GetForcebyIndex(index0);
-                Force force1 = GetForcebyIndex(index1);
-
-                L = ComFunLib.CalLineLength(fromPoint, nextPoint);
-                sin = (nextPoint.Y - fromPoint.Y) / L;
-                cos = (nextPoint.X - fromPoint.X) / L;
-
-                if (force0 != null)
+                for (int i = 0; i < n - 1; i++)
                 {
-                    //vector_F[3 * index0, 0] += force0.Fx;
-                    //vector_F[3 * index0 + 1, 0] += force0.Fy;
+                    fromPoint = edge.Node1;
+                    nextPoint = edge.Node2;
 
-                    //vector_F[3 * index0+ 2, 0] += -1.0 * L * (force0.Fx * sin + force0.Fy * cos);
+                    index0 = fromPoint.ID;
+                    index1 = nextPoint.ID;
+                    //获得受力
+                    Force force0 = GetForcebyIndex(index0);
+                    Force force1 = GetForcebyIndex(index1);
+
+                    L = ComFunLib.CalLineLength(fromPoint, nextPoint);
+                    sin = (nextPoint.Y - fromPoint.Y) / L;
+                    cos = (nextPoint.X - fromPoint.X) / L;
+
+                    if (force0 != null)
+                    {
+                        //vector_F[3 * index0, 0] += force0.Fx;
+                        //vector_F[3 * index0 + 1, 0] += force0.Fy;
+
+                        //vector_F[3 * index0+ 2, 0] += -1.0 * L * (force0.Fx * sin + force0.Fy * cos);
 
 
-                    vector_F[3 * index0, 0] += 0.5 * L * force0.Fx;
-                    vector_F[3 * index0 + 1, 0] += 0.5 * L * force0.Fy;
-                    vector_F[3 * index0 + 2, 0] += 1.0 * L * L * (force0.Fx * sin + force0.Fy * cos) / 12;
+                        vector_F[3 * index0, 0] += 0.5 * L * force0.Fx;
+                        vector_F[3 * index0 + 1, 0] += 0.5 * L * force0.Fy;
+                        vector_F[3 * index0 + 2, 0] += 1.0 * L * L * (force0.Fx * sin + force0.Fy * cos) / 12;
 
-                }
+                    }
 
-                if (force1 != null)
-                {
-                    // vector_F[3 * index1, 0] += force1.Fx;
-                    // vector_F[3 * index1 + 1, 0] += force1.Fy;
-                    //vector_F[3 * index1 + 2, 0] += +1.0 * L * (force1.Fx * sin + force1.Fy * cos);
+                    if (force1 != null)
+                    {
+                        // vector_F[3 * index1, 0] += force1.Fx;
+                        // vector_F[3 * index1 + 1, 0] += force1.Fy;
+                        //vector_F[3 * index1 + 2, 0] += +1.0 * L * (force1.Fx * sin + force1.Fy * cos);
 
-                    vector_F[3 * index1, 0] += 0.5 * L * force1.Fx;
-                    vector_F[3 * index1 + 1, 0] += 0.5 * L * force1.Fy;
-                    vector_F[3 * index1 + 2, 0] += -1.0 * L * L * (force1.Fx * sin + force1.Fy * cos) / 12;
+                        vector_F[3 * index1, 0] += 0.5 * L * force1.Fx;
+                        vector_F[3 * index1 + 1, 0] += 0.5 * L * force1.Fy;
+                        vector_F[3 * index1 + 2, 0] += -1.0 * L * L * (force1.Fx * sin + force1.Fy * cos) / 12;
 
+                    }
                 }
             }
+            return true;
         }
-        return true;
-    }
+
+        /// <summary>
+        /// 计算力向量
+        /// </summary>
+        /// <returns></returns>
+        public bool MakeForceVectorfrmGraphNew_2()
+        {
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+            int n = ProxiGraph.NodeList.Count;
+            test_Vector_F = new double[3 * n, 1];
+
+            double L = 0.0;
+            double sin = 0.0;
+            double cos = 0.0;
+
+            //WriteForce(@"E:\map\实验数据\network", "F.txt", forceList);
+            Node fromPoint = null;
+            Node nextPoint = null;
+            int index0 = -1;
+            int index1 = -1;
+            foreach (ProxiEdge edge in ProxiGraph.EdgeList)
+            {
+                for (int i = 0; i < n - 1; i++)
+                {
+                    fromPoint = edge.Node1;
+                    nextPoint = edge.Node2;
+
+                    index0 = fromPoint.ID;
+                    index1 = nextPoint.ID;
+                    //获得受力
+                    Force force0 = GetForcebyIndex(index0);
+                    Force force1 = GetForcebyIndex(index1);
+
+                    L = ComFunLib.CalLineLength(fromPoint, nextPoint);
+                    sin = (nextPoint.Y - fromPoint.Y) / L;
+                    cos = (nextPoint.X - fromPoint.X) / L;
+
+                    if (force0 != null)
+                    {
+                        test_Vector_F[3 * index0, 0] += 0.5 * L * force0.Fx;
+                        test_Vector_F[3 * index0 + 1, 0] += 0.5 * L * force0.Fy;
+                        test_Vector_F[3 * index0 + 2, 0] += 1.0 * L * L * (force0.Fx * sin + force0.Fy * cos) / 12;
+                    }
+
+                    if (force1 != null)
+                    {
+                        test_Vector_F[3 * index1, 0] += 0.5 * L * force1.Fx;
+                        test_Vector_F[3 * index1 + 1, 0] += 0.5 * L * force1.Fy;
+                        test_Vector_F[3 * index1 + 2, 0] += -1.0 * L * L * (force1.Fx * sin + force1.Fy * cos) / 12;
+                    }
+                }
+            }
+            return true;
+        }
+
         /// <summary>
         /// 计算邻近图上个点的最终受力-最大力做主方向的局部最大值法
         /// </summary>
@@ -2893,7 +3132,7 @@ namespace AlgEMLib
                     double fx = f * c;
                     double fy = f * s;
                     int ID = curConflict.LeftPoint.ID;
-                    Force force = new Force(ID, fx, fy,s,c,f);
+                    Force force = new Force(ID, fx, fy, s, c, f);
                     VertexForce vForce = this.GetvForcebyIndex(ID, vForceList);
                     if (vForce == null)
                     {
@@ -2989,7 +3228,7 @@ namespace AlgEMLib
                         fx = 0;
                         fy = 0;
                         ID = curConflict.RightPoint.ID;
-                        force = new Force(ID, fx, fy,f);
+                        force = new Force(ID, fx, fy, f);
                         force.IsBouldPoint = true;
                         vForce = this.GetvForcebyIndex(ID, vForceList);
                         if (vForce == null)
@@ -3101,7 +3340,7 @@ namespace AlgEMLib
         /// <param name="conflictList">冲突</param>
         /// <param name="groups">分组</param>
         /// <returns></returns>
-        private List<Force> CalForceforProxiGraph_Group(List<ConflictBase> conflictList,List<GroupofMapObject> groups)
+        private List<Force> CalForceforProxiGraph_Group(List<ConflictBase> conflictList, List<GroupofMapObject> groups)
         {
             #region 计算每个点的各受力分量
             List<VertexForce> vForceList = new List<VertexForce>();
@@ -3276,7 +3515,7 @@ namespace AlgEMLib
                             leftTagID = curConflict.Skel_arc.LeftMapObj.ID;
                             type = FeatureType.PolygonType;
                         }
-  
+
                         int ID = ProxiGraph.GetNodebyTagIDandType(leftTagID, type).ID;
                         Force force = new Force(ID, fx, fy, s, c, f);
                         VertexForce vForce = this.GetvForcebyIndex(ID, vForceList);
@@ -3459,19 +3698,19 @@ namespace AlgEMLib
         /// </summary>
         /// <param name="TriList">三角形列表</param>
         /// <returns>返回一个新的三角形列表</returns>
-        public  List<Triangle> FindBottle_NeckTriangle(List<Triangle> TriList)
+        public List<Triangle> FindBottle_NeckTriangle(List<Triangle> TriList)
         {
-            if(TriList==null||TriList.Count==0)
+            if (TriList == null || TriList.Count == 0)
                 return null;
             List<Triangle> triList = new List<Triangle>();
             if (TriList.Count == 1)
             {
                 return TriList;
             }
-              
+
             else if (TriList.Count == 2)
             {
-               // List<Triangle> triList = new List<Triangle>();
+                // List<Triangle> triList = new List<Triangle>();
                 if (TriList[0].W > TriList[1].W)
                 {
                     //List<Triangle> triList = new List<Triangle>();
@@ -3485,9 +3724,9 @@ namespace AlgEMLib
                     return triList;
                 }
             }
-            else if(TriList.Count >=3)
+            else if (TriList.Count >= 3)
             {
-                
+
                 int n = TriList.Count;
                 if (TriList[0].W < TriList[1].W)
                 {
@@ -3500,7 +3739,7 @@ namespace AlgEMLib
                         triList.Add(TriList[i]);
                     }
                 }
-                if (TriList[n-1].W < TriList[n-2].W)
+                if (TriList[n - 1].W < TriList[n - 2].W)
                 {
                     triList.Add(TriList[n - 1]);
                 }
@@ -3522,17 +3761,17 @@ namespace AlgEMLib
             {
                 int indexInMap = cuf.ID;
                 TriNode pInMap = this.Map.TriNodeList[indexInMap];
-                
+
                 int indexInSubNetwork = subNetwork.GetIndexofVertexbyX_Y(pInMap, 0.000001f);
                 if (indexInSubNetwork == -1)//没找到的情况
                 {
                     continue;
                 }
-                Force forceInSubNetwork =new Force(cuf);
-                forceInSubNetwork.ID=indexInSubNetwork;
+                Force forceInSubNetwork = new Force(cuf);
+                forceInSubNetwork.ID = indexInSubNetwork;
                 forceList.Add(forceInSubNetwork);
             }
-            BeamsForceVector subNetForceVector=new BeamsForceVector(subNetwork,forceList);
+            BeamsForceVector subNetForceVector = new BeamsForceVector(subNetwork, forceList);
             return subNetForceVector;
         }
 
@@ -3542,7 +3781,7 @@ namespace AlgEMLib
         /// </summary>
         /// <param name="conflictList">冲突</param>
         /// <returns>是否成功</returns>
-        public bool CreateForceVectorfrmConflictforMST(List<ConflictBase> conflictList,ProxiGraph MstPg)
+        public bool CreateForceVectorfrmConflictforMST(List<ConflictBase> conflictList, ProxiGraph MstPg)
         {
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
                 return false;
@@ -3555,7 +3794,6 @@ namespace AlgEMLib
             return false;
 
         }
-
 
         /// <summary>
         /// 计算力向量
@@ -3579,8 +3817,8 @@ namespace AlgEMLib
             int index1 = -1;
             int tagID0 = -1;
             int tagID1 = -1;
-            FeatureType type0=FeatureType.Unknown;
-            FeatureType type1 = FeatureType.Unknown; 
+            FeatureType type0 = FeatureType.Unknown;
+            FeatureType type1 = FeatureType.Unknown;
             foreach (ProxiEdge edge in MstPg.EdgeList)
             {
                 for (int i = 0; i < n - 1; i++)
@@ -3595,7 +3833,7 @@ namespace AlgEMLib
                     type0 = fromPoint.FeatureType;
                     type1 = nextPoint.FeatureType;
                     //获得受力
-                    Force force0 = GetForcebyTagIDandType(tagID0, type0,this.ProxiGraph);
+                    Force force0 = GetForcebyTagIDandType(tagID0, type0, this.ProxiGraph);
                     Force force1 = GetForcebyTagIDandType(tagID1, type1, this.ProxiGraph);
 
                     L = ComFunLib.CalLineLength(fromPoint, nextPoint);
@@ -3638,7 +3876,7 @@ namespace AlgEMLib
         /// <param name="type"></param>
         /// <param name="pg"></param>
         /// <returns></returns>
-        public Force GetForcebyTagIDandType(int tagID,FeatureType type,ProxiGraph pg)
+        public Force GetForcebyTagIDandType(int tagID, FeatureType type, ProxiGraph pg)
         {
 
             ProxiNode node = pg.GetNodebyTagIDandType(tagID, type);
@@ -3653,7 +3891,7 @@ namespace AlgEMLib
         /// </summary>
         /// <param name="conflictList">冲突</param>
         /// <returns>是否成功</returns>
-        public bool CreateForceVectorfrmConflictforBader(List<ConflictBase> conflictList,ProxiGraph mstPg)
+        public bool CreateForceVectorfrmConflictforBader(List<ConflictBase> conflictList, ProxiGraph mstPg)
         {
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
                 return false;

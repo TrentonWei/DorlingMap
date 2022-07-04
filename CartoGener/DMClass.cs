@@ -177,6 +177,56 @@ namespace CartoGener
         }
 
         /// <summary>
+        /// Compute the radius for each Circle（Only consider the minR）
+        /// </summary>
+        /// <param name="ValueList"></param>
+        /// <param name="MinR"></param>
+        /// <param name="Rate"></param>a unit for 100
+        /// <param name="RType">=0 linear R</param>=1 SinR；=2 sqrt
+        /// <returns></returns>
+        public List<Double> GetR(List<double> ValueList, double MinR, double scale, int RType)
+        {
+            double MinValue = ValueList.Min();//Get the minValue
+            List<double> RList = new List<double>();//Return R
+
+            #region Linear R
+            if (RType == 0)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = ValueList[i] / MinValue * MinR * scale;
+                    RList.Add(R);
+                }
+            }
+            #endregion
+
+            #region SinR
+            else if (RType == 1)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = Math.Sin(ValueList[i] / MinValue) * MinR * scale;
+                    RList.Add(R);
+                }
+            }
+            #endregion
+
+            #region SqrtR
+            else if (RType == 2)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+
+                    double R = Math.Sqrt(ValueList[i] / MinValue) * MinR * scale;
+                    RList.Add(R);
+                }
+            }
+            #endregion
+
+            return RList;
+        }
+
+        /// <summary>
         /// Compute the radius for each Circle（Only consider the minR）For stableMap
         /// </summary>
         /// <param name="ValueList"></param>
@@ -402,7 +452,54 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// Get the initial Circles with R
+        /// Get the initial Circles with R（有偏置）
+        /// </summary>
+        /// <param name="pFeatureClass"></param>
+        /// <returns></returns>
+        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, string ValueField, string NameField,double MinR, double scale, int RType)
+        {
+            int i = 0;
+            List<Circle> InitialCircleList = new List<Circle>();
+            List<double> ValueList = new List<double>();
+
+            #region Circles without R
+            IFeatureCursor pFeatureCursor = pFeatureClass.Update(null, true);
+            IFeature pFeature = pFeatureCursor.NextFeature();
+            while (pFeature != null)
+            {
+                Circle CacheCircle = new Circle(i);
+                double Value = DMS.GetValue(pFeature, ValueField);
+                ValueList.Add(Value);
+                CacheCircle.Value = Value;
+                CacheCircle.scale = scale;
+
+                string Name = DMS.GetStringValue(pFeature, NameField);
+                CacheCircle.Name = Name;
+
+                IArea pArea = pFeature.Shape as IArea;
+                CacheCircle.CenterX = pArea.Centroid.X;
+                CacheCircle.CenterY = pArea.Centroid.Y;
+                InitialCircleList.Add(CacheCircle);
+
+                i++;
+                pFeature = pFeatureCursor.NextFeature();
+            }
+            #endregion
+
+            #region assign R for circles
+            List<double> RList = this.GetR(ValueList, MinR, scale, RType);
+
+            for (int j = 0; j < InitialCircleList.Count; j++)
+            {
+                InitialCircleList[j].Radius = RList[j];
+            }
+            #endregion
+
+            return InitialCircleList;
+        }
+
+        /// <summary>
+        /// Get the initial Circles with R（有偏置）
         /// </summary>
         /// <param name="pFeatureClass"></param>
         /// <returns></returns>
@@ -446,7 +543,9 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// Get the initial Circles with R
+        /// Get the initial Circles with 
+        /// ValueField+NameField
+        /// 阻尼振荡法
         /// </summary>
         /// <param name="pFeatureClass"></param>
         /// <returns></returns>
@@ -494,6 +593,8 @@ namespace CartoGener
 
         /// <summary>
         /// Get the initial Circles with R
+        /// 阻尼振荡法
+        /// ValueField
         /// </summary>
         /// <param name="pFeatureClass"></param>
         /// <returns></returns>
@@ -537,7 +638,7 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// Get the initial Circles with R
+        /// Get the initial Circles with R（不用阻尼振荡法 设置最小参数的阈值）
         /// </summary>
         /// <param name="pFeatureClass"></param>
         /// <returns></returns>
@@ -563,6 +664,43 @@ namespace CartoGener
 
             #region assign R for circles
             List<double> RList = this.GetR(ValueList, MinR, scale, RType,DefaultMin);
+
+            for (int j = 0; j < InitialCircleList.Count; j++)
+            {
+                InitialCircleList[j].Radius = RList[j];
+            }
+            #endregion
+
+            return InitialCircleList;
+        }
+
+        /// <summary>
+        /// Get the initial Circles with R（不用阻尼振荡法 不设置最小参数的阈值）
+        /// </summary>
+        /// <param name="pFeatureClass"></param>
+        /// <returns></returns>
+        public List<Circle> GetInitialCircle(Dictionary<IPolygon, double> TimeSeriesData, double MinR, double scale, int RType)
+        {
+            List<Circle> InitialCircleList = new List<Circle>();
+            List<double> ValueList = new List<double>();
+
+            #region Circles without R
+            for (int i = 0; i < TimeSeriesData.Keys.ToList().Count; i++)
+            {
+                Circle CacheCircle = new Circle(i);
+                ValueList.Add(TimeSeriesData[TimeSeriesData.Keys.ToList()[i]]);
+                CacheCircle.Value = TimeSeriesData[TimeSeriesData.Keys.ToList()[i]];
+                CacheCircle.scale = scale;
+
+                IArea pArea = TimeSeriesData.Keys.ToList()[i] as IArea;
+                CacheCircle.CenterX = pArea.Centroid.X;
+                CacheCircle.CenterY = pArea.Centroid.Y;
+                InitialCircleList.Add(CacheCircle);
+            }
+            #endregion
+
+            #region assign R for circles
+            List<double> RList = this.GetR(ValueList, MinR, scale, RType);
 
             for (int j = 0; j < InitialCircleList.Count; j++)
             {
@@ -611,7 +749,7 @@ namespace CartoGener
         }
 
         /// <summary>
-        /// Get the initial Circles with R
+        /// Get the initial Circles with R（不用阻尼振荡法 设置最小参数的阈值）
         /// </summary>
         /// <param name="pFeatureClass"></param>
         /// <returns></returns>
@@ -815,6 +953,16 @@ namespace CartoGener
             algBeams.OriginalGraph = CopyG;
             algBeams.Scale = scale;
             algBeams.AlgType = algType;
+
+            if (Iterations < 20)
+            {
+                Iterations = 20;
+            }
+            if (Iterations > 100)
+            {
+                Iterations = 100;
+            }
+
             for (int i = 0; i < Iterations; i++)//迭代计算
             {
                 Console.WriteLine(i.ToString());//标识

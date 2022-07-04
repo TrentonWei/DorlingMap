@@ -11,15 +11,15 @@ using AuxStructureLib.ConflictLib;
 
 namespace AlgEMLib
 {
-    public class AlgBeams:AlgEM
+    public class AlgBeams : AlgEM
     {
         #region 参数
         //public double PAT = 0.6;
-        public double E=10000;
-        public double I=2;
-        public double A=2;
-        public string strPath = "";   
-        BeamsStiffMatrix bM=null;
+        public double E = 10000;
+        public double I = 2;
+        public double A = 2;
+        public string strPath = "";
+        BeamsStiffMatrix bM = null;
         BeamsForceVector fV = null;
         #endregion
 
@@ -33,7 +33,7 @@ namespace AlgEMLib
         /// <param name="i">惯性力矩</param>
         /// <param name="a">横截面积</param>
         /// <param name="disThresholdPP">邻近冲突距离阈值</param>
-        public AlgBeams(ProxiGraph proxiGraph, SMap map,double e, double i, double a, double disThreshold)
+        public AlgBeams(ProxiGraph proxiGraph, SMap map, double e, double i, double a, double disThreshold)
         {
             this.E = e;
             this.I = i;
@@ -81,6 +81,23 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// 构造函数-CTP
+        /// </summary>
+        /// <param name="proxiGraph">邻近图</param>
+        /// <param name="map">地图对象</param>
+        /// <param name="e">弹性模量</param>
+        /// <param name="i">惯性力矩</param>
+        /// <param name="a">横截面积</param>
+        /// <param name="disThresholdPP">邻近冲突距离阈值</param>
+        public AlgBeams(ProxiGraph Pg, double e, double i, double a)
+        {
+            this.E = e;
+            this.I = i;
+            this.A = a;
+            this.ProxiGraph = Pg;
+        }
+
+        /// <summary>
         /// 构造函数-从建筑物群邻近图构建Beams模型
         /// </summary>
         /// <param name="proxiGraph">邻近图</param>
@@ -109,8 +126,8 @@ namespace AlgEMLib
         /// <param name="a">横截面积</param>
         /// <param name="disThresholdLP">线-面邻近冲突距离阈值</param>
         /// <param name="disThresholdPP">面-面邻近冲突距离阈值</param>
-        public AlgBeams(ProxiGraph proxiGraph, SMap map, double e, double i, double a, 
-            double disThresholdLP,double disThresholdPP)
+        public AlgBeams(ProxiGraph proxiGraph, SMap map, double e, double i, double a,
+            double disThresholdLP, double disThresholdPP)
         {
             this.E = e;
             this.I = i;
@@ -126,24 +143,24 @@ namespace AlgEMLib
         /// </summary>
         public void DoDispacePG()
         {
-            bM=new BeamsStiffMatrix(this.ProxiGraph,E,I,A);
+            bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
             this.K = bM.Matrix_K;
             fV = new BeamsForceVector(this.ProxiGraph);
             fV.isDragForce = this.isDragF;
-            fV.CreateForceVectorfrmGraph(this.DisThresholdLP,this.DisThresholdPP);
+            fV.CreateForceVectorfrmGraph(this.DisThresholdLP, this.DisThresholdPP);
             fV.Create_WriteForceVector2Shp(strPath, @"ForceVector", esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
             this.F = fV.Vector_F;
 
             SetBoundPointParams();//设置边界条件
 
-            this.D= this.K.Inverse() * this.F;
+            this.D = this.K.Inverse() * this.F;
 
             double MaxD;
             double MaxF;
             int indexMaxD = -1;
             int indexMaxF = -1;
 
-            StaticDis(out MaxD,out MaxF,out indexMaxD,out indexMaxF);
+            StaticDis(out MaxD, out MaxF, out indexMaxD, out indexMaxF);
 
             if (MaxF > 0)
             {
@@ -171,24 +188,24 @@ namespace AlgEMLib
         /// <summary>
         /// 统计移位值
         /// </summary>
-        private void StaticDis(out double MaxD,out double MaxF,out int indexMaxD,out int indexMaxF)
+        private void StaticDis(out double MaxD, out double MaxF, out int indexMaxD, out int indexMaxF)
         {
             int n = this.fV.ForceList.Count;
             MaxD = -1;
-            MaxF = -1; 
+            MaxF = -1;
             double curD;
             indexMaxD = -1;
             indexMaxF = -1;
-            
+
             for (int i = 0; i < n; i++)
             {
-               // curD = Math.Sqrt(this.D[3 * i, 0] * this.D[3 * i, 0] + this.D[3 * i + 1, 0] * this.D[3 * i + 1, 0]);
+                // curD = Math.Sqrt(this.D[3 * i, 0] * this.D[3 * i, 0] + this.D[3 * i + 1, 0] * this.D[3 * i + 1, 0]);
 
-               // if (curD > MaxD)
-               // {
-               //     indexMaxD = i;
-              //      MaxD = curD;
-             //   }
+                // if (curD > MaxD)
+                // {
+                //     indexMaxD = i;
+                //      MaxD = curD;
+                //   }
 
 
                 if (this.fV.ForceList[i].F > MaxF)
@@ -245,7 +262,7 @@ namespace AlgEMLib
         /// <param name="MaxF"></param>
         /// <param name="indexMaxD"></param>
         /// <param name="indexMaxF"></param>
-        private void StaticDisforPGNewDF(out double MaxFD, out double MaxD, out double MaxDF,out double MaxF, out int indexMaxD, out int indexMaxF)
+        private void StaticDisforPGNewDF(out double MaxFD, out double MaxD, out double MaxDF, out double MaxF, out int indexMaxD, out int indexMaxF)
         {
             int n = this.fV.ForceList.Count;
             MaxD = -1;
@@ -258,13 +275,13 @@ namespace AlgEMLib
 
             for (int i = 0; i < n; i++)
             {
-                 curD = Math.Sqrt(this.D[3 * i, 0] * this.D[3 * i, 0] + this.D[3 * i + 1, 0] * this.D[3 * i + 1, 0]);
+                curD = Math.Sqrt(this.D[3 * i, 0] * this.D[3 * i, 0] + this.D[3 * i + 1, 0] * this.D[3 * i + 1, 0]);
 
-                 if (curD > MaxD)
-                 {
-                     indexMaxD = i;
-                     MaxD = curD;
-                 }
+                if (curD > MaxD)
+                {
+                    indexMaxD = i;
+                    MaxD = curD;
+                }
 
 
                 if (this.fV.ForceList[i].F > MaxF)
@@ -284,6 +301,51 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// 统计最大的受力极其对应的移位值
+        /// </summary>
+        /// <param name="MaxD"></param>
+        /// <param name="MaxF"></param>
+        /// <param name="indexMaxD"></param>
+        /// <param name="indexMaxF"></param>
+        private void StaticDisforPGNewDF_2(out double MaxFD, out double MaxD, out double MaxDF, out double MaxF, out int indexMaxD, out int indexMaxF)
+        {
+            int n = this.fV.ForceList.Count;
+            MaxD = -1;
+            MaxF = -1;
+            MaxFD = -1;
+            MaxDF = -1;
+            double curD;
+            indexMaxD = -1;
+            indexMaxF = -1;
+
+            for (int i = 0; i < n; i++)
+            {
+                curD = Math.Sqrt(this.Test_D[3 * i, 0] * this.Test_D[3 * i, 0] + this.Test_D[3 * i + 1, 0] * this.Test_D[3 * i + 1, 0]);
+
+                if (curD > MaxD)
+                {
+                    indexMaxD = i;
+                    MaxD = curD;
+                }
+
+                if (this.fV.ForceList[i].F > MaxF)
+                {
+                    indexMaxF = this.fV.ForceList[i].ID;
+                    MaxF = fV.ForceList[i].F;
+                }
+            }
+            if (indexMaxF != -1)
+            {
+                MaxFD = Math.Sqrt(this.Test_D[3 * indexMaxF, 0] * this.Test_D[3 * indexMaxF, 0] + this.Test_D[3 * indexMaxF + 1, 0] * this.Test_D[3 * indexMaxF + 1, 0]);
+            }
+            if (indexMaxD != -1)
+            {
+                MaxDF = fV.ForceList[indexMaxD].F;
+            }
+        }
+
+
+        /// <summary>
         /// 更新坐标位置
         /// </summary>
         private void UpdataCoordsforLine()
@@ -294,9 +356,9 @@ namespace AlgEMLib
                 Node curPoint = Polyline.PointList[i];
                 int index = curPoint.ID;
                 curPoint.X += this.D[3 * index, 0];
-                curPoint.Y += this.D[3 * index+1, 0];
+                curPoint.Y += this.D[3 * index + 1, 0];
             }
-            
+
         }
         #endregion
 
@@ -419,10 +481,10 @@ namespace AlgEMLib
             //如果线的端点出不受力的作用则，将它们设置为不移动的边界点
             if (this.F[0, 0] == 0 && this.F[1, 0] == 0)
                 this.SetBoundPointParamsBigNumber(0, 0, 0);
-               // SetBoundPointParamsOld(0, 0, 0);
-            if (this.F[3 * (n - 1), 0] == 0 && this.F[3 * (n - 1)+1, 0] == 0)
+            // SetBoundPointParamsOld(0, 0, 0);
+            if (this.F[3 * (n - 1), 0] == 0 && this.F[3 * (n - 1) + 1, 0] == 0)
                 this.SetBoundPointParamsBigNumber(n - 1, 0, 0);
-               // SetBoundPointParamsOld(n - 1, 0, 0);
+            // SetBoundPointParamsOld(n - 1, 0, 0);
         }
 
         /// <summary>
@@ -431,7 +493,7 @@ namespace AlgEMLib
         /// <param name="index"></param>
         /// <param name="dx"></param>
         /// <param name="dy"></param>
-        private void SetBoundPointParamsOld(int index, double dx,double dy)
+        private void SetBoundPointParamsOld(int index, double dx, double dy)
         {
             int r1, r2, r3;//x,y,a
 
@@ -494,7 +556,7 @@ namespace AlgEMLib
                 SetBoundPointParamsBigNumber(curID, curDx, curDy);
             }
         }
-     
+
         /// <summary>
         /// 置大数法
         /// </summary>
@@ -568,7 +630,7 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count*3, 1);
+                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 3, 1);
                 this.UpdataCoordsforPGbyForce();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -711,7 +773,7 @@ namespace AlgEMLib
                     r2 = k * 3 + 1;
                     r3 = k * 3 + 2;
 
-                    this.SetBoundPointParamsBigNumber(k, 0, 0);                
+                    this.SetBoundPointParamsBigNumber(k, 0, 0);
                 }
             }
         }
@@ -726,7 +788,7 @@ namespace AlgEMLib
                 int index = curNode.ID;
                 int tagID = curNode.TagID;
                 FeatureType fType = curNode.FeatureType;
-                VoronoiPolygon vp=null;
+                VoronoiPolygon vp = null;
 
                 if (fType == FeatureType.PolygonType)
                 {
@@ -778,9 +840,9 @@ namespace AlgEMLib
 
                     PolygonObject po = this.Map.GetObjectbyID(tagID, fType) as PolygonObject;
                     Force force = fV.GetForcebyIndex(index);
-                    double curDx0 =0;
+                    double curDx0 = 0;
                     double curDy0 = 0;
-                    double curDx =0;
+                    double curDx = 0;
                     double curDy = 0;
                     if (force != null)
                     {
@@ -808,8 +870,8 @@ namespace AlgEMLib
                     }
                     else
                     {
-                            this.D[3 * index, 0] = curDx;
-                            this.D[3 * index + 1, 0] = curDy;
+                        this.D[3 * index, 0] = curDx;
+                        this.D[3 * index + 1, 0] = curDy;
                     }
                 }
             }
@@ -825,10 +887,10 @@ namespace AlgEMLib
         /// <param name="i">惯性力矩</param>
         /// <param name="a">横截面积</param>
         /// <param name="conflictList">冲突列表</param>
-        public AlgBeams(SMap map,double e, double i, double a, List<ConflictBase> conflictList)
+        public AlgBeams(SMap map, double e, double i, double a, List<ConflictBase> conflictList)
         {
             this.Map = map;
-           
+
             this.E = e;
             this.I = i;
             this.A = a;
@@ -875,7 +937,7 @@ namespace AlgEMLib
 
             StaticDisforNT(out MaxD, out MaxF, out indexMaxD, out indexMaxF);
 
-            if (MaxF > 0 && indexMaxF>=0)
+            if (MaxF > 0 && indexMaxF >= 0)
             {
                 double k = MaxD / MaxF;
                 this.E *= k;
@@ -886,7 +948,7 @@ namespace AlgEMLib
                 SetBoundaryPointListAtEndNode();//设置边界条件
 
                 this.D = this.K.Inverse() * this.F;
-             
+
             }
             else
             {
@@ -894,7 +956,7 @@ namespace AlgEMLib
                 return;
             }
             this.UpdataCoordsforNT();      //更新坐标
-    
+
             if (MaxF <= DisThresholdPP * 0.01)
             {
                 this.isContinue = false;
@@ -961,7 +1023,7 @@ namespace AlgEMLib
                     this.SetBoundPointParamsBigNumber(index, 0, 0);
                 }
             }
-          
+
         }
         /// <summary>
         /// 设置边界--如果两个端点不受力，则将它们设置为边界点
@@ -970,7 +1032,7 @@ namespace AlgEMLib
         {
             foreach (ConNode node in Map.ConNodeList)
             {
-                if (node.Point.IsBoundaryPoint==true)
+                if (node.Point.IsBoundaryPoint == true)
                 {
                     int index = node.Point.ID;
                     this.SetBoundPointParamsBigNumber(index, 0, 0);
@@ -997,7 +1059,7 @@ namespace AlgEMLib
         private void UpdataCoordsforNT()
         {
 
-            for (int i = 0; i <Map.TriNodeList.Count; i++)
+            for (int i = 0; i < Map.TriNodeList.Count; i++)
             {
                 Node curPoint = Map.TriNodeList[i];
                 int index = curPoint.ID;
@@ -1049,7 +1111,7 @@ namespace AlgEMLib
         /// 输出移位值和力
         /// </summary>
         /// <param name="ForceList">力列表</param>
-        private void OutputTotalDisplacementforProxmityGraph(ProxiGraph orginal,ProxiGraph current,SMap map)
+        private void OutputTotalDisplacementforProxmityGraph(ProxiGraph orginal, ProxiGraph current, SMap map)
         {
             if (orginal == null || current == null)
                 return;
@@ -1062,7 +1124,7 @@ namespace AlgEMLib
             tableforce.Columns.Add("Dy", typeof(double));
             tableforce.Columns.Add("D", typeof(double));
 
-            foreach(PolygonObject obj in map.PolygonList)
+            foreach (PolygonObject obj in map.PolygonList)
             {
                 int id = obj.ID;
                 ProxiNode oNode = orginal.GetNodebyTagIDandType(id, FeatureType.PolygonType);
@@ -1071,7 +1133,7 @@ namespace AlgEMLib
                 {
                     double dx = cNode.X - oNode.X;
                     double dy = cNode.Y - oNode.Y;
-                    double d=Math.Sqrt(dx * dx + dy * dy);
+                    double d = Math.Sqrt(dx * dx + dy * dy);
                     DataRow dr = tableforce.NewRow();
                     dr[0] = id;
                     dr[1] = dx;
@@ -1079,7 +1141,7 @@ namespace AlgEMLib
                     dr[3] = d;
                     tableforce.Rows.Add(dr);
                 }
-               
+
             }
             TXTHelper.ExportToTxt(tableforce, this.strPath + @"-Displacement.txt");
         }
@@ -1117,7 +1179,7 @@ namespace AlgEMLib
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
 
-            fV.CreateForceVectorfrmConflict_Group(ConflictList,Groups);
+            fV.CreateForceVectorfrmConflict_Group(ConflictList, Groups);
 
             fV.Create_WriteForceVector2Shp(strPath, @"ForceVector", esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
             this.F = fV.Vector_F;
@@ -1200,13 +1262,211 @@ namespace AlgEMLib
         /// DorlingDisplace
         /// MaxTd 吸力的作用范围
         /// </summary>
-        public void DoDisplacePgDorling(SMap pMap, double StopT,double MaxTd,int ForceType,bool WeightConsi,double InterDis)
+        public void DoDisplacePgCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis, double StopT)
         {
             fV = new BeamsForceVector(this.ProxiGraph);
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
-            fV.CreateForceVectorForDorling(pMap.PolygonList,MaxTd,ForceType,WeightConsi,InterDis);//ForceList
+            fV.CreateForceVectorForCTP(NodeList, FinalLocation, MinDis);//ForceList
+            this.F = fV.Vector_F;
+
+            double MaxD;
+            double MaxF = 100;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            #region 移位
+            if (this.ProxiGraph.NodeList.Count > 0)
+            {
+                //计算刚度矩阵
+                bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                this.K = bM.Matrix_K;
+                this.SetBoundPointParamforPG_CTP();//设置边界条件
+
+                try
+                {
+                    this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                }
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.E *= k;
+
+                    bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                    this.K = bM.Matrix_K;
+                    SetBoundPointParamforPG_CTP();//设置边界条件
+                    try
+                    {
+                        this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                    }
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPGCTP();      //更新坐标
+            }
+            #endregion
+
+            ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
+
+            if (MaxF <= StopT)
+            {
+                this.isContinue = false;
+            }
+        }
+
+        /// <summary>
+        /// DorlingDisplace
+        /// MaxTd 吸力的作用范围
+        /// </summary>
+        public void DoDisplacePgCTP_2(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis, double StopT)
+        {
+            fV = new BeamsForceVector(this.ProxiGraph);
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.isDragForce = this.isDragF;
+            fV.CreateForceVectorForCTP_2(NodeList, FinalLocation, MinDis);//ForceList
+            this.Test_F = fV.test_Vector_F;
+
+            double MaxD;
+            double MaxF = 100;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            #region 移位
+            if (this.ProxiGraph.NodeList.Count > 0)
+            {
+                //计算刚度矩阵
+                bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A, 1);
+                this.Test_K = bM.Test_K;
+
+                this.SetBoundPointParamforPG();//设置边界条件
+                try
+                {
+                    double[,] Inverse_K = this.ReverseMatrix(this.Test_K, 3 * this.ProxiGraph.NodeList.Count);
+
+                    #region 计算Test_D
+                    for (int i = 0; i < 3 * this.ProxiGraph.NodeList.Count; i++)
+                    {
+                        for (int j = 0; j < 3 * this.ProxiGraph.NodeList.Count; j++)
+                        {
+                            Test_D[3 * i, 0] += Inverse_K[3 * i, j] * Test_F[j, 0];
+                            Test_D[3 * i + 1, 0] += Inverse_K[3 * i + 1, j] * Test_F[j, 0];
+                            Test_D[3 * i + 2, 0] += Inverse_K[3 * i + 2, j] * Test_F[j, 0];
+                        }
+                    }
+                    #endregion
+
+                    //this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                }
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+
+                StaticDisforPGNewDF_2(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.E *= k;
+                    bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A, 1);
+                    this.Test_K = bM.Test_K;
+                   
+                    SetBoundPointParamforPG();//设置边界条件
+                    try
+                    {
+                        double[,] Inverse_K = this.ReverseMatrix(this.Test_K, 3 * this.ProxiGraph.NodeList.Count);
+                        
+                        #region 计算Test_D
+                        for (int i = 0; i < 3 * this.ProxiGraph.NodeList.Count; i++)
+                        {
+                            for (int j = 0; j < 3 * this.ProxiGraph.NodeList.Count; j++)
+                            {
+                                Test_D[3 * i, 0] += Inverse_K[3 * i, j] * Test_F[j, 0];
+                                Test_D[3 * i + 1, 0] += Inverse_K[3 * i + 1, j] * Test_F[j, 0];
+                                Test_D[3 * i + 2, 0] += Inverse_K[3 * i + 2, j] * Test_F[j, 0];
+                            }
+                        }
+                        #endregion
+                    }
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPGCTP_2();      //更新坐标
+            }
+            #endregion
+
+            ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
+
+            if (MaxF <= StopT)
+            {
+                this.isContinue = false;
+            }
+        }
+
+        /// <summary>
+        /// DorlingDisplace
+        /// MaxTd 吸力的作用范围
+        /// </summary>
+        public void DoDisplacePgDorling(SMap pMap, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        {
+            fV = new BeamsForceVector(this.ProxiGraph);
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.isDragForce = this.isDragF;
+            fV.CreateForceVectorForDorling(pMap.PolygonList, MaxTd, ForceType, WeightConsi, InterDis);//ForceList
             this.F = fV.Vector_F;
 
             double MaxD;
@@ -1222,7 +1482,7 @@ namespace AlgEMLib
                 BeamsForceVector BFV = new BeamsForceVector();
                 PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, pMap.PolygonList);
                 PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, pMap.PolygonList);
-                List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge,MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
+                List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
                 #endregion
 
                 #region 更新坐标
@@ -1330,13 +1590,13 @@ namespace AlgEMLib
         /// MaxTd 吸力的作用范围
         /// </summary>
         /// GroupForceType=0 平均力；GroupForceType=1最大力；GroupForceType=0 最小力；
-        public void DoDisplacePgStableDorling(List<SMap> SubMaps,double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis,int GroupForceType)
+        public void DoDisplacePgStableDorling(List<SMap> SubMaps, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis, int GroupForceType)
         {
             fV = new BeamsForceVector(this.ProxiGraph);
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
-            fV.CreateForceVectorForStableDorling(SubMaps, MaxTd, ForceType, WeightConsi, InterDis,GroupForceType);//ForceList
+            fV.CreateForceVectorForStableDorling(SubMaps, MaxTd, ForceType, WeightConsi, InterDis, GroupForceType);//ForceList
             this.F = fV.Vector_F;
 
             double MaxD;
@@ -1355,17 +1615,17 @@ namespace AlgEMLib
                 for (int i = 0; i < SubMaps.Count; i++)
                 {
                     #region 基本几何算法（直接移位）
-                     BeamsForceVector BFV = new BeamsForceVector();
-                     PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, SubMaps[i].PolygonList);
-                     PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, SubMaps[i].PolygonList);
-                     List<Force> CacheForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
-                     if (CacheForceList.Count > 0)
-                     {
-                         eSumFx = CacheForceList[0].Fx + eSumFx; eSumFy = CacheForceList[0].Fy + eSumFy; eSum = CacheForceList[0].F + eSum;
-                         sSumFx = CacheForceList[1].Fx + sSumFx; sSumFy = CacheForceList[1].Fy + sSumFy; sSum = CacheForceList[1].F + sSum;
-                         s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
-                     }
-                     #endregion
+                    BeamsForceVector BFV = new BeamsForceVector();
+                    PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, SubMaps[i].PolygonList);
+                    PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, SubMaps[i].PolygonList);
+                    List<Force> CacheForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
+                    if (CacheForceList.Count > 0)
+                    {
+                        eSumFx = CacheForceList[0].Fx + eSumFx; eSumFy = CacheForceList[0].Fy + eSumFy; eSum = CacheForceList[0].F + eSum;
+                        sSumFx = CacheForceList[1].Fx + sSumFx; sSumFy = CacheForceList[1].Fy + sSumFy; sSum = CacheForceList[1].F + sSum;
+                        s = CacheForceList[0].Sin; c = CacheForceList[0].Cos;
+                    }
+                    #endregion
                 }
 
                 List<Force> ForceList = new List<Force>();
@@ -1414,7 +1674,7 @@ namespace AlgEMLib
                 return;
             }
 
-            else if (this.ProxiGraph.NodeList.Count >2)
+            else if (this.ProxiGraph.NodeList.Count > 2)
             {
                 //计算刚度矩阵
                 bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
@@ -1622,7 +1882,7 @@ namespace AlgEMLib
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = 0.5 * this.Scale / 1000;
             fV.isDragForce = this.isDragF;
-            fV.CreateForceVectorfrmConflict_Group(ConflictList,this.Groups);
+            fV.CreateForceVectorfrmConflict_Group(ConflictList, this.Groups);
             fV.Create_WriteForceVector2Shp(strPath, @"ForceVector", esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
             this.F = fV.Vector_F;
 
@@ -1675,6 +1935,22 @@ namespace AlgEMLib
             foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
             {
                 if (curNode.FeatureType == FeatureType.PolylineType)
+                {
+                    int index = curNode.ID;
+                    this.SetBoundPointParamsBigNumber(index, 0, 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 设置邻近图的边界点2014-3-2
+        /// </summary>
+        private void SetBoundPointParamforPG_CTP()
+        {
+            Force curForce = null;
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                if (curNode.FeatureType == FeatureType.PointType && curNode.TagID == 0)
                 {
                     int index = curNode.ID;
                     this.SetBoundPointParamsBigNumber(index, 0, 0);
@@ -1831,6 +2107,94 @@ namespace AlgEMLib
                 {
                     this.D[3 * index, 0] = curDx;
                     this.D[3 * index + 1, 0] = curDy;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 更新坐标位置
+        /// </summary>
+        private void UpdataCoordsforPGCTP()
+        {
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                int index = curNode.ID;
+                int tagID = curNode.TagID;
+                FeatureType fType = curNode.FeatureType;
+                VoronoiPolygon vp = null;
+                Force force = fV.GetForcebyIndex(index);
+
+                double curDx0 = 0;
+                double curDy0 = 0;
+                double curDx = 0;
+                double curDy = 0;
+                if (force != null)
+                {
+
+                    curDx0 = this.fV.GetForcebyIndex(index).Fx;
+                    curDy0 = this.fV.GetForcebyIndex(index).Fy;
+                    curDx = this.fV.GetForcebyIndex(index).Fx;
+                    curDy = this.fV.GetForcebyIndex(index).Fy;
+                    if (this.IsTopCos == true)
+                    {
+                        vp = this.VD.GetVPbyIDandType(tagID, fType);
+                        vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+                        this.D[3 * index, 0] = curDx;
+                        this.D[3 * index + 1, 0] = curDy;
+                    }
+                    //纠正拓扑错误
+                    curNode.X += curDx;//更新邻近图
+                    curNode.Y += curDy;
+                }
+                else
+                {
+                    this.D[3 * index, 0] = curDx;
+                    this.D[3 * index + 1, 0] = curDy;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 更新坐标位置
+        /// </summary>
+        private void UpdataCoordsforPGCTP_2()
+        {
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                int index = curNode.ID;
+                int tagID = curNode.TagID;
+                FeatureType fType = curNode.FeatureType;
+                VoronoiPolygon vp = null;
+                Force force = fV.GetForcebyIndex(index);
+
+                double curDx0 = 0;
+                double curDy0 = 0;
+                double curDx = 0;
+                double curDy = 0;
+                if (force != null)
+                {
+
+                    curDx0 = this.fV.GetForcebyIndex(index).Fx;
+                    curDy0 = this.fV.GetForcebyIndex(index).Fy;
+                    curDx = this.fV.GetForcebyIndex(index).Fx;
+                    curDy = this.fV.GetForcebyIndex(index).Fy;
+                    if (this.IsTopCos == true)
+                    {
+                        vp = this.VD.GetVPbyIDandType(tagID, fType);
+                        vp.TopologicalConstraint(curDx0, curDy0, 0.001, out curDx, out curDy);
+                        this.Test_D[3 * index, 0] = curDx;
+                        this.Test_D[3 * index + 1, 0] = curDy;
+                    }
+                    //纠正拓扑错误
+                    curNode.X += curDx;//更新邻近图
+                    curNode.Y += curDy;
+                }
+                else
+                {
+                    this.Test_D[3 * index, 0] = curDx;
+                    this.Test_D[3 * index + 1, 0] = curDy;
                 }
             }
 
@@ -2126,7 +2490,7 @@ namespace AlgEMLib
             this.I = i;
             this.A = a;
             this.Map = map;
-           // this.ConflictList = conflictList;
+            // this.ConflictList = conflictList;
             this.IsTopCos = false;
         }
 
@@ -2138,7 +2502,7 @@ namespace AlgEMLib
         {
             DataSet ds = new DataSet();
             //创建一个表
-            DataTable tableConflict= new DataTable();
+            DataTable tableConflict = new DataTable();
             tableConflict.TableName = "ConflictsCount";
             tableConflict.Columns.Add("ID", typeof(int));
             tableConflict.Columns.Add("ConflictCount", typeof(int));
@@ -2192,20 +2556,20 @@ namespace AlgEMLib
             {
                 //if (edge.Node1.FeatureType != FeatureType.PolylineType && edge.Node2.FeatureType != FeatureType.PolylineType)
                 //{
-                    double dis = edge.NearestEdge.NearestDistance;
-                    if (dis <= (disThreshold * 10 * scale) / 1000)
+                double dis = edge.NearestEdge.NearestDistance;
+                if (dis <= (disThreshold * 10 * scale) / 1000)
+                {
+                    double w = dijkstra.AdjMatrix[edge.Node1.ID, edge.Node2.ID];
+                    if (w == double.PositiveInfinity)
                     {
-                        double w = dijkstra.AdjMatrix[edge.Node1.ID, edge.Node2.ID];
-                        if (w == double.PositiveInfinity)
+                        double minDis = double.PositiveInfinity;
+                        dijkstra.OneToOneSP(edge.Node1.ID, edge.Node2.ID, n, double.PositiveInfinity, out minDis);
+                        if (dis <= (4.0 / 7.0) * minDis)
                         {
-                            double minDis = double.PositiveInfinity;
-                            dijkstra.OneToOneSP(edge.Node1.ID, edge.Node2.ID, n, double.PositiveInfinity, out minDis);
-                            if (dis <= (4.0 / 7.0) * minDis)
-                            {
-                                mstpg.EdgeList.Add(edge);
-                            }
+                            mstpg.EdgeList.Add(edge);
                         }
                     }
+                }
                 //}
             }
             #endregion
@@ -2214,12 +2578,12 @@ namespace AlgEMLib
             //计算刚度矩阵
             bM = new BeamsStiffMatrix(mstpg, E, I, A);
             this.K = bM.Matrix_K;
-            Matrix identityMatrix = new Matrix(3*n, 3*n);
-            this.D = new Matrix(3*n, 1);
-            for (int i = 0; i < 3*n; i++)
+            Matrix identityMatrix = new Matrix(3 * n, 3 * n);
+            this.D = new Matrix(3 * n, 1);
+            for (int i = 0; i < 3 * n; i++)
             {
                 this.D[i, 0] = 0.0;
-                for (int j = 0; j < 3*n; j++)
+                for (int j = 0; j < 3 * n; j++)
                 {
                     this.K[i, j] *= r;
                     if (i == j)
@@ -2277,29 +2641,29 @@ namespace AlgEMLib
                 fV.CreateForceVectorfrmConflictforBader(cd.ConflictList, mstpg);
                 // fV.Create_WriteForceVector2Shp(strPath, @"ForceVector", esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
 
-               // this.ReCoverCoordsforMST(mstpg);
+                // this.ReCoverCoordsforMST(mstpg);
                 this.F = fV.Vector_F;
                 this.SetBoundPointParamforMST(mstpg);//设置边界条件
                 this.F = this.D + r * this.F;        //d(t-1)+rf(t-1)
                 this.D = this.K.Inverse() * this.F;
 
                 if (!IsDisplaceValueNaN())
-                        break;
+                    break;
 
                 this.UpdataCoordsforMST(mstpg);      //更新坐标
-             
-                OutputDisplacement(strPath, "Displacement" + i.ToString()+".txt", mstpg);
+
+                OutputDisplacement(strPath, "Displacement" + i.ToString() + ".txt", mstpg);
             }
 
             TXTHelper.ExportToTxt(tableConflict, strPath + @"\ConflictsCount.txt");
-            
+
             //输出受力点出的受力与当前移位值
-          //  this.OutputDisplacementandForces(fV.ForceList);
+            //  this.OutputDisplacementandForces(fV.ForceList);
             //输出各点的移位总和
-         //   OutputTotalDisplacementforProxmityGraph(this.OriginalGraph, this.ProxiGraph, this.Map);
+            //   OutputTotalDisplacementforProxmityGraph(this.OriginalGraph, this.ProxiGraph, this.Map);
         }
 
-        public void DoDispaceBader1(double r, int times, double scale, double disThreshold,ISpatialReference prj)
+        public void DoDispaceBader1(double r, int times, double scale, double disThreshold, ISpatialReference prj)
         {
             #region 三角网+骨架线+邻近图+冲突检测
             DelaunayTin dt = new DelaunayTin(this.Map.TriNodeList);
@@ -2480,7 +2844,7 @@ namespace AlgEMLib
         /// <returns></returns>
         private bool IsDisplaceValueNaN()
         {
-            int rowCount=this.D.Row;
+            int rowCount = this.D.Row;
             for (int i = 0; i < rowCount; i++)
             {
                 double curV = this.D[i, 0];
@@ -2529,8 +2893,8 @@ namespace AlgEMLib
 
                     foreach (TriNode curPoint in po.PointList)
                     {
-                        curPoint.X+= curDx;
-                        curPoint.Y+= curDy;
+                        curPoint.X += curDx;
+                        curPoint.Y += curDy;
                     }
                 }
 
@@ -2574,7 +2938,7 @@ namespace AlgEMLib
                     dr[0] = index;
                     dr[1] = curDx;
                     dr[2] = curDy;
-                    dr[3] = Math.Sqrt(curDx*curDx+curDy*curDy);
+                    dr[3] = Math.Sqrt(curDx * curDx + curDy * curDy);
                     tableforce.Rows.Add(dr);
                 }
             }
@@ -2592,5 +2956,246 @@ namespace AlgEMLib
             throw new NotImplementedException();
         }
         #endregion
+
+        /// <summary>
+        /// 求矩阵的逆
+        /// </summary>
+        /// <param name="dMatrix"></param>
+        /// <param name="Level"></param>
+        /// <returns></returns>
+        private double[,] ReverseMatrix(double[,] dMatrix, int Level)
+        {
+
+            double dMatrixValue = MatrixValue(dMatrix, Level);
+
+            if (dMatrixValue == 0) return null;
+
+
+
+            double[,] dReverseMatrix = new double[Level, 2 * Level];
+
+            double x, c;
+
+            // Init Reverse matrix
+
+            for (int i = 0; i < Level; i++)
+            {
+
+                for (int j = 0; j < 2 * Level; j++)
+                {
+
+                    if (j < Level)
+
+                        dReverseMatrix[i, j] = dMatrix[i, j];
+
+                    else
+
+                        dReverseMatrix[i, j] = 0;
+
+                }
+
+
+
+                dReverseMatrix[i, Level + i] = 1;
+
+            }
+
+
+
+            for (int i = 0, j = 0; i < Level && j < Level; i++, j++)
+            {
+
+                if (dReverseMatrix[i, j] == 0)
+                {
+
+                    int m = i;
+
+                    for (; dMatrix[m, j] == 0; m++) ;
+
+                    if (m == Level)
+
+                        return null;
+
+                    else
+                    {
+
+                        // Add i-row with m-row
+
+                        for (int n = j; n < 2 * Level; n++)
+
+                            dReverseMatrix[i, n] += dReverseMatrix[m, n];
+
+                    }
+
+                }
+
+
+
+                // Format the i-row with "1" start
+
+                x = dReverseMatrix[i, j];
+
+                if (x != 1)
+                {
+
+                    for (int n = j; n < 2 * Level; n++)
+
+                        if (dReverseMatrix[i, n] != 0)
+
+                            dReverseMatrix[i, n] /= x;
+
+                }
+
+
+
+                // Set 0 to the current column in the rows after current row
+
+                for (int s = Level - 1; s > i; s--)
+                {
+
+                    x = dReverseMatrix[s, j];
+
+                    for (int t = j; t < 2 * Level; t++)
+
+                        dReverseMatrix[s, t] -= (dReverseMatrix[i, t] * x);
+
+                }
+
+            }
+
+
+
+            // Format the first matrix into unit-matrix
+
+            for (int i = Level - 2; i >= 0; i--)
+            {
+
+                for (int j = i + 1; j < Level; j++)
+
+                    if (dReverseMatrix[i, j] != 0)
+                    {
+
+                        c = dReverseMatrix[i, j];
+
+                        for (int n = j; n < 2 * Level; n++)
+
+                            dReverseMatrix[i, n] -= (c * dReverseMatrix[j, n]);
+
+                    }
+
+            }
+
+
+
+            double[,] dReturn = new double[Level, Level];
+
+            for (int i = 0; i < Level; i++)
+
+                for (int j = 0; j < Level; j++)
+
+                    dReturn[i, j] = dReverseMatrix[i, j + Level];
+
+            return dReturn;
+
+        }
+        
+        /// <summary>
+        /// 存储MatrixValue
+        /// </summary>
+        /// <param name="MatrixList"></param>
+        /// <param name="Level"></param>
+        /// <returns></returns>
+        private double MatrixValue(double[,] MatrixList, int Level)
+        {
+
+            double[,] dMatrix = new double[Level, Level];
+
+            for (int i = 0; i < Level; i++)
+
+                for (int j = 0; j < Level; j++)
+
+                    dMatrix[i, j] = MatrixList[i, j];
+
+            double c, x;
+
+            int k = 1;
+
+            for (int i = 0, j = 0; i < Level && j < Level; i++, j++)
+            {
+
+                if (dMatrix[i, j] == 0)
+                {
+
+                    int m = i;
+
+                    for (; dMatrix[m, j] == 0; m++) ;
+
+                    if (m == Level)
+
+                        return 0;
+
+                    else
+                    {
+
+                        // Row change between i-row and m-row
+
+                        for (int n = j; n < Level; n++)
+                        {
+
+                            c = dMatrix[i, n];
+
+                            dMatrix[i, n] = dMatrix[m, n];
+
+                            dMatrix[m, n] = c;
+
+                        }
+
+
+
+                        // Change value pre-value
+
+                        k *= (-1);
+
+                    }
+
+                }
+
+
+
+                // Set 0 to the current column in the rows after current row
+
+                for (int s = Level - 1; s > i; s--)
+                {
+
+                    x = dMatrix[s, j];
+
+                    for (int t = j; t < Level; t++)
+
+                        dMatrix[s, t] -= dMatrix[i, t] * (x / dMatrix[i, j]);
+
+                }
+
+            }
+
+
+
+            double sn = 1;
+
+            for (int i = 0; i < Level; i++)
+            {
+
+                if (dMatrix[i, i] != 0)
+
+                    sn *= dMatrix[i, i];
+
+                else
+
+                    return 0;
+
+            }
+
+            return k * sn;
+
+        }
     }
 }

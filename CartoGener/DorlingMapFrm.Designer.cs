@@ -48,6 +48,8 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.button19 = new System.Windows.Forms.Button();
+            this.button18 = new System.Windows.Forms.Button();
             this.button14 = new System.Windows.Forms.Button();
             this.button13 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -59,6 +61,7 @@
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.button16 = new System.Windows.Forms.Button();
             this.button15 = new System.Windows.Forms.Button();
+            this.button20 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -248,6 +251,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.button20);
             this.groupBox2.Controls.Add(this.button9);
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Controls.Add(this.button10);
@@ -258,21 +262,43 @@
             this.groupBox2.Controls.Add(this.button7);
             this.groupBox2.Location = new System.Drawing.Point(560, 5);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(249, 286);
+            this.groupBox2.Size = new System.Drawing.Size(249, 327);
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Experimental use";
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.button19);
+            this.groupBox3.Controls.Add(this.button18);
             this.groupBox3.Controls.Add(this.button14);
             this.groupBox3.Controls.Add(this.button13);
             this.groupBox3.Location = new System.Drawing.Point(312, 145);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(242, 96);
+            this.groupBox3.Size = new System.Drawing.Size(242, 163);
             this.groupBox3.TabIndex = 19;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = " Version_2";
+            // 
+            // button19
+            // 
+            this.button19.Location = new System.Drawing.Point(6, 124);
+            this.button19.Name = "button19";
+            this.button19.Size = new System.Drawing.Size(224, 23);
+            this.button19.TabIndex = 23;
+            this.button19.Text = "Linear Size AmericaData";
+            this.button19.UseVisualStyleBackColor = true;
+            this.button19.Click += new System.EventHandler(this.button19_Click);
+            // 
+            // button18
+            // 
+            this.button18.Location = new System.Drawing.Point(6, 95);
+            this.button18.Name = "button18";
+            this.button18.Size = new System.Drawing.Size(225, 23);
+            this.button18.TabIndex = 22;
+            this.button18.Text = "Linear Size USA Data";
+            this.button18.UseVisualStyleBackColor = true;
+            this.button18.Click += new System.EventHandler(this.button18_Click);
             // 
             // button14
             // 
@@ -334,7 +360,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(135, 15);
             this.label3.TabIndex = 2;
-            this.label3.Text = "Original circles";
+            this.label3.Text = "Original regions";
             // 
             // comboBox4
             // 
@@ -383,11 +409,21 @@
             this.button15.UseVisualStyleBackColor = true;
             this.button15.Click += new System.EventHandler(this.button15_Click);
             // 
+            // button20
+            // 
+            this.button20.Location = new System.Drawing.Point(15, 280);
+            this.button20.Name = "button20";
+            this.button20.Size = new System.Drawing.Size(224, 29);
+            this.button20.TabIndex = 14;
+            this.button20.Text = "Efficiency analysis for US counties";
+            this.button20.UseVisualStyleBackColor = true;
+            this.button20.Click += new System.EventHandler(this.button20_Click);
+            // 
             // DorlingMapFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(811, 323);
+            this.ClientSize = new System.Drawing.Size(811, 372);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
@@ -445,5 +481,8 @@
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.Button button16;
         private System.Windows.Forms.Button button15;
+        private System.Windows.Forms.Button button19;
+        private System.Windows.Forms.Button button18;
+        private System.Windows.Forms.Button button20;
     }
 }

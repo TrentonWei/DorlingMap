@@ -12,7 +12,7 @@ namespace AlgEMLib
     /// </summary>
     public abstract class StiffMatrix
     {
-        protected  Matrix _K = null;                                            //刚度矩阵
+        public  Matrix _K = null;                                            //刚度矩阵
     }
 
 }

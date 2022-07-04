@@ -1021,6 +1021,317 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        /// 计算邻近图上个点的最终受力-最大力做主方向的局部最大值法
+        /// </summary>
+        /// <returns></returns>
+        protected List<Force> CalForceforProxiGraph_CTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,double MaxForce)
+        {
+            #region 计算受力
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return null;
+
+            InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            List<VertexForce> vForceList = new List<VertexForce>();
+
+            foreach (ProxiNode sNode in NodeList)
+            {
+                if (sNode.FeatureType == FeatureType.PointType)
+                {
+                    ProxiNode eNode = this.GetPNodeByID(sNode.TagID, FinalLocation);//获得对应的FinalLocation中的Points（TagValue=ID）
+                    int TestID = sNode.ID;
+
+                    if (eNode != null) //只计算给定目的地的受力
+                    {
+                        List<Force> ForceList = this.GetForceCTP(sNode, eNode, MinDis,MaxForce);//获的起点到终点的力
+
+                        if (ForceList.Count > 0)
+                        {
+                            #region 添加Force
+                            VertexForce svForce = this.GetvForcebyIndex(sNode.ID, vForceList);//受力的标志还是用的ID来标识
+                            if (svForce == null)
+                            {
+                                svForce = new VertexForce(sNode.ID);
+                                vForceList.Add(svForce);
+                            }
+                            svForce.forceList.Add(ForceList[0]);//将当前的受力加入VertexForce数组
+                            #endregion
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            #region 计算合力
+            List<Force> rforceList = new List<Force>();
+            foreach (VertexForce vForce in vForceList)
+            {
+                if (vForce.forceList.Count == 1)//当只受一个力作用时
+                {
+                    rforceList.Add(vForce.forceList[0]);
+
+                }
+                else if (vForce.forceList.Count > 1)
+                {
+                    int index = 0;
+                    double maxFx = 0;
+                    double minFx = 0;
+                    double maxFy = 0;
+                    double minFy = 0;
+                    Force maxF = GetMaxForce(out  index, vForce.forceList);
+                    maxFx = maxF.F;
+                    double s = maxF.Sin;
+                    double c = maxF.Cos;
+
+                    for (int i = 0; i < vForce.forceList.Count; i++)
+                    {
+
+                        if (i != index)
+                        {
+                            Force F = vForce.forceList[i];
+                            double fx = F.Fx * c + F.Fy * s;
+                            double fy = F.Fy * c - F.Fx * s;
+
+                            if (minFx > fx) minFx = fx;
+                            if (maxFy < fy) maxFy = fy;
+                            if (minFy > fy) minFy = fy;
+                        }
+                    }
+                    double FFx = maxFx + minFx;
+                    double FFy = maxFy + minFy;
+                    double Fx = FFx * c - FFy * s;
+                    double Fy = FFx * s + FFy * c;
+                    double f = Math.Sqrt(Fx * Fx + Fy * Fy);
+                    Force rForce = new Force(vForce.ID, Fx, Fy, f);
+                    rforceList.Add(rForce);
+                }
+            }
+            #endregion
+
+            return rforceList;
+        }
+
+        /// <summary>
+        /// 计算邻近图上个点的最终受力-最大力做主方向的局部最大值法
+        /// 输出BoundingPoints
+        /// </summary>
+        /// <returns></returns>
+        protected List<Force> CalForceforProxiGraph_HierCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,out List<int> BoundingPoint,double MaxForce)
+        {
+            BoundingPoint = new List<int>();
+
+            #region 计算受力
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return null;
+
+            InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            List<VertexForce> vForceList = new List<VertexForce>();
+
+            foreach (ProxiNode sNode in NodeList)
+            {
+                if (sNode.FeatureType == FeatureType.PointType)
+                {
+                    ProxiNode eNode = this.GetPNodeByID(sNode.TagID, FinalLocation);//获得对应的FinalLocation中的Points（TagValue=ID）
+                    int TestID = sNode.ID;
+
+                    if (eNode != null) //只计算给定目的地的受力
+                    {
+                        List<Force> ForceList = this.GetForceCTP(sNode, eNode, MinDis, MaxForce);//获的起点到终点的力
+
+                        if (ForceList.Count > 0)
+                        {
+                            #region 添加Force
+                            VertexForce svForce = this.GetvForcebyIndex(sNode.ID, vForceList);//受力的标志还是用的ID来标识
+                            if (svForce == null)
+                            {
+                                svForce = new VertexForce(sNode.ID);
+                                vForceList.Add(svForce);
+                            }
+                            svForce.forceList.Add(ForceList[0]);//将当前的受力加入VertexForce数组
+                            #endregion
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            #region 计算合力
+            List<Force> rforceList = new List<Force>();
+            foreach (VertexForce vForce in vForceList)
+            {
+                if (vForce.forceList.Count == 1)//当只受一个力作用时
+                {
+                    rforceList.Add(vForce.forceList[0]);
+
+                }
+                else if (vForce.forceList.Count > 1)
+                {
+                    int index = 0;
+                    double maxFx = 0;
+                    double minFx = 0;
+                    double maxFy = 0;
+                    double minFy = 0;
+                    Force maxF = GetMaxForce(out  index, vForce.forceList);
+                    maxFx = maxF.F;
+                    double s = maxF.Sin;
+                    double c = maxF.Cos;
+
+                    for (int i = 0; i < vForce.forceList.Count; i++)
+                    {
+
+                        if (i != index)
+                        {
+                            Force F = vForce.forceList[i];
+                            double fx = F.Fx * c + F.Fy * s;
+                            double fy = F.Fy * c - F.Fx * s;
+
+                            if (minFx > fx) minFx = fx;
+                            if (maxFy < fy) maxFy = fy;
+                            if (minFy > fy) minFy = fy;
+                        }
+                    }
+                    double FFx = maxFx + minFx;
+                    double FFy = maxFy + minFy;
+                    double Fx = FFx * c - FFy * s;
+                    double Fy = FFx * s + FFy * c;
+                    double f = Math.Sqrt(Fx * Fx + Fy * Fy);
+                    Force rForce = new Force(vForce.ID, Fx, Fy, f);
+                    rforceList.Add(rForce);
+                }
+            }
+            #endregion
+
+            #region 返回受力最小前20名
+            //List<Force> subrforceList = rforceList.GetRange(0, 20);
+
+            //List<double> CacheFList = new List<double>();
+            //for (int i = 0; i < subrforceList.Count; i++)
+            //{
+            //    CacheFList.Add(subrforceList[i].F);
+            //}
+            //double MaxF = CacheFList.Max();
+
+            //for (int i = 20; i < rforceList.Count; i++)
+            //{
+            //    if (rforceList[i].F < MaxF)
+            //    {
+            //        subrforceList.RemoveAt(CacheFList.IndexOf(MaxF));
+            //        subrforceList.Add(rforceList[i]);
+
+            //        CacheFList.Remove(MaxF);
+            //        CacheFList.Add(rforceList[i].F);
+            //        MaxF = CacheFList.Max();
+            //    }
+            //}
+            #endregion
+
+            #region 计算受力最大的十名
+            List<Force> subrforceList = rforceList.GetRange(0, 10);
+
+            List<double> CacheFList = new List<double>();
+            for (int i = 0; i < subrforceList.Count; i++)
+            {
+                CacheFList.Add(subrforceList[i].F);
+            }
+            double MinF = CacheFList.Min();
+
+            for (int i = 10; i < rforceList.Count; i++)
+            {
+                if (rforceList[i].F > MinF)
+                {
+                    subrforceList.RemoveAt(CacheFList.IndexOf(MinF));
+                    subrforceList.Add(rforceList[i]);
+
+                    CacheFList.Remove(MinF);
+                    CacheFList.Add(rforceList[i].F);
+                    MinF = CacheFList.Min();
+                }
+            }
+            #endregion
+
+            #region
+            //for (int i = 0; i < rforceList.Count; i++)
+            //{
+            //    if (rforceList[i].F < 0.1)
+            //    {
+            //        BoundingPoint.Add(rforceList[i].ID);
+            //    }
+            //}
+            #endregion
+
+            return subrforceList;
+        }
+
+        /// <summary>
+        /// 计算起点到终点的力
+        /// </summary>
+        /// <param name="sNode">起点</param>
+        /// <param name="eNode">终点</param>
+        /// <param name="MinDis">最小距离</param>
+        /// <returns></returns>
+        public List<Force> GetForceCTP(ProxiNode sNode, ProxiNode eNode, double MinDis,double MaxForce)
+        {
+            //ProxiNode tNode1 = sPo1.CalProxiNode();
+            //ProxiNode tNode2 = ePo2.CalProxiNode();
+
+            double EdgeDis = this.GetDis(sNode, eNode);
+            List<Force> ForceList = new List<Force>();
+            List<VertexForce> vForceList = new List<VertexForce>();
+
+            if (EdgeDis > MinDis)
+            {
+                double curForce = EdgeDis;
+                if (curForce > MaxForce)
+                {
+                    curForce = MaxForce;
+                }
+
+                double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));
+                double s = (eNode.Y - sNode.Y) / r;
+                double c = (eNode.X - sNode.X) / r;
+
+                double fx = curForce * c;
+                double fy = curForce * s;
+                Force sForce = new Force(sNode.ID, fx, fy, s, c, curForce);//力的ID就是Node的ID
+                ForceList.Add(sForce);
+            }
+
+            return ForceList;
+        }
+
+        /// <summary>
+        /// Distance between two trinode
+        /// </summary>
+        /// <param name="sNode"></param>
+        /// <param name="eNode"></param>
+        /// <returns></returns>
+        public double GetDis(ProxiNode sNode, ProxiNode eNode)
+        {
+            double Dis = Math.Sqrt((sNode.X - eNode.X) * (sNode.X - eNode.X) + (sNode.Y - eNode.Y) * (sNode.Y - eNode.Y));
+            return Dis;
+        }
+
+        /// <summary>
+        /// GetPoByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public ProxiNode GetPNodeByID(int ID, List<ProxiNode> NodeList)
+        {
+            ProxiNode eNode = null;
+            foreach (ProxiNode CacheNode in NodeList)
+            {
+                if (CacheNode.TagID == ID)
+                {
+                    eNode = CacheNode;
+                    break;
+                }
+            }
+
+            return eNode;
+        }
+
+        /// <summary>
         /// 考虑分组
         /// </summary>
         /// <param name="conflictList">冲突</param>

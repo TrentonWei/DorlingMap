@@ -128,6 +128,17 @@ namespace CartoGener
             StableDorlingMapFrm SDMF=new StableDorlingMapFrm(this.axMapControl1);
             SDMF.Show();
         }
+
+        /// <summary>
+        /// Central TP Map
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void centralTPMapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Central_TP_MapFrm CTPF = new Central_TP_MapFrm(this.axMapControl1);
+            CTPF.Show();
+        }
     }
 }
 
