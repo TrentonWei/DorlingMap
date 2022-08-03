@@ -41,9 +41,9 @@
             this.button10 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button9 = new System.Windows.Forms.Button();
             this.comboBox4 = new System.Windows.Forms.ComboBox();
@@ -51,6 +51,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.button12 = new System.Windows.Forms.Button();
+            this.button13 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -122,6 +124,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.button13);
             this.groupBox1.Controls.Add(this.button11);
             this.groupBox1.Controls.Add(this.button10);
             this.groupBox1.Controls.Add(this.button8);
@@ -132,14 +135,14 @@
             this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Location = new System.Drawing.Point(281, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(230, 265);
+            this.groupBox1.Size = new System.Drawing.Size(230, 298);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Experimental use";
             // 
             // button11
             // 
-            this.button11.Location = new System.Drawing.Point(16, 234);
+            this.button11.Location = new System.Drawing.Point(16, 263);
             this.button11.Name = "button11";
             this.button11.Size = new System.Drawing.Size(208, 23);
             this.button11.TabIndex = 13;
@@ -149,7 +152,7 @@
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(16, 204);
+            this.button10.Location = new System.Drawing.Point(16, 234);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(208, 23);
             this.button10.TabIndex = 12;
@@ -163,7 +166,7 @@
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(208, 23);
             this.button8.TabIndex = 11;
-            this.button8.Text = "Separated Dorling";
+            this.button8.Text = "Separated Dorling USA Data";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
@@ -176,16 +179,6 @@
             this.button7.Text = "StableDorling_Adjacent";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(57, 20);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(208, 23);
-            this.button6.TabIndex = 9;
-            this.button6.Text = "StableDorling_RNG";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button5
             // 
@@ -207,6 +200,16 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(6, 20);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(259, 23);
+            this.button6.TabIndex = 9;
+            this.button6.Text = "StableDorling_RNG_USA Data";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.button9);
@@ -214,7 +217,7 @@
             this.groupBox2.Controls.Add(this.comboBox3);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(0, 164);
+            this.groupBox2.Location = new System.Drawing.Point(0, 204);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(275, 113);
             this.groupBox2.TabIndex = 8;
@@ -267,19 +270,40 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.button12);
             this.groupBox3.Controls.Add(this.button6);
-            this.groupBox3.Location = new System.Drawing.Point(0, 107);
+            this.groupBox3.Location = new System.Drawing.Point(0, 116);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(275, 51);
+            this.groupBox3.Size = new System.Drawing.Size(275, 82);
             this.groupBox3.TabIndex = 9;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "User use";
+            // 
+            // button12
+            // 
+            this.button12.Location = new System.Drawing.Point(7, 50);
+            this.button12.Name = "button12";
+            this.button12.Size = new System.Drawing.Size(258, 23);
+            this.button12.TabIndex = 10;
+            this.button12.Text = "StableDorling_RNG_EUR Data";
+            this.button12.UseVisualStyleBackColor = true;
+            this.button12.Click += new System.EventHandler(this.button12_Click);
+            // 
+            // button13
+            // 
+            this.button13.Location = new System.Drawing.Point(16, 205);
+            this.button13.Name = "button13";
+            this.button13.Size = new System.Drawing.Size(208, 23);
+            this.button13.TabIndex = 14;
+            this.button13.Text = "Separated Dorling EUR Data";
+            this.button13.UseVisualStyleBackColor = true;
+            this.button13.Click += new System.EventHandler(this.button13_Click);
             // 
             // StableDorlingMapFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(530, 283);
+            this.ClientSize = new System.Drawing.Size(530, 400);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -324,5 +348,7 @@
         private System.Windows.Forms.Button button10;
         private System.Windows.Forms.Button button11;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Button button13;
+        private System.Windows.Forms.Button button12;
     }
 }

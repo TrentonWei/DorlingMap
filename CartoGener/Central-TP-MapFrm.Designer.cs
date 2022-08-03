@@ -45,8 +45,10 @@
             this.comboBox4 = new System.Windows.Forms.ComboBox();
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
-            this.button9 = new System.Windows.Forms.Button();
             this.button10 = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
+            this.button11 = new System.Windows.Forms.Button();
+            this.button12 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -112,41 +114,41 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(153, 116);
+            this.button2.Location = new System.Drawing.Point(118, 116);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(238, 34);
+            this.button2.Size = new System.Drawing.Size(273, 34);
             this.button2.TabIndex = 7;
-            this.button2.Text = "确定（Beams）[邻近图不重构]";
+            this.button2.Text = "确定（Beams-DT）[邻近图不重构]";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(154, 156);
+            this.button3.Location = new System.Drawing.Point(118, 156);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(238, 30);
+            this.button3.Size = new System.Drawing.Size(274, 30);
             this.button3.TabIndex = 8;
-            this.button3.Text = "确定（Snake）[邻近图不重构]";
+            this.button3.Text = "确定（Snake-RNG）[邻近图不重构]";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(154, 192);
+            this.button4.Location = new System.Drawing.Point(118, 192);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(238, 36);
+            this.button4.Size = new System.Drawing.Size(274, 36);
             this.button4.TabIndex = 9;
-            this.button4.Text = "确定（Snake）[邻近图重构]";
+            this.button4.Text = "确定（Snake-RNG）[邻近图重构]";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(154, 234);
+            this.button5.Location = new System.Drawing.Point(118, 234);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(237, 32);
+            this.button5.Size = new System.Drawing.Size(273, 32);
             this.button5.TabIndex = 10;
-            this.button5.Text = "确定（snake）[Map输出]";
+            this.button5.Text = "确定（Snake-RNG）[Map输出]";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
@@ -179,33 +181,23 @@
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(154, 273);
+            this.button7.Location = new System.Drawing.Point(118, 273);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(237, 27);
+            this.button7.Size = new System.Drawing.Size(273, 28);
             this.button7.TabIndex = 14;
-            this.button7.Text = "层次Snake";
+            this.button7.Text = "层次Snake（DT）";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(154, 307);
+            this.button8.Location = new System.Drawing.Point(118, 307);
             this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(237, 29);
+            this.button8.Size = new System.Drawing.Size(273, 29);
             this.button8.TabIndex = 15;
-            this.button8.Text = "移动控制的Snake";
+            this.button8.Text = "移动控制的Snake(DT)";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
-            // 
-            // button9
-            // 
-            this.button9.Location = new System.Drawing.Point(153, 342);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(238, 30);
-            this.button9.TabIndex = 16;
-            this.button9.Text = "层次邻近图控制的Snake";
-            this.button9.UseVisualStyleBackColor = true;
-            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // button10
             // 
@@ -213,17 +205,49 @@
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(237, 34);
             this.button10.TabIndex = 17;
-            this.button10.Text = "终点计算";
+            this.button10.Text = "终点计算（计算点的最终位置）";
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(118, 342);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(273, 33);
+            this.button9.TabIndex = 18;
+            this.button9.Text = "确定-边界关系维护的Snake（RNG）";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
+            // button11
+            // 
+            this.button11.Location = new System.Drawing.Point(118, 382);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(273, 33);
+            this.button11.TabIndex = 19;
+            this.button11.Text = "确定-边界关系维护的Snake（MST）";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
+            // 
+            // button12
+            // 
+            this.button12.Location = new System.Drawing.Point(401, 156);
+            this.button12.Name = "button12";
+            this.button12.Size = new System.Drawing.Size(233, 30);
+            this.button12.TabIndex = 20;
+            this.button12.Text = "最小二乘方法";
+            this.button12.UseVisualStyleBackColor = true;
+            this.button12.Click += new System.EventHandler(this.button12_Click);
             // 
             // Central_TP_MapFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(764, 406);
-            this.Controls.Add(this.button10);
+            this.ClientSize = new System.Drawing.Size(1292, 461);
+            this.Controls.Add(this.button12);
+            this.Controls.Add(this.button11);
             this.Controls.Add(this.button9);
+            this.Controls.Add(this.button10);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
             this.Controls.Add(this.comboBox4);
@@ -266,7 +290,9 @@
         private System.Windows.Forms.ComboBox comboBox4;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button11;
+        private System.Windows.Forms.Button button12;
     }
 }

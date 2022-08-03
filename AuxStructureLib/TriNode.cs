@@ -19,6 +19,8 @@ namespace AuxStructureLib
        // public double Y;        //坐标
        // public int ID;         //编号
         public int TagValue;   //标识值,1、道路网：当为端点是为-1，否则为所属线目标的ID
+        public double Initial_X = 0;//点可能偏移，这里记录点偏移的初始位置X
+        public double Initial_Y = 0;//点可能偏移，这里记录点偏移的初始位置Y
 
         public double MoveDis = 0;
         /// <summary>

@@ -283,6 +283,55 @@ namespace CartoGener
         /// <param name="Rate"></param>a unit for 100
         /// <param name="RType">=0 linear R</param>=1 SinR；=2 sqrt
         /// <returns></returns>
+        public List<Double> GetSR_2(List<double> ValueList, double MinR, double MaxR, double scale, double MinValue,double MaxValue,int RType)
+        {
+            List<double> RList = new List<double>();//Return R
+
+            #region Linear R
+            if (RType == 0)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = ((ValueList[i] - MinValue) / (MaxValue - MinValue) * (MaxR - MinR) + MinR) * scale;
+                    RList.Add(R);
+                }
+            }
+            #endregion
+
+            #region SinR
+            else if (RType == 1)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = (Math.Sin(((ValueList[i] - MinValue) / (MaxValue - MinValue)) * Math.PI / 2) * (MaxR - MinR) + MinR) * scale;
+                    RList.Add(R);
+                }
+            }
+
+            #endregion
+
+            #region SqrtR
+            else if (RType == 2)
+            {
+                for (int i = 0; i < ValueList.Count; i++)
+                {
+                    double R = (Math.Sqrt(((ValueList[i] - MinValue) / (MaxValue - MinValue)) * Math.PI / 2) * (MaxR - MinR) + MinR) * scale;
+                    RList.Add(R);
+                }
+            }
+            #endregion
+
+            return RList;
+        }
+
+        /// <summary>
+        /// Compute the radius for each Circle （consider minR and maxR）
+        /// </summary>
+        /// <param name="ValueList"></param>
+        /// <param name="MinR"></param>
+        /// <param name="Rate"></param>a unit for 100
+        /// <param name="RType">=0 linear R</param>=1 SinR；=2 sqrt
+        /// <returns></returns>
         public List<Double> GetR(List<double> ValueList,double MinR,double MaxR, double scale,int RType)
         {
             double MinValue = ValueList.Min();//Get the minValue
@@ -748,6 +797,42 @@ namespace CartoGener
             return InitialCircleList;
         }
 
+        /// Get the initial Circles with R for StableDorling
+        /// </summary>
+        /// <param name="pFeatureClass"></param>
+        /// <returns></returns>
+        public List<Circle> GetInitialCircleSDorling_2(Dictionary<IPolygon, double> TimeSeriesData, double MinR,double MaxR, double scale, int RType, double MinValue,double MaxValue)
+        {
+            List<Circle> InitialCircleList = new List<Circle>();
+            List<double> ValueList = new List<double>();
+
+            #region Circles without R
+            for (int i = 0; i < TimeSeriesData.Keys.ToList().Count; i++)
+            {
+                Circle CacheCircle = new Circle(i);
+                ValueList.Add(TimeSeriesData[TimeSeriesData.Keys.ToList()[i]]);
+                CacheCircle.Value = TimeSeriesData[TimeSeriesData.Keys.ToList()[i]];
+                CacheCircle.scale = scale;
+
+                IArea pArea = TimeSeriesData.Keys.ToList()[i] as IArea;
+                CacheCircle.CenterX = pArea.Centroid.X;
+                CacheCircle.CenterY = pArea.Centroid.Y;
+                InitialCircleList.Add(CacheCircle);
+            }
+            #endregion
+
+            #region assign R for circles
+            List<double> RList = this.GetSR_2(ValueList, MinR, MaxR, scale, MinValue, MaxValue, RType);
+
+            for (int j = 0; j < InitialCircleList.Count; j++)
+            {
+                InitialCircleList[j].Radius = RList[j];
+            }
+            #endregion
+
+            return InitialCircleList;
+        }
+
         /// <summary>
         /// Get the initial Circles with R（不用阻尼振荡法 设置最小参数的阈值）
         /// </summary>
@@ -875,6 +960,57 @@ namespace CartoGener
 
             return CircleObjectList;
         }
+
+        /// <summary>
+        /// Circles to PolygonObjects
+        /// </summary>
+        /// <param name="CircleList"></param>
+        /// <returns></returns>
+        public List<List<PolygonObject>> GetInitialPolygonObjectForStableDorling_2(List<Dictionary<IPolygon, double>> TimeSeriesData, double MinR, double MaxR,double Scale, int RType, double MinValue)
+        {
+            #region 获得最小值和最大值
+            double CacheMinValue = 100000000;
+            double MaxValue = 0;
+            for (int i = 0; i < TimeSeriesData.Count; i++)
+            {
+                if (TimeSeriesData[i].Values.ToList().Min() < CacheMinValue)
+                {
+                    CacheMinValue = TimeSeriesData[i].Values.ToList().Min();
+                }
+
+                if (TimeSeriesData[i].Values.ToList().Max() > MaxValue)
+                {
+                    MaxValue = TimeSeriesData[i].Values.ToList().Max();
+                }
+            }
+            #endregion
+
+            #region 比较获取圆赋值最小值
+            if (CacheMinValue > MinValue)
+            {
+                MinValue = CacheMinValue;
+            }
+            #endregion
+
+            #region 生成圆
+            List<List<Circle>> CircleLists = new List<List<Circle>>();
+            for (int i = 0; i < TimeSeriesData.Count; i++)
+            {
+                List<Circle> CircleList = this.GetInitialCircleSDorling_2(TimeSeriesData[i], MinR, MaxR, Scale, RType, MinValue, MaxValue);
+                CircleLists.Add(CircleList);
+            }
+
+            List<List<PolygonObject>> CircleObjectList = new List<List<PolygonObject>>();
+            for (int i = 0; i < CircleLists.Count; i++)
+            {
+                List<PolygonObject> PoList = this.GetInitialPolygonObject2(CircleLists[i]);
+                CircleObjectList.Add(PoList);
+            }
+            #endregion
+
+            return CircleObjectList;
+        }
+
 
         /// <summary>
         /// Circles to PolygonObjects

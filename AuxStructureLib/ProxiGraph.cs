@@ -7,7 +7,6 @@ using AuxStructureLib;
 using System.IO;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.esriSystem;
-using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace AuxStructureLib
@@ -373,7 +372,7 @@ namespace AuxStructureLib
         }
 
         /// <summary>
-        /// 创建点集的MST（最短距离）
+        /// 创建点集的MST（最短距离）【For DorlingMap 以圆之间的距离赋值】
         /// </summary>
         public void CreateMST(List<ProxiNode> PnList, List<ProxiEdge> PeList,List<PolygonObject> PoList)
         {
@@ -528,7 +527,7 @@ namespace AuxStructureLib
         }
 
         /// <summary>
-        /// 创建点集的MST（最短距离）
+        /// 创建点集的MST（最短距离）【For DorlingMap 以圆之间的距离赋值】
         /// </summary>
         public void CreateMSTRevise(List<ProxiNode> PnList, List<ProxiEdge> PeList, List<PolygonObject> PoList)
         {
@@ -670,6 +669,154 @@ namespace AuxStructureLib
                     {
                         if (!MSTEdgeList.Contains(Pe))
                         {
+                            MSTEdgeList.Add(Pe);
+                            break;
+                        }
+                    }
+                }
+
+            }
+            #endregion
+
+            this.MSTEdgeList = MSTEdgeList;
+        }
+
+        /// <summary>
+        /// 生成给定邻近图的MST
+        /// </summary>
+        /// <param name="PnList"></param>
+        /// <param name="PeList"></param>
+        public void CreateGravityMST(List<ProxiNode> PnList, List<ProxiEdge> PeList)
+        {
+            #region 矩阵初始化
+            double[,] matrixGraph = new double[PnList.Count, PnList.Count];
+
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                for (int j = 0; j < PnList.Count; j++)
+                {
+                    matrixGraph[i, j] = -1;
+                }
+            }
+            #endregion
+
+            #region 矩阵赋值
+            //double MinV = 1000000;//矩阵最小值
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                ProxiNode Point1 = PnList[i];
+
+                for (int j = 0; j < PeList.Count; j++)
+                {
+                    ProxiEdge Edge1 = PeList[j];
+
+                    ProxiNode pPoint1 = Edge1.Node1;
+                    ProxiNode pPoint2 = Edge1.Node2;
+                    if (Point1.X == pPoint1.X && Point1.Y == pPoint1.Y)
+                    {
+                        for (int m = 0; m < PnList.Count; m++)
+                        {
+                            ProxiNode Point2 = PnList[m];
+
+                            if (Point2.X == pPoint2.X && Point2.Y == pPoint2.Y)
+                            {
+
+                                double EdgeDis = this.GetDis(pPoint1, pPoint2);
+                                matrixGraph[i, m] = matrixGraph[m, i] = EdgeDis;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            for (int i = 0; i < PnList.Count; i++)
+            {
+                for (int j = 0; j < PnList.Count; j++)
+                {
+                    if (matrixGraph[i, j] == -1 || matrixGraph[j, i] == -1)
+                    {
+                        matrixGraph[i, j] = matrixGraph[j, i] = 100000;
+                    }
+                }
+            }
+            #endregion
+
+            #region MST计算
+            IArray LabelArray = new ArrayClass();//MST点集
+            IArray fLabelArray = new ArrayClass();
+            List<List<int>> EdgesGroup = new List<List<int>>();//MST边集
+
+            for (int F = 0; F < PnList.Count; F++)
+            {
+                fLabelArray.Add(F);
+            }
+
+            int LabelFirst = 0;//任意添加一个节点
+            LabelArray.Add(LabelFirst);
+            //int x = 0;
+            int LabelArrayNum;
+            do
+            {
+                LabelArrayNum = LabelArray.Count;
+                int fLabelArrayNum = fLabelArray.Count;
+                double MinDist = 100001;
+                List<int> Edge = new List<int>();
+
+                int EdgeLabel2 = -1;
+                int EdgeLabel1 = -1;
+                int Label = -1;
+
+                for (int i = 0; i < LabelArrayNum; i++)
+                {
+                    int p1 = (int)LabelArray.get_Element(i);
+
+                    for (int j = 0; j < fLabelArrayNum; j++)
+                    {
+                        int p2 = (int)fLabelArray.get_Element(j);
+
+                        if (matrixGraph[p1, p2] < MinDist)
+                        {
+                            MinDist = matrixGraph[p1, p2];
+                            EdgeLabel2 = p2;
+                            EdgeLabel1 = p1;
+                            Label = j;
+                        }
+                    }
+                }
+
+
+                //x++;
+                Edge.Add(EdgeLabel1);
+                Edge.Add(EdgeLabel2);
+                EdgesGroup.Add(Edge);
+
+                fLabelArray.Remove(Label);
+                LabelArray.Add(EdgeLabel2);
+
+            } while (LabelArrayNum < PnList.Count);
+            #endregion
+
+            #region 生成MST的nodes和Edges
+            int EdgesGroupNum = EdgesGroup.Count;
+            List<ProxiEdge> MSTEdgeList = new List<ProxiEdge>();
+
+            for (int i = 0; i < EdgesGroupNum; i++)
+            {
+                int m, n;
+                m = EdgesGroup[i][0];
+                n = EdgesGroup[i][1];
+
+                ProxiNode Pn1 = PnList[m];
+                ProxiNode Pn2 = PnList[n];
+
+                foreach (ProxiEdge Pe in PeList)
+                {
+                    if ((Pe.Node1.X == Pn1.X && Pe.Node2.X == Pn2.X) || (Pe.Node1.X == Pn2.X && Pe.Node2.X == Pn1.X))
+                    {
+                        if (!MSTEdgeList.Contains(Pe))
+                        {
+                            Pe.MSTLable = true;
                             MSTEdgeList.Add(Pe);
                             break;
                         }
@@ -1636,23 +1783,42 @@ namespace AuxStructureLib
                 {
                     if (j != i)
                     {
-                        IGeometry iGeo = pFeatureClass.GetFeature(i).Shape;
-                        IGeometry jGeo = pFeatureClass.GetFeature(j).Shape;
-
-                        IRelationalOperator iRo = iGeo as IRelationalOperator;
-                        if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
+                        try
                         {
-                            ITopologicalOperator iTo = iGeo as ITopologicalOperator;
-                            IGeometry pGeo = iTo.Intersect(jGeo, esriGeometryDimension.esriGeometry1Dimension) as IGeometry;
-                            IPolyline pPolyline = pGeo as IPolyline;
+                            IGeometry iGeo = pFeatureClass.GetFeature(i).Shape;
+                            IGeometry jGeo = pFeatureClass.GetFeature(j).Shape;
 
-                            IPolygon iPo=iGeo as IPolygon;IPolygon jPo=jGeo as IPolygon;
-                            if (pPolyline.Length / iPo.Length > Td || pPolyline.Length / jPo.Length > Td)
+                            IRelationalOperator iRo = iGeo as IRelationalOperator;
+                            if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
                             {
-                                ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
-                                CacheEdge.adajactLable = true;//表示是由邻近产生的边
-                                this.EdgeList.Add(CacheEdge);
+
+                                if (Td > 0)
+                                {
+                                    ITopologicalOperator iTo = iGeo as ITopologicalOperator;
+                                    IGeometry pGeo = iTo.Intersect(jGeo, esriGeometryDimension.esriGeometry1Dimension) as IGeometry;
+                                    IPolyline pPolyline = pGeo as IPolyline;
+
+                                    IPolygon iPo = iGeo as IPolygon; IPolygon jPo = jGeo as IPolygon;
+                                    if (pPolyline.Length / iPo.Length > Td || pPolyline.Length / jPo.Length > Td)
+                                    {
+                                        ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
+                                        CacheEdge.adajactLable = true;//表示是由邻近产生的边
+                                        this.EdgeList.Add(CacheEdge);
+                                    }
+                                }
+                                else
+                                {
+                                    ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
+                                    CacheEdge.adajactLable = true;//表示是由邻近产生的边
+                                    this.EdgeList.Add(CacheEdge);
+                                }
+
                             }
+                        }
+
+                        catch
+                        {
+
                         }
                     }
                 }
@@ -2211,6 +2377,44 @@ namespace AuxStructureLib
                     ProxiEdge cachePe = new ProxiEdge(this.EdgeList.Count, this.NodeList[rPe.Node1.ID], this.NodeList[rPe.Node2.ID]);
                     cachePe.MSTLable = true;//是考虑MST添加的边（即不邻近）
                     this.EdgeList.Add(cachePe);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 依据邻近关系refine proximity graph
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        public void PgRefined_3(List<ProxiEdge> pEdgeList)
+        {
+            foreach (ProxiEdge rPe in pEdgeList)
+            {
+                if (!this.repeatEdge(rPe, this.EdgeList))
+                {
+                    ProxiEdge cachePe = new ProxiEdge(this.EdgeList.Count, this.NodeList[rPe.Node1.ID], this.NodeList[rPe.Node2.ID]);
+                    //cachePe.MSTLable = true;//是考虑MST添加的边（即不邻近）
+                    this.EdgeList.Add(cachePe);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 依据邻近关系refine proximity graph (针对欧陆数据的特殊处理)
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        public void PgRefined_special(List<ProxiEdge> pEdgeList)
+        {
+            foreach (ProxiEdge rPe in pEdgeList)
+            {
+                if (!this.repeatEdge(rPe, this.EdgeList))
+                {
+                    if ((rPe.Node1.ID== 15 || rPe.Node2.ID == 15)||
+                    (rPe.Node1.ID == 13 || rPe.Node2.ID == 13))
+                    {
+                        ProxiEdge cachePe = new ProxiEdge(this.EdgeList.Count, this.NodeList[rPe.Node1.ID], this.NodeList[rPe.Node2.ID]);
+                        //cachePe.MSTLable = true;//是考虑MST添加的边（即不邻近）
+                        this.EdgeList.Add(cachePe);
+                    }
                 }
             }
         }

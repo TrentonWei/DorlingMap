@@ -130,7 +130,7 @@ namespace CartoGener
             ProxiGraph pg = new ProxiGraph();
             pg.CreateProxiG(pFeatureClass, 0);
 
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "POPULATION", 1, 50, 1, 2, 0.01, 0.1);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "AREA", 1, 50, 1, 2, 0.01, 0.1);
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
@@ -1086,8 +1086,9 @@ namespace CartoGener
             IFeature sFeature = sFeatureCursor.NextFeature();
             while (sFeature != null)
             {
-                string Name = this.GetStringValue(sFeature, "STATE_ABBR");
+                //string Name = this.GetStringValue(sFeature, "STATE_ABBR");
                 //string Name = this.GetStringValue(sFeature, "GMI_CNTRY");
+                string Name = this.GetStringValue(sFeature, "COUNTRY");
                 IPolygon pPolygon = sFeature.Shape as IPolygon;
                 sDic.Add(Name, pPolygon);
 
@@ -1141,20 +1142,31 @@ namespace CartoGener
                 {
                     if (j != i)
                     {
-                        IGeometry iGeo = sFeatureClass.GetFeature(i).Shape;
-                        IGeometry jGeo = sFeatureClass.GetFeature(j).Shape;
-
-                        IRelationalOperator iRo = iGeo as IRelationalOperator;
-                        if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
+                        try
                         {
-                            string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "STATE_ABBR");
-                            string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "STATE_ABBR");
+                            IGeometry iGeo = sFeatureClass.GetFeature(i).Shape;
+                            IGeometry jGeo = sFeatureClass.GetFeature(j).Shape;
 
-                            //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "GMI_CNTRY");
-                            //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "GMI_CNTRY");
+                            IRelationalOperator iRo = iGeo as IRelationalOperator;
+                            if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
+                            {
+                                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "STATE_ABBR");
+                                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "STATE_ABBR");
 
-                            Tuple<string, string> NameMatch = new Tuple<string, string>(NameI, NameJ);
-                            TouchedList.Add(NameMatch);
+                                string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "COUNTRY");
+                                string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "COUNTRY");
+
+                                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "GMI_CNTRY");
+                                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "GMI_CNTRY");
+
+                                Tuple<string, string> NameMatch = new Tuple<string, string>(NameI, NameJ);
+                                TouchedList.Add(NameMatch);
+                            }
+                        }
+
+                        catch
+                        {
+
                         }
                     }
                 }
@@ -1184,13 +1196,22 @@ namespace CartoGener
             List<Tuple<string, string>> NearList = new List<Tuple<string, string>>();
             for (int i = 0; i < pg.RNGBuildingEdgesListShortestDistance.Count; i++)
             {
-                string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "STATE_ABBR");
-                string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "STATE_ABBR");
+                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "STATE_ABBR");
+                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "STATE_ABBR");
 
-                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "GMI_CNTRY");
-                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "GMI_CNTRY");
-                Tuple<string, string> NameMatch = new Tuple<string, string>(NameI, NameJ);
-                NearList.Add(NameMatch);
+                try
+                {
+                    string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "COUNTRY");
+                    string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "COUNTRY");
+
+                    //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "GMI_CNTRY");
+                    //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "GMI_CNTRY");
+                    Tuple<string, string> NameMatch = new Tuple<string, string>(NameI, NameJ);
+                    NearList.Add(NameMatch);
+                }
+                catch
+                {
+                }
             }
             #endregion
 

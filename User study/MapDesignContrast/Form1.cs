@@ -27,9 +27,23 @@ namespace MapDesignContrast
             InitializeComponent();
         }
 
+        string FilePath_stable = @"C:\WorkFiles\06 代码集合\DorlingMap\User study\Data\01 Stable Dorling";
+        string FilePath_unstable = @"C:\WorkFiles\06 代码集合\DorlingMap\User study\Data\02 Separated Dorling";
+        int Number = 0;
+        String CommonName = "PolygonObject";
+        List<int> TestMaps = new List<int>();
+        List<string> NameList = new List<string>();
+      
         #region 初始化
         private void Form1_Load(object sender, EventArgs e)
         {
+            #region 视图数量初始化
+            for (int i = 1; i < 14; i++)
+            {
+                TestMaps.Add(i);
+            }
+            #endregion
+
             #region 添加工具
             try
             {
@@ -64,8 +78,8 @@ namespace MapDesignContrast
                 MessageBox.Show("异常");
                 return;
             }
-            #endregion
-
+            #endregion    
+  
             #region 注记要素属性
             IRgbColor pColor = new RgbColorClass()
             {
@@ -78,7 +92,7 @@ namespace MapDesignContrast
                 Name = "宋体",
                 Size = 5
             } as IFontDisp;
-            
+
             ITextSymbol pTextSymbol = new TextSymbolClass()
             {
                 Color = pColor,
@@ -117,6 +131,10 @@ namespace MapDesignContrast
                 //添加标注
                 pGraContainer.AddElement(pEle, 0);
                 pFeature = pFeatCur.NextFeature();
+                if (NameList.Count <= 13)
+                {
+                    NameList.Add(pFeature.get_Value(index).ToString());
+                }
             }
             (axMapControl1.Map as IActiveView).PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, axMapControl1.Extent);
             #endregion
@@ -173,7 +191,7 @@ namespace MapDesignContrast
                 if (e.button == 1)
                 {
                     DateTime dt = DateTime.Now;
-                    Console.WriteLine("当前点击时间：" + dt.Hour + ":" + dt.Minute + ":" + dt.Second + ":" + dt.Millisecond);
+                    Console.WriteLine("目标" + this.textBox1.Text +"左侧屏当前点击时间" +  ":" + dt.Hour + ":" + dt.Minute + ":" + dt.Second + ":" + dt.Millisecond);
                 }
                 #endregion
             }
@@ -195,6 +213,14 @@ namespace MapDesignContrast
                 if (e.button == 2)
                 {
                     this.contextMenuStrip1.Show(this.axMapControl2, e.x, e.y);
+                }
+                #endregion
+
+                #region 左键事件（记录当前的时间）
+                if (e.button == 1)
+                {
+                    DateTime dt = DateTime.Now;
+                    Console.WriteLine("目标"+this.textBox1.Text + "右侧屏当前点击时间" + ":" + dt.Hour + ":" + dt.Minute + ":" + dt.Second + ":" + dt.Millisecond);
                 }
                 #endregion
             }
@@ -332,7 +358,7 @@ namespace MapDesignContrast
                         return;
                     }
                 }
-                #endregion          
+                #endregion
             }
 
             catch
@@ -457,5 +483,133 @@ namespace MapDesignContrast
         }
         #endregion
 
+        #region 刷新加载新的两张对比内容
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (TestMaps.Count > 0)
+            {
+                Random r = new Random();
+                int View = TestMaps[r.Next(0, TestMaps.Count)];
+                TestMaps.Remove(View);
+
+                if (View >= 7)
+                {
+                    View = View - 7;
+                }
+
+                this.textBox1.Text = NameList[View];
+
+                #region 注记要素属性
+                IRgbColor pColor = new RgbColorClass()
+                {
+                    Red = 255,
+                    Blue = 0,
+                    Green = 0
+                };
+                IFontDisp pFont = new StdFont()
+                {
+                    Name = "宋体",
+                    Size = 5
+                } as IFontDisp;
+
+                ITextSymbol pTextSymbol = new TextSymbolClass()
+                {
+                    Color = pColor,
+                    Font = pFont,
+                    Size = 11
+                };
+                #endregion
+
+                #region Map1添加
+                this.axMapControl1.ClearLayers();
+                axMapControl1.AddShapeFile(FilePath_unstable, View.ToString() + CommonName + View.ToString());
+
+                #region 图层1添加注记
+                IGraphicsContainer pGraContainer = axMapControl1.Map as IGraphicsContainer;
+                pGraContainer.DeleteAllElements();
+
+                //遍历要标注的要素
+                IFeatureLayer pFeaLayer = axMapControl1.Map.get_Layer(0) as IFeatureLayer;
+                IFeatureClass pFeaClass = pFeaLayer.FeatureClass;
+                IFeatureCursor pFeatCur = pFeaClass.Search(null, false);
+                IFeature pFeature = pFeatCur.NextFeature();
+                int index = pFeature.Fields.FindField("Name");//要标注的字段的索引
+                IEnvelope pEnv = null;
+                ITextElement pTextElment = null;
+                IElement pEle = null;
+                while (pFeature != null)
+                {
+                    //使用地理对象的中心作为标注的位置
+                    pEnv = pFeature.Extent;
+                    IPoint pPoint = new PointClass();
+                    pPoint.PutCoords(pEnv.XMin + pEnv.Width * 0.5, pEnv.YMin + pEnv.Height * 0.5);
+
+                    pTextElment = new TextElementClass()
+                    {
+                        Symbol = pTextSymbol,
+                        ScaleText = true,
+                        Text = pFeature.get_Value(index).ToString()
+                    };
+                    pEle = pTextElment as IElement;
+                    pEle.Geometry = pPoint;
+                    //添加标注
+                    pGraContainer.AddElement(pEle, 0);
+                    pFeature = pFeatCur.NextFeature();
+                }
+                (axMapControl1.Map as IActiveView).PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, axMapControl1.Extent);
+                #endregion
+                #endregion
+
+                #region Map2添加
+                this.axMapControl2.ClearLayers();
+                axMapControl2.AddShapeFile(FilePath_unstable, (View + 1).ToString() + CommonName + (View + 1).ToString());
+                #region 图层2添加注记
+                IGraphicsContainer pGraContainer2 = axMapControl2.Map as IGraphicsContainer;
+                pGraContainer2.DeleteAllElements();
+
+                //遍历要标注的要素
+                IFeatureLayer pFeaLayer2 = axMapControl2.Map.get_Layer(0) as IFeatureLayer;
+                IFeatureClass pFeaClass2 = pFeaLayer2.FeatureClass;
+                IFeatureCursor pFeatCur2 = pFeaClass2.Search(null, false);
+                IFeature pFeature2 = pFeatCur2.NextFeature();
+                int index2 = pFeature2.Fields.FindField("Name");//要标注的字段的索引
+                IEnvelope pEnv2 = null;
+                ITextElement pTextElment2 = null;
+                IElement pEle2 = null;
+                while (pFeature2 != null)
+                {
+                    //使用地理对象的中心作为标注的位置
+                    pEnv2 = pFeature2.Extent;
+                    IPoint pPoint = new PointClass();
+                    pPoint.PutCoords(pEnv2.XMin + pEnv2.Width * 0.5, pEnv2.YMin + pEnv2.Height * 0.5);
+
+                    pTextElment2 = new TextElementClass()
+                    {
+                        Symbol = pTextSymbol,
+                        ScaleText = true,
+                        Text = pFeature2.get_Value(index).ToString()
+                    };
+                    pEle2 = pTextElment2 as IElement;
+                    pEle2.Geometry = pPoint;
+                    //添加标注
+                    pGraContainer2.AddElement(pEle2, 0);
+                    pFeature2 = pFeatCur2.NextFeature();
+                }
+                (axMapControl2.Map as IActiveView).PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, axMapControl2.Extent);
+                #endregion
+                #endregion
+            }
+
+            else
+            {
+                MessageBox.Show("测试结束");
+            }
+        }
+        #endregion
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine(this.textBox1.Text + "Confirm");
+        }
     }
 }

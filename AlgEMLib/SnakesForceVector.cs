@@ -266,13 +266,65 @@ namespace AlgEMLib
         /// </summary>
         /// <param name="conflictList">冲突</param>
         /// <returns>是否成功</returns>
-        public bool CreateForceVectorfrm_CTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,double MaxForce)
+        /// <param name="MaxForce">用于限制计算两个力时的最大力</param>
+        /// <param name="MaxForce_2">用于限制全力力时的最大力</param>
+        public bool CreateForceVectorfrm_CTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,double MaxForce,double MaxForce_2)
         {
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
                 return false;
 
             // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
-            this.ForceList = CalForceforProxiGraph_CTP(NodeList, FinalLocation, MinDis, MaxForce);
+            this.ForceList = CalForceforProxiGraph_CTP(NodeList, FinalLocation, MinDis, MaxForce,MaxForce_2);
+
+            if (MakeForceVectorfrmGraphNew())
+                return true;
+            return false;
+
+        }
+        
+        /// <summary>
+        ///依据节点计算获取的受力更新邻近图
+        ///若节点受力已达最大力限制，则与节点关联的边只保留是MST的边
+        /// </summary>
+        /// <returns></returns>
+        public void PGRefine()
+        {
+            for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
+            {
+                ProxiNode Pn = this.ProxiGraph.NodeList[i];
+                if (this.proxiGraph.NodeList[i].MaxForce)
+                {
+                    for (int j = this.ProxiGraph.EdgeList.Count - 1; j >= 0; j--)
+                    {
+                        ProxiEdge Pe = this.ProxiGraph.EdgeList[j];
+                        if ((Pe.Node1.X == Pn.X && Pe.Node1.Y == Pn.Y) || (Pe.Node2.X == Pn.X && Pe.Node2.Y == Pn.Y))
+                        {
+                            if (!Pe.MSTLable)
+                            {
+                                this.ProxiGraph.EdgeList.Remove(Pe);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 计算节点力的过程——依据计算的节点力更新邻近图
+        /// </summary>
+        /// <param name="MaxForce">用于限制计算两个力时的最大力</param>
+        /// <param name="MaxForce_2">用于限制全力力时的最大力</param>
+        /// <returns>是否成功</returns>
+        public bool CreateForceVectorfrm_CTP_AdpPg(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis, double MaxForce,double MaxForce_2)
+        {
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+
+            // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            this.ForceList = CalForceforProxiGraph_CTP(NodeList, FinalLocation, MinDis, MaxForce,MaxForce_2);
+
+            this.ProxiGraph.CreateGravityMST(this.ProxiGraph.NodeList, this.ProxiGraph.EdgeList);//标识MST
+            this.PGRefine();//需要依据节点是否受最大力更新邻近图的边
 
             if (MakeForceVectorfrmGraphNew())
                 return true;
@@ -285,7 +337,7 @@ namespace AlgEMLib
         /// </summary>
         /// <param name="conflictList">冲突</param>
         /// <returns>是否成功</returns>
-        public bool CreateForceVectorfrm_HierCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,out List<int> BoundingPoint,double MaxForce)
+        public bool CreateForceVectorfrm_HierCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,out List<int> BoundingPoint,double MaxForce,double ForceRate)
         {
             BoundingPoint = new List<int>();
 
@@ -293,7 +345,7 @@ namespace AlgEMLib
                 return false;
 
             // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
-            this.ForceList = CalForceforProxiGraph_HierCTP(NodeList, FinalLocation, MinDis, out BoundingPoint, MaxForce);
+            this.ForceList = CalForceforProxiGraph_HierCTP(NodeList, FinalLocation, MinDis, out BoundingPoint, MaxForce, ForceRate);
 
             if (MakeForceVectorfrmGraphNew())
                 return true;

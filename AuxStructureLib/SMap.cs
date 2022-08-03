@@ -250,6 +250,8 @@ namespace AuxStructureLib
                                     curX = point.X;
                                     curY = point.Y;
                                     curVextex = new TriNode((float)curX, (float)curY, vextexID, pID, FeatureType.PointType);
+                                    curVextex.Initial_X = curX; curVextex.Initial_Y = curY;
+
                                     curPoint = new PointObject(pID, curVextex);
 
                                     curPoint.TT = TT;

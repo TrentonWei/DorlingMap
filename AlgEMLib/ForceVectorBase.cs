@@ -1020,11 +1020,19 @@ namespace AlgEMLib
             return rforceList;
         }
 
-        /// <summary>
+       /// <summary>
+        ///  /// <summary>
         /// 计算邻近图上个点的最终受力-最大力做主方向的局部最大值法
         /// </summary>
         /// <returns></returns>
-        protected List<Force> CalForceforProxiGraph_CTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,double MaxForce)
+       /// </summary>
+       /// <param name="NodeList"></param>
+       /// <param name="FinalLocation"></param>
+       /// <param name="MinDis"></param>
+       /// <param name="MaxForce">用于限制计算两个力时的最大力</param>
+       /// <param name="MaxForce_2">用于限制全力力时的最大力</param>
+       /// <returns></returns>
+        protected List<Force> CalForceforProxiGraph_CTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,double MaxForce,double MaxForce_2)
         {
             #region 计算受力
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
@@ -1107,15 +1115,38 @@ namespace AlgEMLib
             }
             #endregion
 
+            #region 将力减小
+            double Maxf = 0;
+            for (int i = 0; i < rforceList.Count; i++)
+            {
+                if (Math.Abs(rforceList[i].F) > Maxf)
+                {
+                    Maxf = Math.Abs(rforceList[i].F);
+                }
+            }
+
+            if (Maxf > MaxForce_2)
+            {
+                double Scale_p = MaxForce_2 / Maxf;
+
+                for (int i = 0; i < rforceList.Count; i++)
+                {
+                    rforceList[i].F = rforceList[i].F * Scale_p;
+                    rforceList[i].Fx = rforceList[i].Fx* Scale_p;
+                    rforceList[i].Fy = rforceList[i].Fy * Scale_p;
+                }
+            }
+            #endregion
+
             return rforceList;
         }
 
         /// <summary>
         /// 计算邻近图上个点的最终受力-最大力做主方向的局部最大值法
-        /// 输出BoundingPoints
+        /// 输出BoundingPoints（每次只取受力前十名的力进行处理！！）
         /// </summary>
         /// <returns></returns>
-        protected List<Force> CalForceforProxiGraph_HierCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,out List<int> BoundingPoint,double MaxForce)
+        protected List<Force> CalForceforProxiGraph_HierCTP(List<ProxiNode> NodeList, List<ProxiNode> FinalLocation, double MinDis,out List<int> BoundingPoint,double MaxForce,double ForceRate)
         {
             BoundingPoint = new List<int>();
 
@@ -1200,32 +1231,33 @@ namespace AlgEMLib
             }
             #endregion
 
-            #region 返回受力最小前20名
-            //List<Force> subrforceList = rforceList.GetRange(0, 20);
+            #region 计算受力最大的十名
+            //List<Force> subrforceList = rforceList.GetRange(0, 10);
 
             //List<double> CacheFList = new List<double>();
             //for (int i = 0; i < subrforceList.Count; i++)
             //{
             //    CacheFList.Add(subrforceList[i].F);
             //}
-            //double MaxF = CacheFList.Max();
+            //double MinF = CacheFList.Min();
 
-            //for (int i = 20; i < rforceList.Count; i++)
+            //for (int i = 10; i < rforceList.Count; i++)
             //{
-            //    if (rforceList[i].F < MaxF)
+            //    if (rforceList[i].F > MinF)
             //    {
-            //        subrforceList.RemoveAt(CacheFList.IndexOf(MaxF));
+            //        subrforceList.RemoveAt(CacheFList.IndexOf(MinF));
             //        subrforceList.Add(rforceList[i]);
 
-            //        CacheFList.Remove(MaxF);
+            //        CacheFList.Remove(MinF);
             //        CacheFList.Add(rforceList[i].F);
-            //        MaxF = CacheFList.Max();
+            //        MinF = CacheFList.Min();
             //    }
             //}
             #endregion
 
             #region 计算受力最大的十名
-            List<Force> subrforceList = rforceList.GetRange(0, 10);
+            int ForceCount =Convert.ToInt16(Math.Ceiling(FinalLocation.Count * ForceRate));
+            List<Force> subrforceList = rforceList.GetRange(0, ForceCount);
 
             List<double> CacheFList = new List<double>();
             for (int i = 0; i < subrforceList.Count; i++)
@@ -1234,7 +1266,7 @@ namespace AlgEMLib
             }
             double MinF = CacheFList.Min();
 
-            for (int i = 10; i < rforceList.Count; i++)
+            for (int i = ForceCount; i < rforceList.Count; i++)
             {
                 if (rforceList[i].F > MinF)
                 {
@@ -1246,16 +1278,6 @@ namespace AlgEMLib
                     MinF = CacheFList.Min();
                 }
             }
-            #endregion
-
-            #region
-            //for (int i = 0; i < rforceList.Count; i++)
-            //{
-            //    if (rforceList[i].F < 0.1)
-            //    {
-            //        BoundingPoint.Add(rforceList[i].ID);
-            //    }
-            //}
             #endregion
 
             return subrforceList;
@@ -1283,6 +1305,8 @@ namespace AlgEMLib
                 if (curForce > MaxForce)
                 {
                     curForce = MaxForce;
+
+                    sNode.MaxForce = true;//表示该点已受到规定范围的最大力
                 }
 
                 double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));

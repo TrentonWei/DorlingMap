@@ -39,6 +39,18 @@ namespace AuxStructureLib
         {
             return Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y));
         }
+
+        /// <summary>
+        /// 计算长度
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double CalLineLength(TriNode p1, TriNode p2)
+        {
+            return Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y));
+        }
+
         /// <summary>
         /// 计算直线的方位角[-PI/20~PI/20]
         /// </summary>
@@ -244,6 +256,7 @@ namespace AuxStructureLib
         /// </summary>
         /// <param name="p">点</param>
         /// <param name="polygon">多边形</param>
+        /// true在多边形内；false不在多边形内
         /// <returns>是否在多边形内部</returns>
         public static bool IsPointinPolygon(TriNode p, List<TriNode> polygon)
         {
@@ -781,6 +794,66 @@ namespace AuxStructureLib
                 }
             }
             return triList;
+        }
+
+        /// <summary>
+        /// 获取两条线段的交点
+        /// </summary>
+        /// <param name="p1">第一条线段的起点</param>
+        /// <param name="p2">第一条线段的终点</param>
+        /// <param name="p3">第二条线段的起点</param>
+        /// <param name="p4">第一条线段的终点</param>
+        /// <returns>是否相交</returns>
+        public static TriNode CrossNode(TriNode p1, TriNode p2, TriNode p3, TriNode p4)
+        {
+            #region 相交，求交点
+            if (ComFunLib.IsLineSegCross(p1, p2, p3, p4))
+            {
+                double Area_abc = (p1.X - p3.X) * (p2.Y - p3.Y) - (p1.Y - p3.Y) * (p2.X - p3.X);
+                double Area_abd = (p1.X - p4.X) * (p2.Y - p4.Y) - (p1.Y - p4.Y) * (p2.X - p4.X);
+                double Area_cda = (p3.X - p1.X) * (p4.Y - p1.Y) - (p3.Y - p1.Y) * (p4.X - p1.X);
+
+                double t = Area_cda / (Area_abd - Area_abc);
+                double Dx = t * (p2.X - p1.X);
+                double Dy = t * (p2.Y - p1.Y);
+                TriNode OutNode = new TriNode(p1.X + Dx, p1.Y + Dy);
+                return OutNode;
+            }
+            #endregion
+
+            #region 不相交，返回空
+            else
+            {
+                return null;
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// 给定两点，获得CurPoint沿該条直线的延长线
+        /// </summary>
+        /// <param name="CurPoint"></param>
+        /// <param name="EndPoint"></param>
+        /// <returns></returns>
+        public static List<TriNode> GetExtendingLine(TriNode CurPoint)
+        {
+            TriNode StartNode = new TriNode();
+            TriNode EndNode = new TriNode();
+
+            double sExtend_X = CurPoint.Initial_X - 100 * (CurPoint.X - CurPoint.Initial_X);
+            double sExtend_Y = CurPoint.Initial_Y - 100 * (CurPoint.Y - CurPoint.Initial_Y);
+
+            double eExtend_X = 100 * (CurPoint.X - CurPoint.Initial_X) + CurPoint.X;
+            double eExtend_Y = 100 * (CurPoint.Y - CurPoint.Initial_Y) + CurPoint.Y;
+
+            StartNode.X = sExtend_X; StartNode.Y = sExtend_Y;
+            EndNode.X = eExtend_X; EndNode.Y = eExtend_Y;
+
+            List<TriNode> EdgeNodes = new List<TriNode>();
+            EdgeNodes.Add(StartNode);
+            EdgeNodes.Add(EndNode);
+
+            return EdgeNodes;
         }
     }
 }
