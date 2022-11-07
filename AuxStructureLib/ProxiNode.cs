@@ -35,6 +35,7 @@ namespace AuxStructureLib
         public int TagID=-1;
         public List<int> TagIds = new List<int>();//表示代表的节点或建筑物列表
         public bool MaxForce = false;
+        public bool NearFinal = false;//表示该点是否靠近其最终的位置
 
         public List<ProxiEdge> EdgeList = null;
         /// <summary>

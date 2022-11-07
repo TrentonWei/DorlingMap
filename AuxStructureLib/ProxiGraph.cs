@@ -1771,6 +1771,7 @@ namespace AuxStructureLib
             {
                 IArea pArea = pFeatureClass.GetFeature(i).Shape as IArea;
                 ProxiNode CacheNode = new ProxiNode(pArea.Centroid.X, pArea.Centroid.Y, i, i);
+                CacheNode.FeatureType = FeatureType.PointType;
                 this.NodeList.Add(CacheNode);
             }
             #endregion
@@ -2183,6 +2184,53 @@ namespace AuxStructureLib
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 依据冲突refine proximity graph
+        /// 虽然不邻接，但是冲突的Circles
+        /// 依据小于指定距离的边Refine 邻近图(不删除原有的重叠边)
+        /// </summary>
+        /// <param name="PoList"></param>
+        public void PgRefinedShort(List<ProxiNode> PnList,double TDis,bool Dele)
+        {
+            #region 删除原有的短距离边
+            if (Dele)
+            {
+                #region 首先删除邻近图中原有的短边
+                for (int i = this.EdgeList.Count - 1; i >= 0; i--)
+                {
+                    ProxiEdge Pe = this.EdgeList[i];
+                    if (Pe.ShortEdge)
+                    {
+                        this.EdgeList.Remove(Pe);
+                    }
+                }
+                #endregion
+            }
+            #endregion
+
+            #region 添加新的短距离边
+            for (int i = 0; i < PnList.Count - 1; i++)
+            {
+                for (int j = i + 1; j < PnList.Count; j++)
+                {
+                    ProxiNode Node1 = PnList[i];
+                    ProxiNode Node2 = PnList[j];
+                    double NodeDis = this.GetDis(Node1, Node2);
+
+                    if (NodeDis < TDis)
+                    {
+                        ProxiEdge rPe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
+                        if (!this.repeatEdge(rPe, this.EdgeList))
+                        {
+                            rPe.ShortEdge = true;
+                            this.EdgeList.Add(rPe);
+                        }
+                    }
+                }
+            }
+            #endregion
         }
 
         /// <summary>
@@ -2611,6 +2659,30 @@ namespace AuxStructureLib
             ProxiNode CacheNode = new ProxiNode(X, Y);
             CacheNode.TagIds = PoIds;
             return CacheNode;
+        }
+
+        /// <summary>
+        /// 获得给定节点的1阶邻近
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        /// <param name="Pn"></param>
+        /// <returns></returns>
+        public List<Node> GetNeibors(List<ProxiEdge> EdgeList, ProxiNode Pn)
+        {
+            List<Node> NeiborNodes = new List<Node>();
+            foreach (ProxiEdge Pe in EdgeList)
+            {
+                if (Pe.Node1.TagID == Pn.TagID)
+                {
+                    NeiborNodes.Add(Pe.Node2);
+                }
+                if (Pe.Node2.TagID == Pn.TagID)
+                {
+                    NeiborNodes.Add(Pe.Node2);
+                }
+            }
+
+            return NeiborNodes;
         }
     }
 }

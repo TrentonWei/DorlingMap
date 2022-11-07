@@ -20,6 +20,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 地图类-用于处理数据读入和组织
     /// </summary>
+    [Serializable]
     public class SMap
     {
         /// <summary>
@@ -437,6 +438,117 @@ namespace AuxStructureLib
                 }
             }
         }
+
+        /// <summary>
+        /// 从ArcGIS图层中读取地图数据
+        /// </summary>
+        public void ReadDateFrmMaps(SMap Map)
+        {
+            #region 初始化
+            if (Map.PointList.Count > 0)
+            {
+                PointList = new List<PointObject>();
+            }
+            if (Map.PolylineList.Count > 0)
+            {
+                PolylineList = new List<PolylineObject>();
+                ConNodeList = new List<ConNode>();
+            }
+            if (Map.PolygonList.Count > 0)
+            {
+                PolygonList = new List<PolygonObject>();
+            }
+            TriNodeList = new List<TriNode>();
+            #endregion
+
+            int vextexID = 0;
+            double sylSize = 0;
+            int pID = 0;
+            int plID = 0;
+            int ppID = 0;
+
+            #region 点要素
+            for (int i = 0; i < Map.PointList.Count; i++)
+            {
+                PointObject point = Map.PointList[i];
+                PointObject curPoint = null;           //当前道路
+                TriNode curVextex = null;                  //当前关联点
+                double curX;
+                double curY;
+
+                curX = point.Point.X;
+                curY = point.Point.Y;
+                curVextex = new TriNode((float)curX, (float)curY, vextexID, pID, FeatureType.PointType);
+                curVextex.Initial_X = curX; curVextex.Initial_Y = curY;
+
+                curPoint = new PointObject(pID, curVextex);
+
+                curPoint.TT = point.TT;
+                TriNodeList.Add(curVextex);
+                PointList.Add(curPoint);
+                vextexID++;
+                pID++;
+            }
+            #endregion
+
+            #region 线要素
+            for (int i = 0; i < Map.PolylineList.Count; i++)
+            {
+                PolylineObject polyline = Map.PolylineList[i];
+
+                PolylineObject curPL = null;                      //当前道路
+                TriNode curVextex = null;
+                List<TriNode> curPointList = new List<TriNode>();
+                double curX;
+                double curY;
+
+                for (int j = 0; j < polyline.PointList.Count; j++)
+                {
+                    curX = polyline.PointList[j].X;
+                    curY = polyline.PointList[j].Y;
+
+                    curVextex = new TriNode(curX, curY, vextexID, plID, FeatureType.PolylineType);
+                    TriNodeList.Add(curVextex);
+                    ConNode curNode = new ConNode(vextexID, 0.2f, curVextex);
+                    ConNodeList.Add(curNode);
+                    curPointList.Add(curVextex);
+                    vextexID++;
+
+                    curPL = new PolylineObject(plID, curPointList, sylSize);
+                    PolylineList.Add(curPL);
+                    plID++;
+                }
+            }
+            #endregion
+
+            #region 面要素
+            for (int i = 0; i < Map.PolygonList.Count; i++)
+            {
+                PolygonObject polygon = Map.PolygonList[i];
+                PolygonObject curPP = null;                      //当前道路
+                TriNode curVextex = null;                  //当前关联点
+                List<TriNode> curPointList = new List<TriNode>();
+                double curX;
+                double curY;
+
+                for (int j = 0; j < polygon.PointList.Count; j++)
+                {
+                    curX = polygon.PointList[j].X;
+                    curY = polygon.PointList[j].Y;
+                    curVextex = new TriNode(curX, curY, vextexID, ppID, FeatureType.PolygonType);
+                    TriNodeList.Add(curVextex);
+                    curPointList.Add(curVextex);
+                    vextexID++;
+                }
+
+                //添加起点
+                curPP = new PolygonObject(ppID, curPointList);
+                this.PolygonList.Add(curPP);
+                ppID++;
+            }
+            #endregion
+        }
+
 
         /// <summary>
         /// 从ArcGIS图层中读取地图数据ForEnrichNetWork

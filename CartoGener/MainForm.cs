@@ -139,6 +139,17 @@ namespace CartoGener
             Central_TP_MapFrm CTPF = new Central_TP_MapFrm(this.axMapControl1);
             CTPF.Show();
         }
+
+        /// <summary>
+        /// TileMap
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tileMapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TileMap TM = new TileMap(this.axMapControl1);
+            TM.Show();
+        }
     }
 }
 

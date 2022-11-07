@@ -125,6 +125,24 @@ namespace CartoGener
             return FinalPoints;
         }
 
+        /// <summary>
+        /// 计算每个位置的最终位置
+        /// </summary>
+        /// <param name="InitialObject">第一个点是起点；其它点是终点</param>
+        /// <returns></returns>
+        public List<ProxiNode> FinalLocation_3(List<PointObject> InitialObject)
+        {
+            List<ProxiNode> FinalPoints = new List<ProxiNode>();
+
+            for (int i = 0; i < InitialObject.Count; i++)
+            {
+                ProxiNode curVextex = new ProxiNode(InitialObject[i].Point.X, InitialObject[i].Point.Y, i + 40, i + 1);
+                FinalPoints.Add(curVextex);
+            }
+
+            return FinalPoints;
+        }
+
         /// 计算每个位置的最终位置
         /// </summary>
         /// <param name="InitialObject">第一个点是起点；其它点是终点</param>
@@ -220,25 +238,7 @@ namespace CartoGener
             #endregion
 
             return FinalPoints;
-        }
-
-        /// <summary>
-        /// 计算每个位置的最终位置
-        /// </summary>
-        /// <param name="InitialObject">第一个点是起点；其它点是终点</param>
-        /// <returns></returns>
-        public List<ProxiNode> FinalLocation_3(List<PointObject> InitialObject)
-        {
-            List<ProxiNode> FinalPoints = new List<ProxiNode>();
-
-            for (int i = 0; i < InitialObject.Count; i++)
-            {
-                ProxiNode curVextex = new ProxiNode(InitialObject[i].Point.X, InitialObject[i].Point.Y, i + 40, i + 1);
-                FinalPoints.Add(curVextex);
-            }
-
-            return FinalPoints;
-        }
+        }      
 
         /// <summary>
         /// 深拷贝（通用拷贝）
@@ -427,8 +427,10 @@ namespace CartoGener
                 //cdt.CreateConsDTfromPolylineandPolygon(null, sMap.PolygonList);
                 //ProxiGraph CachePg = new ProxiGraph(cdt.TriNodeList, cdt.TriEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的
 
-                dt.CreateRNG();
-                ProxiGraph CachePg = new ProxiGraph(dt.RNGNodeList, dt.RNGEdgeList); 
+                ConsDelaunayTin cdt = new ConsDelaunayTin(dt);
+                cdt.CreateConsDTfromPolylineandPolygon(null, sMap.PolygonList);
+                cdt.CreateRNG();
+                ProxiGraph CachePg = new ProxiGraph(cdt.RNGNodeList, cdt.RNGEdgeList); 
                 
                 CachePg.WriteProxiGraph2Shp(OutFilePath, "pG_" + i.ToString(), pMap.SpatialReference);
                 //pg.WriteProxiGraph2Shp(OutFilePath, "pG_" + i.ToString(), pMap.SpatialReference);
@@ -443,6 +445,220 @@ namespace CartoGener
                     break;
                 }
             }
+        }
+
+        /// Beams Displace
+        /// </summary>
+        /// <param name="pg">邻近图</param>
+        /// <param name="pMap">Dorling图层</param>
+        /// <param name="scale">比例尺</param>
+        /// <param name="E">弹性模量</param>
+        /// <param name="I">惯性力矩</param>
+        /// <param name="A">横切面积</param>
+        /// MinDis 起点和终点之间的距离误差
+        /// StopT 迭代终止的最大力大小
+        /// <param name="Iterations">迭代次数</param>
+        /// <param name="MaxForce">用于限制计算两个力时的最大力</param>
+        /// <param name="MaxForce_2">用于限制全力力时的最大力(最后受力计算时力的大小)</param>
+        public void CTPSnake_PgReBuiltMapIn_TwoStages(ProxiGraph pg, List<ProxiNode> FinalLocation, SMap sMap, double scale, double a, double b, int Iterations, int algType, double MinDis, double StopT, string OutFilePath, IMap pMap, double MaxForce, double MaxForce_2)
+        {
+            #region 阶段1
+            AlgSnake algSnakes = new AlgSnake(pg, sMap, a, b);
+            //求吸引力-2014-3-20所用
+            ProxiGraph CopyG = Clone((object)pg) as ProxiGraph;
+            algSnakes.OriginalGraph = CopyG;
+            algSnakes.Scale = scale;//目标比例尺
+            algSnakes.AlgType = algType;//0-Snakes, 1-Sequence, 2-Combined
+
+            for (int i = 0; i < Iterations; i++)//迭代计算
+            {
+                Console.WriteLine(i.ToString());//标识
+                System.Diagnostics.Stopwatch oTime = new System.Diagnostics.Stopwatch();
+                oTime.Start(); //记录开始时间
+
+                algSnakes.DoDispacePG_CTP(FinalLocation, sMap, MinDis, MaxForce, MaxForce_2);//执行邻近图Beams移位算法，代表混合型
+
+                #region 邻近图重构
+                List<TriNode> CacheNodeList = new List<TriNode>();
+                for (int j = 0; j < algSnakes.ProxiGraph.NodeList.Count; j++)
+                {
+                    TriNode CacheNode = new TriNode(algSnakes.ProxiGraph.NodeList[j].X, algSnakes.ProxiGraph.NodeList[j].Y, algSnakes.ProxiGraph.NodeList[j].ID, algSnakes.ProxiGraph.NodeList[j].TagID);
+                    CacheNode.FeatureType = algSnakes.ProxiGraph.NodeList[j].FeatureType;
+                    CacheNodeList.Add(CacheNode);
+                }
+                DelaunayTin dt = new DelaunayTin(CacheNodeList); ///Dt中节点的ID和Map.PointList中节点的ID是一样的
+                dt.CreateDelaunayTin(AlgDelaunayType.Side_extent);
+
+                #region DT
+                //ProxiGraph CachePg = new ProxiGraph(dt.TriNodeList, dt.TriEdgeList);
+                #endregion
+
+                #region DT MST 
+                //dt.CreateMST();
+                //ProxiGraph CachePg = new ProxiGraph(dt.MSTNodeList, dt.MSTEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的 （MST）
+                #endregion
+
+                #region DT RNG
+                //dt.CreateRNG();
+                //ProxiGraph CachePg = new ProxiGraph(dt.RNGNodeList, dt.RNGEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的 （MST）
+                #endregion
+
+                #region CDT
+                //ConsDelaunayTin cdt = new ConsDelaunayTin(dt);
+                //cdt.CreateConsDTfromPolylineandPolygon(null, sMap.PolygonList);
+                //ProxiGraph CachePg = new ProxiGraph(cdt.TriNodeList, cdt.TriEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的
+                #endregion
+
+                #region CDT RNG
+                ConsDelaunayTin cdt = new ConsDelaunayTin(dt);
+                cdt.CreateConsDTfromPolylineandPolygon(null, sMap.PolygonList);
+                cdt.CreateRNG();
+                ProxiGraph CachePg = new ProxiGraph(cdt.RNGNodeList, cdt.RNGEdgeList);
+                #endregion
+
+                #region  CDT MST
+                //ConsDelaunayTin cdt = new ConsDelaunayTin(dt);
+                //cdt.CreateConsDTfromPolylineandPolygon(null, sMap.PolygonList);
+                //cdt.CreateMST();
+                //ProxiGraph CachePg = new ProxiGraph(cdt.MSTNodeList, cdt.MSTEdgeList);
+                #endregion
+
+                CachePg.WriteProxiGraph2Shp(OutFilePath, "pG_" + i.ToString(), pMap.SpatialReference);
+                //pg.WriteProxiGraph2Shp(OutFilePath, "pG_" + i.ToString(), pMap.SpatialReference);
+                sMap.WriteResult2Shp(OutFilePath, "Map_" + i.ToString(), pMap.SpatialReference);
+
+                algSnakes.ProxiGraph = CachePg;
+                #endregion
+
+                this.continueLable = algSnakes.isContinue;
+                if (algSnakes.isContinue == false)
+                {
+                    break;
+                }
+
+                #region 时间与Steps记录
+                oTime.Stop(); //记录结束时间
+
+                //输出运行时间
+                Console.WriteLine("程序的运行时间：{0} 时", oTime.Elapsed.Hours);
+                Console.WriteLine("程序的运行时间：{0} 分", oTime.Elapsed.Minutes);
+                Console.WriteLine("程序的运行时间：{0} 秒", oTime.Elapsed.Seconds);
+                Console.WriteLine("程序的运行时间：{0} 毫秒", oTime.Elapsed.Milliseconds);
+                #endregion
+            }
+            #endregion
+
+            #region 阶段二
+            int Steps = 0; double Cachea = algSnakes.a; double Cacheb = algSnakes.b;
+            do
+            {
+                #region Snake方法移位
+                AlgSnake CachealgSnakes = new AlgSnake(pg, sMap, Cachea, Cacheb);
+                CachealgSnakes.OriginalGraph = pg;
+                CachealgSnakes.Scale = scale;//目标比例尺
+                CachealgSnakes.AlgType = algType;//0-Snakes, 1-Sequence, 2-Combined
+
+                CachealgSnakes.DoDispacePG_CTP_Stage2(FinalLocation, sMap, MinDis, MaxForce, MaxForce_2);//执行邻近图Beams移位算法，代表混合型
+                #endregion
+
+                #region 更新Map和FinalLocation(这里是核心)
+                //SMap CopyMap = Clone((object)sMap) as SMap;
+                for (int i = 0; i < pg.NodeList.Count; i++)
+                {
+                    ProxiNode curNode = pg.NodeList[i];
+                    if (curNode.NearFinal)
+                    {
+                        PointObject CachePointObject = this.GetPointObjectByID(curNode.TagID, sMap.PointList);
+                        ProxiNode FinalPoint = this.GetPNodeByID(curNode.TagID, FinalLocation);
+                        if (CachePointObject != null)
+                        {
+                            
+                            sMap.PointList.Remove(CachePointObject);
+                        }
+                        if (FinalPoint != null)
+                        {
+                            FinalLocation.Remove(FinalPoint);
+                        }
+                    }
+                }
+
+                SMap CacheMap = new SMap();
+                CacheMap.ReadDateFrmMaps(sMap);
+                //sMap.ReadDateFrmMaps(CopyMap);
+               
+                #region 更新Finallocation
+                for (int i = 0; i < sMap.PointList.Count; i++)
+                {
+                    PointObject CachePointObject = sMap.PointList[i];
+                    ProxiNode FinalPoint = this.GetPNodeByID(CachePointObject.Point.TagValue, FinalLocation);
+
+                    if (FinalPoint != null)
+                    {
+                        FinalPoint.TagID = i;
+                    }
+                }
+                #endregion
+
+                sMap = CacheMap;//将sMap重新赋值
+                sMap.WriteResult2Shp(OutFilePath, "Map_" + (Steps+Iterations).ToString(), pMap.SpatialReference);
+                #endregion
+
+                #region 重构邻近图
+                DelaunayTin dt = new DelaunayTin(sMap.TriNodeList); ///Dt中节点的ID和Map.PointList中节点的ID是一样的
+                dt.CreateDelaunayTin(AlgDelaunayType.Side_extent);
+
+                #region DT
+                //pg = new ProxiGraph();
+                //pg = new ProxiGraph(dt.TriNodeList, dt.TriEdgeList); 
+                #endregion
+
+                #region DT MST
+                //dt.CreateMST();
+                //pg = new ProxiGraph();
+                //pg = new ProxiGraph(dt.MSTNodeList, dt.MSTEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的 （RNG）//Pg中节点的ID和Map.PointList中节点的ID是一样的 （MST）
+                #endregion
+
+                #region DT RNG
+                //dt.CreateRNG();
+                //pg = new ProxiGraph();
+                //pg = new ProxiGraph(dt.RNGNodeList, dt.RNGEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的 （RNG）//Pg中节点的ID和Map.PointList中节点的ID是一样的 （MST）
+                #endregion
+
+                #region CDT
+                //ConsDelaunayTin cdt = new ConsDelaunayTin(dt);
+                //cdt.CreateConsDTfromPolylineandPolygon(null, sMap.PolygonList);
+                //pg = new ProxiGraph();
+                //pg = new ProxiGraph(cdt.TriNodeList, cdt.TriEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的 （CDT）
+                #endregion
+
+                #region CDT RNG
+                ConsDelaunayTin cdt = new ConsDelaunayTin(dt);
+                cdt.CreateConsDTfromPolylineandPolygon(null, sMap.PolygonList);
+                cdt.CreateRNG();
+                pg = new ProxiGraph();
+                pg = new ProxiGraph(cdt.RNGNodeList, cdt.RNGEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的 （RNG）
+                #endregion
+
+                #region CDT MST
+                //ConsDelaunayTin cdt = new ConsDelaunayTin(dt);
+                //cdt.CreateConsDTfromPolylineandPolygon(null, sMap.PolygonList);
+                //cdt.CreateMST();
+                //pg = new ProxiGraph();
+                //pg = new ProxiGraph(cdt.MSTNodeList, cdt.MSTEdgeList); //Pg中节点的ID和Map.PointList中节点的ID是一样的 （RNG）
+                #endregion
+
+                pg.WriteProxiGraph2Shp(OutFilePath, "pG_" + (Steps + Iterations).ToString(), pMap.SpatialReference);
+                #endregion
+
+                #region 更新参数
+                Cachea = CachealgSnakes.a;
+                Cacheb = CachealgSnakes.b;
+                #endregion
+
+                Steps++;
+
+            } while (Steps < 100 || sMap.PointList.Count == 0);
+            #endregion
         }
 
         /// Beams Displace
@@ -1382,6 +1598,69 @@ namespace CartoGener
             }
 
             return resNodes;
+        }
+
+        /// <summary>
+        /// GetPointByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public TriNode GetPointByID(int ID, List<TriNode> NodeList)
+        {
+            TriNode No = null;
+            foreach (TriNode CacheNo in NodeList)
+            {
+                if (CacheNo.ID == ID)
+                {
+                    No = CacheNo;
+                    break;
+                }
+            }
+
+            return No;
+        }
+
+        // <summary>
+        /// GetPointByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public PointObject GetPointObjectByID(int ID, List<PointObject> PointObjectList)
+        {
+            PointObject No = null;
+            foreach (PointObject CacheNo in PointObjectList)
+            {
+                if (CacheNo.ID == ID)
+                {
+                    No = CacheNo;
+                    break;
+                }
+            }
+
+            return No;
+        }
+
+        /// <summary>
+        /// GetPoByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public ProxiNode GetPNodeByID(int ID, List<ProxiNode> NodeList)
+        {
+            ProxiNode eNode = null;
+            foreach (ProxiNode CacheNode in NodeList)
+            {
+                if (CacheNode.TagID == ID)
+                {
+                    eNode = CacheNode;
+                    break;
+                }
+            }
+
+            return eNode;
         }
     }
 }

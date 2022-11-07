@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ESRI.ArcGIS.Geometry;
+using System.IO;
+using ESRI.ArcGIS.esriSystem;
 
 namespace AuxStructureLib
 {
@@ -14,6 +16,12 @@ namespace AuxStructureLib
         {
             this.DT = dt;
         }
+
+        public List<TriEdge> RNGEdgeList = new List<TriEdge>();
+        public List<TriNode> RNGNodeList = new List<TriNode>();
+
+        public List<TriEdge> MSTEdgeList = new List<TriEdge>();
+        public List<TriNode> MSTNodeList = new List<TriNode>();
 
         /// <summary>
         /// 三角形列表
@@ -56,6 +64,191 @@ namespace AuxStructureLib
                     return this.DT.TriNodeList;
             }
         }
+
+        /// 创建点集的RNG图（最短距离）
+        ///RNG计算(找到邻近图中每一个三角形，删除三角形中的最长边)
+        ///说明：对于任意一条边，找到对应的三角形；如果是最长边，则删除（如果是一条边，保留；如果是两条边，若是最长边，删除）
+        /// </summary>
+        public void CreateRNG()
+        {
+            #region 找到潜在RNG对应的每条边，判断是否是邻近图中三角形对应的最长边，如果是，删除
+            for (int i = 0; i < this.TriEdgeList.Count; i++)
+            {
+                TriEdge TinLine = this.TriEdgeList[i];
+
+                Triangle LeftTri = TinLine.leftTriangle;
+                Triangle RightTri = TinLine.rightTriangle;
+                double MaxRight = 1000000000;
+                double MaxLeft = 1000000000;
+
+                if (LeftTri != null)
+                {
+                    List<double> LeftList = new List<double>();
+                    LeftList.Add(LeftTri.edge1.Length); LeftList.Add(LeftTri.edge2.Length); LeftList.Add(LeftTri.edge3.Length);
+                    MaxLeft = LeftList.Max();
+                }
+
+                if (RightTri != null)
+                {
+                    List<double> RightList = new List<double>();
+                    RightList.Add(RightTri.edge1.Length); RightList.Add(RightTri.edge2.Length); RightList.Add(RightTri.edge3.Length);
+                    MaxRight = RightList.Max();
+                }
+
+                if (TinLine.Length < MaxLeft && TinLine.Length < MaxRight)
+                {
+                    this.RNGEdgeList.Add(TinLine);
+                }
+            }
+            #endregion
+
+            this.RNGNodeList = this.TriNodeList;
+        }
+
+        /// 创建点集的RNG图（最短距离）
+        ///RNG计算(找到邻近图中每一个三角形，删除三角形中的最长边)
+        ///说明：对于任意一条边，找到对应的三角形；如果是最长边，则删除（如果是一条边，保留；如果是两条边，若是最长边，删除）
+        /// </summary>
+        public void CreateMST()
+        {
+            #region 矩阵初始化
+            double[,] matrixGraph = new double[this.TriNodeList.Count, this.TriNodeList.Count];
+
+            for (int i = 0; i < this.TriNodeList.Count; i++)
+            {
+                for (int j = 0; j < this.TriNodeList.Count; j++)
+                {
+                    matrixGraph[i, j] = -1;
+                }
+            }
+            #endregion
+
+            #region 矩阵赋值
+            //double MinV = 1000000;//矩阵最小值
+            for (int i = 0; i < this.TriNodeList.Count; i++)
+            {
+                TriNode Point1 = this.TriNodeList[i];
+
+                for (int j = 0; j < this.TriEdgeList.Count; j++)
+                {
+                    TriEdge Edge1 = this.TriEdgeList[j];
+
+                    TriNode pPoint1 = Edge1.startPoint;
+                    TriNode pPoint2 = Edge1.endPoint;
+                    if (Point1.X == pPoint1.X && Point1.Y == pPoint1.Y)
+                    {
+                        for (int m = 0; m < this.TriNodeList.Count; m++)
+                        {
+                            TriNode Point2 = this.TriNodeList[m];
+
+                            if (Point2.X == pPoint2.X && Point2.Y == pPoint2.Y)
+                            {
+
+                                double EdgeDis = ComFunLib.CalLineLength(pPoint1, pPoint2);
+                                matrixGraph[i, m] = matrixGraph[m, i] = EdgeDis;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            for (int i = 0; i < this.TriNodeList.Count; i++)
+            {
+                for (int j = 0; j < this.TriNodeList.Count; j++)
+                {
+                    if (matrixGraph[i, j] == -1 || matrixGraph[j, i] == -1)
+                    {
+                        matrixGraph[i, j] = matrixGraph[j, i] = 100000;
+                    }
+                }
+            }
+            #endregion
+
+            #region MST计算
+            IArray LabelArray = new ArrayClass();//MST点集
+            IArray fLabelArray = new ArrayClass();
+            List<List<int>> EdgesGroup = new List<List<int>>();//MST边集
+
+            for (int F = 0; F < this.TriNodeList.Count; F++)
+            {
+                fLabelArray.Add(F);
+            }
+
+            int LabelFirst = 0;//任意添加一个节点
+            LabelArray.Add(LabelFirst);
+            //int x = 0;
+            int LabelArrayNum;
+            do
+            {
+                LabelArrayNum = LabelArray.Count;
+                int fLabelArrayNum = fLabelArray.Count;
+                double MinDist = 100001;
+                List<int> Edge = new List<int>();
+
+                int EdgeLabel2 = -1;
+                int EdgeLabel1 = -1;
+                int Label = -1;
+
+                for (int i = 0; i < LabelArrayNum; i++)
+                {
+                    int p1 = (int)LabelArray.get_Element(i);
+
+                    for (int j = 0; j < fLabelArrayNum; j++)
+                    {
+                        int p2 = (int)fLabelArray.get_Element(j);
+
+                        if (matrixGraph[p1, p2] < MinDist)
+                        {
+                            MinDist = matrixGraph[p1, p2];
+                            EdgeLabel2 = p2;
+                            EdgeLabel1 = p1;
+                            Label = j;
+                        }
+                    }
+                }
+
+
+                //x++;
+                Edge.Add(EdgeLabel1);
+                Edge.Add(EdgeLabel2);
+                EdgesGroup.Add(Edge);
+
+                fLabelArray.Remove(Label);
+                LabelArray.Add(EdgeLabel2);
+
+            } while (LabelArrayNum < this.TriNodeList.Count);
+            #endregion
+
+            #region 生成MST的nodes和Edges
+            int EdgesGroupNum = EdgesGroup.Count;
+            for (int i = 0; i < EdgesGroupNum; i++)
+            {
+                int m, n;
+                m = EdgesGroup[i][0];
+                n = EdgesGroup[i][1];
+
+                TriNode Pn1 = this.TriNodeList[m];
+                TriNode Pn2 = this.TriNodeList[n];
+
+                foreach (TriEdge Pe in this.TriEdgeList)
+                {
+                    if ((Pe.startPoint.X == Pn1.X && Pe.endPoint.X == Pn2.X) || (Pe.startPoint.X == Pn2.X && Pe.endPoint.X == Pn1.X))
+                    {
+                        if (!MSTEdgeList.Contains(Pe))
+                        {
+                            MSTEdgeList.Add(Pe);
+                            break;
+                        }
+                    }
+                }
+
+            }
+            #endregion
+
+            this.MSTNodeList = this.TriNodeList;
+        }
+
         /// <summary>
         /// 创建约束CDT
         /// </summary>

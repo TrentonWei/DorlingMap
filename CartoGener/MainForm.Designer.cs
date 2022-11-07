@@ -36,6 +36,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.dorlingMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StableDorlingMapForToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.centralTPMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -44,7 +45,7 @@
             this.axMapControl1 = new AxESRI.ArcGIS.Controls.AxMapControl();
             this.axTOCControl1 = new AxESRI.ArcGIS.Controls.AxTOCControl();
             this.axToolbarControl1 = new AxESRI.ArcGIS.Controls.AxToolbarControl();
-            this.centralTPMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tileMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axLicenseControl2)).BeginInit();
@@ -58,43 +59,51 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.dorlingMapToolStripMenuItem,
             this.StableDorlingMapForToolStripMenuItem,
-            this.centralTPMapToolStripMenuItem});
+            this.centralTPMapToolStripMenuItem,
+            this.tileMapToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(1145, 28);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(9, 2, 0, 2);
+            this.menuStrip1.Size = new System.Drawing.Size(1288, 32);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // dorlingMapToolStripMenuItem
             // 
             this.dorlingMapToolStripMenuItem.Name = "dorlingMapToolStripMenuItem";
-            this.dorlingMapToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
+            this.dorlingMapToolStripMenuItem.Size = new System.Drawing.Size(127, 28);
             this.dorlingMapToolStripMenuItem.Text = "DorlingMap";
             this.dorlingMapToolStripMenuItem.Click += new System.EventHandler(this.dorlingMapToolStripMenuItem_Click);
             // 
             // StableDorlingMapForToolStripMenuItem
             // 
             this.StableDorlingMapForToolStripMenuItem.Name = "StableDorlingMapForToolStripMenuItem";
-            this.StableDorlingMapForToolStripMenuItem.Size = new System.Drawing.Size(158, 24);
+            this.StableDorlingMapForToolStripMenuItem.Size = new System.Drawing.Size(186, 28);
             this.StableDorlingMapForToolStripMenuItem.Text = "Stable DorlingMap";
             this.StableDorlingMapForToolStripMenuItem.Click += new System.EventHandler(this.StableDorlingMapForToolStripMenuItem_Click);
             // 
+            // centralTPMapToolStripMenuItem
+            // 
+            this.centralTPMapToolStripMenuItem.Name = "centralTPMapToolStripMenuItem";
+            this.centralTPMapToolStripMenuItem.Size = new System.Drawing.Size(161, 28);
+            this.centralTPMapToolStripMenuItem.Text = "Central-TP-Map";
+            this.centralTPMapToolStripMenuItem.Click += new System.EventHandler(this.centralTPMapToolStripMenuItem_Click);
+            // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(0, 28);
-            this.splitter1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.splitter1.Location = new System.Drawing.Point(0, 32);
+            this.splitter1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(4, 648);
+            this.splitter1.Size = new System.Drawing.Size(4, 779);
             this.splitter1.TabIndex = 6;
             this.splitter1.TabStop = false;
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(4, 654);
+            this.statusStrip1.Location = new System.Drawing.Point(4, 789);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 19, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(1141, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1284, 22);
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 7;
             this.statusStrip1.Text = "statusBar1";
@@ -104,12 +113,12 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.removeTheLayerToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(206, 28);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(230, 32);
             // 
             // removeTheLayerToolStripMenuItem
             // 
             this.removeTheLayerToolStripMenuItem.Name = "removeTheLayerToolStripMenuItem";
-            this.removeTheLayerToolStripMenuItem.Size = new System.Drawing.Size(205, 24);
+            this.removeTheLayerToolStripMenuItem.Size = new System.Drawing.Size(229, 28);
             this.removeTheLayerToolStripMenuItem.Text = "Remove the layer";
             this.removeTheLayerToolStripMenuItem.Click += new System.EventHandler(this.removeTheLayerToolStripMenuItem_Click);
             // 
@@ -126,46 +135,46 @@
             // axMapControl1
             // 
             this.axMapControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.axMapControl1.Location = new System.Drawing.Point(401, 56);
+            this.axMapControl1.Location = new System.Drawing.Point(480, 60);
             this.axMapControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.axMapControl1.Name = "axMapControl1";
             this.axMapControl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axMapControl1.OcxState")));
-            this.axMapControl1.Size = new System.Drawing.Size(744, 598);
+            this.axMapControl1.Size = new System.Drawing.Size(808, 729);
             this.axMapControl1.TabIndex = 14;
             // 
             // axTOCControl1
             // 
             this.axTOCControl1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.axTOCControl1.Location = new System.Drawing.Point(4, 56);
+            this.axTOCControl1.Location = new System.Drawing.Point(4, 60);
             this.axTOCControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.axTOCControl1.Name = "axTOCControl1";
             this.axTOCControl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axTOCControl1.OcxState")));
-            this.axTOCControl1.Size = new System.Drawing.Size(397, 598);
+            this.axTOCControl1.Size = new System.Drawing.Size(476, 729);
             this.axTOCControl1.TabIndex = 13;
             this.axTOCControl1.OnMouseDown += new AxESRI.ArcGIS.Controls.ITOCControlEvents_OnMouseDownEventHandler(this.axTOCControl1_OnMouseDown_1);
             // 
             // axToolbarControl1
             // 
             this.axToolbarControl1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.axToolbarControl1.Location = new System.Drawing.Point(4, 28);
+            this.axToolbarControl1.Location = new System.Drawing.Point(4, 32);
             this.axToolbarControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.axToolbarControl1.Name = "axToolbarControl1";
             this.axToolbarControl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axToolbarControl1.OcxState")));
-            this.axToolbarControl1.Size = new System.Drawing.Size(1141, 28);
+            this.axToolbarControl1.Size = new System.Drawing.Size(1284, 28);
             this.axToolbarControl1.TabIndex = 12;
             // 
-            // centralTPMapToolStripMenuItem
+            // tileMapToolStripMenuItem
             // 
-            this.centralTPMapToolStripMenuItem.Name = "centralTPMapToolStripMenuItem";
-            this.centralTPMapToolStripMenuItem.Size = new System.Drawing.Size(136, 24);
-            this.centralTPMapToolStripMenuItem.Text = "Central-TP-Map";
-            this.centralTPMapToolStripMenuItem.Click += new System.EventHandler(this.centralTPMapToolStripMenuItem_Click);
+            this.tileMapToolStripMenuItem.Name = "tileMapToolStripMenuItem";
+            this.tileMapToolStripMenuItem.Size = new System.Drawing.Size(92, 28);
+            this.tileMapToolStripMenuItem.Text = "TileMap";
+            this.tileMapToolStripMenuItem.Click += new System.EventHandler(this.tileMapToolStripMenuItem_Click);
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1145, 676);
+            this.ClientSize = new System.Drawing.Size(1288, 811);
             this.Controls.Add(this.axLicenseControl2);
             this.Controls.Add(this.axMapControl1);
             this.Controls.Add(this.axTOCControl1);
@@ -175,7 +184,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "MainForm";
             this.Text = "CartoGener";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -205,6 +214,7 @@
         private AxESRI.ArcGIS.Controls.AxLicenseControl axLicenseControl2;
         private System.Windows.Forms.ToolStripMenuItem StableDorlingMapForToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem centralTPMapToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tileMapToolStripMenuItem;
     }
 }
 

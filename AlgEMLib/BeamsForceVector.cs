@@ -1208,7 +1208,15 @@ namespace AlgEMLib
             double EdgeDis = this.GetDis(sNode, eNode);
             List<Force> ForceList = new List<Force>();
 
-            if (EdgeDis > MinDis)
+            #region 判断控制点是否靠近其最终位置
+            sNode.NearFinal = false;
+            if (EdgeDis < MinDis)
+            {
+                sNode.NearFinal = true;
+            }
+            #endregion
+
+            if (EdgeDis > 0)
             {
                 double curForce = EdgeDis;
                 double r = Math.Sqrt((eNode.Y - sNode.Y) * (eNode.Y - sNode.Y) + (eNode.X - sNode.X) * (eNode.X - sNode.X));

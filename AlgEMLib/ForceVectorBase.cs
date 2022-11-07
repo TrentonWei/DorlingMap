@@ -1299,7 +1299,15 @@ namespace AlgEMLib
             List<Force> ForceList = new List<Force>();
             List<VertexForce> vForceList = new List<VertexForce>();
 
-            if (EdgeDis > MinDis)
+            #region 判断控制点是否靠近其最终位置
+            sNode.NearFinal = false;
+            if (EdgeDis < MinDis)
+            {
+                sNode.NearFinal = true;
+            }
+            #endregion
+
+            if (EdgeDis > 0)
             {
                 double curForce = EdgeDis;
                 if (curForce > MaxForce)

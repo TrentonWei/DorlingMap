@@ -13,7 +13,7 @@ namespace AuxStructureLib
         public double SylWidth =0;
         public int TypeID = 1;//1线要素，2边界
         public int SomeValue=-1;
-        public double TT = -1;
+        public double TT = -1;//
 
         public int ConflictCount = 0;
         
@@ -157,6 +157,7 @@ namespace AuxStructureLib
         /// 计算邻近点-坐标位置为对象的中心
         /// </summary>
         /// <returns>返回邻近点</returns>
+        
         public  ProxiNode CalProxiNode()
         {
             double sumx = 0;
@@ -174,6 +175,7 @@ namespace AuxStructureLib
     /// <summary>
     /// 构造函数
     /// </summary>
+    [Serializable]
     public class ConNode : MapObject
     {
        // public int ID = -1;
