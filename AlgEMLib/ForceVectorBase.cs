@@ -1142,6 +1142,191 @@ namespace AlgEMLib
         }
 
         /// <summary>
+        ///  /// <summary>
+        /// 计算邻近图上个点的最终受力-最大力做主方向的局部最大值法
+        /// </summary>
+        /// <returns></returns>
+        /// </summary>
+        /// <param name="NodeList"></param>
+        /// <param name="MaxForce">用于限制计算两个力时的最大力</param>
+        /// <param name="MaxForce_2">用于限制全力力时的最大力</param>
+        /// Size TileMap的尺寸
+        /// <returns></returns>
+        protected List<Force> CalForceforProxiGraph_TileMap(List<ProxiNode> NodeList, List<ProxiEdge> EdgeList,double MaxForce, double MaxForce_2,double Size)
+        {
+            #region 计算受力
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return null;
+
+            InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            List<VertexForce> vForceList = new List<VertexForce>();
+
+            foreach (ProxiNode pNode in NodeList) //计算每一个中心点的受力
+            {
+                if (pNode.FeatureType == FeatureType.PointType)//如果点Pn是重心点
+                {
+                    Tuple<double, double> NodeXY = this.NodeShiftXY(EdgeList, pNode, Size);
+                    double curForce = Math.Sqrt(NodeXY.Item1 * NodeXY.Item1 + NodeXY.Item2 * NodeXY.Item2);
+                    Force sForce = new Force(pNode.ID, NodeXY.Item1, NodeXY.Item2, NodeXY.Item2 / curForce, NodeXY.Item1 / curForce, curForce);
+
+                    #region 添加Force
+                    VertexForce svForce = this.GetvForcebyIndex(pNode.ID, vForceList);//受力的标志还是用的ID来标识
+                    if (svForce == null)
+                    {
+                        svForce = new VertexForce(pNode.ID);
+                        vForceList.Add(svForce);
+                    }
+                    svForce.forceList.Add(sForce);//将当前的受力加入VertexForce数组
+                    #endregion
+                }
+            }
+            #endregion
+
+            #region 计算合力
+            List<Force> rforceList = new List<Force>();
+            foreach (VertexForce vForce in vForceList)
+            {
+                if (vForce.forceList.Count == 1)//当只受一个力作用时
+                {
+                    rforceList.Add(vForce.forceList[0]);
+
+                }
+                else if (vForce.forceList.Count > 1)
+                {
+                    int index = 0;
+                    double maxFx = 0;
+                    double minFx = 0;
+                    double maxFy = 0;
+                    double minFy = 0;
+                    Force maxF = GetMaxForce(out  index, vForce.forceList);
+                    maxFx = maxF.F;
+                    double s = maxF.Sin;
+                    double c = maxF.Cos;
+
+                    for (int i = 0; i < vForce.forceList.Count; i++)
+                    {
+
+                        if (i != index)
+                        {
+                            Force F = vForce.forceList[i];
+                            double fx = F.Fx * c + F.Fy * s;
+                            double fy = F.Fy * c - F.Fx * s;
+
+                            if (minFx > fx) minFx = fx;
+                            if (maxFy < fy) maxFy = fy;
+                            if (minFy > fy) minFy = fy;
+                        }
+                    }
+                    double FFx = maxFx + minFx;
+                    double FFy = maxFy + minFy;
+                    double Fx = FFx * c - FFy * s;
+                    double Fy = FFx * s + FFy * c;
+                    double f = Math.Sqrt(Fx * Fx + Fy * Fy);
+                    Force rForce = new Force(vForce.ID, Fx, Fy, f);
+                    rforceList.Add(rForce);
+                }
+            }
+            #endregion
+
+            #region 将力减小
+            double Maxf = 0;
+            for (int i = 0; i < rforceList.Count; i++)
+            {
+                if (Math.Abs(rforceList[i].F) > Maxf)
+                {
+                    Maxf = Math.Abs(rforceList[i].F);
+                }
+            }
+
+            if (Maxf > MaxForce_2)
+            {
+                double Scale_p = MaxForce_2 / Maxf;
+
+                for (int i = 0; i < rforceList.Count; i++)
+                {
+                    rforceList[i].F = rforceList[i].F * Scale_p;
+                    rforceList[i].Fx = rforceList[i].Fx * Scale_p;
+                    rforceList[i].Fy = rforceList[i].Fy * Scale_p;
+                }
+            }
+            #endregion
+
+            return rforceList;
+        }
+
+        /// <summary>
+        /// 获得给定节点的1阶邻近(且都是区域重心点)
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        /// <param name="Pn"></param>
+        /// PointConnect判断是否是点连接
+        /// <returns></returns>
+        public List<ProxiNode> GetNeibors(List<ProxiEdge> EdgeList, ProxiNode Pn)
+        {
+            List<ProxiNode> NeiborNodes = new List<ProxiNode>();
+            foreach (ProxiEdge Pe in EdgeList)
+            {
+                if (Pe.Node1.TagID == Pn.TagID && Pe.Node1.FeatureType == FeatureType.PointType && Pe.Node2.FeatureType == FeatureType.PointType)
+                {
+                    NeiborNodes.Add(Pe.Node2);
+                }
+                if (Pe.Node2.TagID == Pn.TagID && Pe.Node1.FeatureType == FeatureType.PointType && Pe.Node2.FeatureType == FeatureType.PointType)
+                {
+                    NeiborNodes.Add(Pe.Node1);
+                }
+            }
+            return NeiborNodes;
+        }
+
+        /// <summary>
+        /// 获得给定点偏移后的位置[x,y]
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        /// <param name="Pn"></param>
+        /// <param name="BoundaryPo"></param>
+        /// <param name="TileCount"></param>
+        /// <returns></returns>
+        public Tuple<double, double> NodeShiftXY(List<ProxiEdge> EdgeList, ProxiNode Pn, double Size)
+        {
+            #region MainProcess
+            List<ProxiNode> NeiborNodes = this.GetNeibors(EdgeList, Pn);//Get NeinorNodes
+
+            double SumX = 0; double SumY = 0;
+            for (int i = 0; i < NeiborNodes.Count; i++)
+            {
+                Tuple<double, double> NodePairVector = this.GetNodePairVector(Pn, NeiborNodes[i]);
+                SumX = SumX + (NeiborNodes[i].X + Size * NodePairVector.Item1);
+                SumY = SumY + (NeiborNodes[i].Y + Size * NodePairVector.Item2);
+            }
+            #endregion
+
+            double NewX = SumX / NeiborNodes.Count;
+            double NewY = SumY / NeiborNodes.Count;
+
+            double ADDX = NewX - Pn.X;
+            double ADDY = NewY - Pn.Y;
+            Tuple<double, double> ShiftXY = new Tuple<double, double>(ADDX, ADDY);
+
+            return ShiftXY;
+        }
+
+        /// <summary>
+        /// Get unit displacement vector betweeo two nodes (Pn1 to Pn2)
+        /// </summary>
+        /// <param name="Pn1"></param>
+        /// <param name="Pn2"></param>
+        /// <returns></returns>
+        public Tuple<double, double> GetNodePairVector(ProxiNode Pn1, ProxiNode Pn2)
+        {
+            double Dis = this.GetDis(Pn1, Pn2);
+            double CosX = (Pn1.X - Pn2.X) / Dis;
+            double SinY = (Pn1.Y - Pn2.Y) / Dis;
+            Tuple<double, double> VectorXY = new Tuple<double, double>(CosX, SinY);
+            return VectorXY;
+        }
+
+
+        /// <summary>
         /// 计算邻近图上个点的最终受力-最大力做主方向的局部最大值法
         /// 输出BoundingPoints（每次只取受力前十名的力进行处理！！）
         /// </summary>

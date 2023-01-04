@@ -1482,43 +1482,47 @@ namespace AlgEMLib
                 BeamsForceVector BFV = new BeamsForceVector();
                 PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, pMap.PolygonList);
                 PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, pMap.PolygonList);
-                List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
-                #endregion
-
-                #region 更新坐标
-                if (ForceList.Count > 0)
+                if (this.ProxiGraph.EdgeList!=null)
                 {
-                    for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
+                    List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
+               
+
+                    #region 更新坐标
+                    if (ForceList.Count > 0)
                     {
-                        int Cachei = -1;
-
-                        if (i == 0)
+                        for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
                         {
-                            Cachei = 1;
+                            int Cachei = -1;
 
-                        }
-                        else
-                        {
-                            Cachei = 0;
-                        }
+                            if (i == 0)
+                            {
+                                Cachei = 1;
 
-                        ProxiNode curNode = this.ProxiGraph.NodeList[Cachei];
-                        curNode.X += ForceList[Cachei].Fx;//更新邻近图
-                        curNode.Y += ForceList[Cachei].Fy;
+                            }
+                            else
+                            {
+                                Cachei = 0;
+                            }
 
-                        PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
-                        foreach (TriNode curPoint in po.PointList)
-                        {
-                            curPoint.X += ForceList[Cachei].Fx;
-                            curPoint.Y += ForceList[Cachei].Fy;
+                            ProxiNode curNode = this.ProxiGraph.NodeList[Cachei];
+                            curNode.X += ForceList[Cachei].Fx;//更新邻近图
+                            curNode.Y += ForceList[Cachei].Fy;
+
+                            PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
+                            foreach (TriNode curPoint in po.PointList)
+                            {
+                                curPoint.X += ForceList[Cachei].Fx;
+                                curPoint.Y += ForceList[Cachei].Fy;
+                            }
                         }
                     }
-                }
-                #endregion
+                    #endregion
 
-                MaxF = 0;
-                this.isContinue = false;
-                return;
+                    MaxF = 0;
+                    this.isContinue = false;
+                }
+                return; 
+                #endregion
             }
 
             else

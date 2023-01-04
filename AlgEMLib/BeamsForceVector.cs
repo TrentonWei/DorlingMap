@@ -1061,7 +1061,7 @@ namespace AlgEMLib
         /// <param name="Po2"></param>
         /// <param name="?"></param>
         /// <returns></returns>List<Force>=[sForce,eForce]
-        /// ForceType=0,只考虑斥力；ForceType=1，既考虑引力，也考虑斥力;ForceType=2，只考虑邻近和MST的引力和斥力;ForceType=3 只考虑引力
+        /// ForceType=0,只考虑斥力；ForceType=1，既考虑引力，也考虑斥力;ForceType=2，只考虑邻近和MST的引力和斥力;ForceType=3 考虑斥力，且只考虑一定长度边的引力
         /// WeightConsi=false 不考虑权重；WeightConsi 考虑权重
         /// Adj=true 邻接；Adj=false 不邻接
         /// MaxTd 考虑的邻近条件

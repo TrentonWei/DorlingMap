@@ -27,6 +27,8 @@ namespace CartoGener
     /// </summary>
     class TileMapSupport
     {
+        public bool continueLable = true;//参数
+
         /// <summary>
         /// Node Transform
         /// </summary>
@@ -96,7 +98,7 @@ namespace CartoGener
         /// <param name="NodeBoundaryPg">中心节点、边缘节点间的邻近关系</param>
         public void PgRefresh(ProxiGraph NodePg, ProxiGraph NodeBoundaryPg)
         {
-            #region 删除NodeBoundaryPg中直接关联两个中心点的边
+            #region 删除NodeBoundaryPg中直接关联两个重心点的边
             for (int i = NodeBoundaryPg.EdgeList.Count - 1; i >= 0; i--)
             {
 
@@ -118,17 +120,16 @@ namespace CartoGener
             for (int i = 0; i < NodePg.EdgeList.Count; i++)
             {
                 ProxiNode Node1 = null; ProxiNode Node2 = null;
-                for (int j = 0; j < NodePg.NodeList.Count; j++)
+                for (int j = 0; j < NodeBoundaryPg.NodeList.Count; j++)
                 {
-                    if (NodePg.EdgeList[i].Node1.TagID == NodePg.NodeList[j].TagID)
+                    if (NodePg.EdgeList[i].Node1.TagID == NodeBoundaryPg.NodeList[j].TagID && NodeBoundaryPg.NodeList[j].FeatureType==FeatureType.PointType)
                     {
-                        Node1 = NodePg.NodeList[j];
+                        Node1 = NodeBoundaryPg.NodeList[j];
                     }
 
-
-                    if (NodePg.EdgeList[i].Node2.TagID == NodePg.NodeList[j].TagID)
+                    if (NodePg.EdgeList[i].Node2.TagID == NodeBoundaryPg.NodeList[j].TagID && NodeBoundaryPg.NodeList[j].FeatureType == FeatureType.PointType)
                     {
-                        Node2 = NodePg.NodeList[j];
+                        Node2 = NodeBoundaryPg.NodeList[j];
                     }
                 }
 
@@ -294,6 +295,109 @@ namespace CartoGener
             else
             {
                 return Math.Sqrt((Pn1.X - Pn2.X) * (Pn1.X - Pn2.X) + (Pn1.Y - Pn2.Y) * (Pn1.Y - Pn2.Y));
+            }
+        }
+
+        /// <summary>
+        /// Get the Center of group nodes
+        /// </summary>
+        /// <param name="NodeList"></param>
+        /// <returns></returns>
+        public ProxiNode GetGroupNodeCenter(List<ProxiNode> NodeList)
+        {
+            if (NodeList.Count > 0)
+            {
+                double SumX = 0; double SumY = 0;
+                for (int i = 0; i < NodeList.Count; i++)
+                {
+                    SumX = SumX + NodeList[i].X;
+                    SumY = SumY + NodeList[i].Y;
+                }
+
+                ProxiNode CacheNode = new ProxiNode(SumX / NodeList.Count, SumY / NodeList.Count);
+                return CacheNode;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 将移动后的邻近图移动到原始的重心
+        /// </summary>
+        /// <param name="pg"></param>
+        /// <param name="OriginalNode"></param>
+        public void CenterRecover(ProxiGraph pg,ProxiNode OriginalNode)
+        {
+            ProxiNode TransformeredCenter = this.GetGroupNodeCenter(pg.NodeList);//计算移动后的新重心
+            double Dx = OriginalNode.X - TransformeredCenter.X;
+            double Dy = OriginalNode.Y - TransformeredCenter.Y;
+
+            #region 移动过程
+            for (int i = 0; i < pg.NodeList.Count; i++)
+            {
+                pg.NodeList[i].X = pg.NodeList[i].X + Dx;
+                pg.NodeList[i].Y = pg.NodeList[i].Y + Dy;
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// 深拷贝（通用拷贝）
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static object Clone(object obj)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(memoryStream, obj);
+            memoryStream.Position = 0;
+            return formatter.Deserialize(memoryStream);
+        }
+
+        /// Beams Displace
+        /// </summary>
+        /// <param name="pg">邻近图</param>
+        /// <param name="pMap">Dorling图层</param>
+        /// <param name="scale">比例尺</param>
+        /// <param name="E">弹性模量</param>
+        /// <param name="I">惯性力矩</param>
+        /// <param name="A">横切面积</param>
+        /// MinDis 起点和终点之间的距离误差
+        /// StopT 迭代终止的最大力大小
+        /// <param name="Iterations">迭代次数</param>
+        /// <param name="MaxForce">用于限制计算两个力时的最大力</param>
+        /// <param name="MaxForce_2">用于限制全力力时的最大力</param>
+        public void TileMapSnake_PgReBuiltMapIn(ProxiGraph pg, SMap sMap, double scale, double a, double b, int Iterations, int algType, double Size, double StopT, string OutFilePath, IMap pMap, double MaxForce, double MaxForce_2)
+        {
+            AlgSnake algSnakes = new AlgSnake(pg, sMap, a, b);
+            //求吸引力-2014-3-20所用
+            ProxiGraph CopyG = Clone((object)pg) as ProxiGraph;
+            algSnakes.OriginalGraph = CopyG;
+            algSnakes.Scale = scale;//目标比例尺
+            algSnakes.AlgType = algType;//0-Snakes, 1-Sequence, 2-Combined
+            //1- Sequence：几何算法。
+            //2-Combined：混合算法，当目标个数大于3用Snakes，否则用几何算法
+
+            for (int i = 0; i < Iterations; i++)//迭代计算
+            {
+                Console.WriteLine(i.ToString());//标识
+
+                algSnakes.DoDisplaceTileMap(sMap, MaxForce, MaxForce_2, Size);//执行邻近图Beams移位算法，代表混合型
+
+                #region 邻近图重构
+                pg.WriteProxiGraph2Shp(OutFilePath, "pG_" + i.ToString(), pMap.SpatialReference);
+                //pg.WriteProxiGraph2Shp(OutFilePath, "pG_" + i.ToString(), pMap.SpatialReference);
+                sMap.WriteResult2Shp(OutFilePath, "Map_" + i.ToString(), pMap.SpatialReference);
+                #endregion
+
+                this.continueLable = algSnakes.isContinue;
+                if (algSnakes.isContinue == false)
+                {
+                    break;
+                }
             }
         }
     }

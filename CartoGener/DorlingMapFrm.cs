@@ -762,7 +762,9 @@ namespace CartoGener
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 1, 0.01, 0.1);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "STATE_ABBR", 0.5, 1, 2);//成比例 美国
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 1, 0.01, 0.1);//不成比例美洲
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "GMI_CNTRY", 1, 1, 2);//成比例 美洲
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
@@ -806,13 +808,13 @@ namespace CartoGener
                         PNum = 10;
                     }
 
-                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 30, 1, true, 0.2);
+                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 1, true, 0.2);
                     if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 1, pMap.SpatialReference); }
                     //OutMap.WriteResult2Shp(OutFilePath, "1", pMap.SpatialReference);
 
                     if (PgList[i].EdgeList.Count > 0)
                     {
-                        DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 30, 0, true, 0.2);
+                        DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
                         if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 2, pMap.SpatialReference); }
                         //OutMap.WriteResult2Shp(OutFilePath, "2", pMap.SpatialReference);
                     }
@@ -851,8 +853,10 @@ namespace CartoGener
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);
-            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);//不成比例 美国
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "STATE_ABBR", 0.5, 1, 2);//成比例，美国
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);//不成比例 美洲
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "GMI_CNTRY", 1, 1, 2);//成比例，美洲
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
@@ -973,8 +977,10 @@ namespace CartoGener
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
-            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);//不成比例
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "STATE_ABBR", 0.5, 1, 2);//成比例，美国
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);//不成比例
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "GMI_CNTRY", 1, 1, 2);//成比例，美洲
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
@@ -1019,10 +1025,12 @@ namespace CartoGener
                         PNum = 10;
                     }
 
-                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 30, 1, true, 0.2);
+                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 1, true, 0.2);//美国
+                    //DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 1, true, 0.2);//美洲
                     //if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 1, pMap.SpatialReference); }
                     //OutMap.WriteResult2Shp(OutFilePath, "1", pMap.SpatialReference);
-                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 30, 0, true, 0.2);
+                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);//美国
+                    //DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 50, 0, true, 0.2);//美洲
                     //if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 2, pMap.SpatialReference); }
                     //OutMap.WriteResult2Shp(OutFilePath, "2", pMap.SpatialReference);
 
@@ -1048,7 +1056,8 @@ namespace CartoGener
             {
                 aPNum = 10;
             }
-            DM.DorlingBeams(anpg, OutMap, 1, 10, 1, 1, 2 * aPNum, 0, 0.05, 30, 0, true, 0.2);
+            DM.DorlingBeams(anpg, OutMap, 1, 10, 1, 1, 2 * aPNum, 0, 0.05, 20, 0, true, 0.2);//美国
+            //DM.DorlingBeams(anpg, OutMap, 1, 10, 1, 1, 2 * aPNum, 0, 0.05, 50, 0, true, 0.2);//美洲
             #endregion
 
             OutMap.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
@@ -1086,9 +1095,9 @@ namespace CartoGener
             IFeature sFeature = sFeatureCursor.NextFeature();
             while (sFeature != null)
             {
-                //string Name = this.GetStringValue(sFeature, "STATE_ABBR");
-                //string Name = this.GetStringValue(sFeature, "GMI_CNTRY");
-                string Name = this.GetStringValue(sFeature, "COUNTRY");
+                string Name = this.GetStringValue(sFeature, "STATE_ABBR");//美国
+                //string Name = this.GetStringValue(sFeature, "GMI_CNTRY");//美洲
+                //string Name = this.GetStringValue(sFeature, "COUNTRY");
                 IPolygon pPolygon = sFeature.Shape as IPolygon;
                 sDic.Add(Name, pPolygon);
 
@@ -1150,14 +1159,14 @@ namespace CartoGener
                             IRelationalOperator iRo = iGeo as IRelationalOperator;
                             if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
                             {
-                                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "STATE_ABBR");
-                                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "STATE_ABBR");
+                                string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "STATE_ABBR");//美国
+                                string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "STATE_ABBR");//美国
 
-                                string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "COUNTRY");
-                                string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "COUNTRY");
+                                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "COUNTRY");
+                                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "COUNTRY");
 
-                                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "GMI_CNTRY");
-                                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "GMI_CNTRY");
+                                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "GMI_CNTRY");//美洲
+                                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "GMI_CNTRY");//美洲
 
                                 Tuple<string, string> NameMatch = new Tuple<string, string>(NameI, NameJ);
                                 TouchedList.Add(NameMatch);
@@ -1196,16 +1205,16 @@ namespace CartoGener
             List<Tuple<string, string>> NearList = new List<Tuple<string, string>>();
             for (int i = 0; i < pg.RNGBuildingEdgesListShortestDistance.Count; i++)
             {
-                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "STATE_ABBR");
-                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "STATE_ABBR");
-
                 try
                 {
-                    string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "COUNTRY");
-                    string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "COUNTRY");
+                    string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "STATE_ABBR");//美国
+                    string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "STATE_ABBR");//美国
 
-                    //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "GMI_CNTRY");
-                    //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "GMI_CNTRY");
+                    //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "COUNTRY");
+                    //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "COUNTRY");
+
+                    //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "GMI_CNTRY");//美洲
+                    //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "GMI_CNTRY");//美洲
                     Tuple<string, string> NameMatch = new Tuple<string, string>(NameI, NameJ);
                     NearList.Add(NameMatch);
                 }
@@ -1342,7 +1351,8 @@ namespace CartoGener
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);//不沉比例
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "STATE_ABBR", 0.5, 1, 2);//成比例
 
             for (int i = 0; i < CircleList.Count; i++) //输出半径
             {
@@ -1361,8 +1371,7 @@ namespace CartoGener
             pg.CreateProxiGByDT(pFeatureClass);
             pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
             npg.PgRefined(pg.EdgeList);//MSTrefine （添加非邻近的边,将所有图形构成一个整体）
-            npg.PgRefined(Map.PolygonList);//重叠边refine  （添加重叠的边）
-            //npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
+            npg.PgRefined(Map.PolygonList);//重叠边refine  （添加重叠的边）;
             npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
             #endregion
 
@@ -1372,12 +1381,14 @@ namespace CartoGener
             {
                 PNum = 10;
             }
-            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
-            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+
             DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);//单用的话就是Tl=0
+
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 20, 3, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
-            if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
+            if (OutFilePath != null) { pg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
             #endregion
 
             oTime.Stop(); //记录结束时间
@@ -1411,7 +1422,8 @@ namespace CartoGener
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
             //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);//不成比例
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "GMI_CNTRY", 1, 1, 2);//成比例
 
             for (int i = 0; i < CircleList.Count; i++) //输出半径
             {
@@ -1440,10 +1452,10 @@ namespace CartoGener
             {
                 PNum = 10;
             }
-            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
-            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 50, 3, true, 0.2);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 50, 0, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 50, 3, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 50, 0, true, 0.2);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
             #endregion
 
@@ -1478,7 +1490,7 @@ namespace CartoGener
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "STATE_ABBR", 1, 1, 2);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "POPULATION", "STATE_ABBR", 0.5, 1, 2);
             //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);
 
             for (int i = 0; i < CircleList.Count; i++) //输出半径
@@ -1508,10 +1520,12 @@ namespace CartoGener
             {
                 PNum = 10;
             }
-            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
-            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+
             DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
             DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 20, 3, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
             if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
             #endregion
@@ -1576,10 +1590,10 @@ namespace CartoGener
             {
                 PNum = 10;
             }
-            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
-            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 10, 3, true, 0.2);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 10, 0, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 10, 3, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 10, 0, true, 0.2);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
             #endregion
 

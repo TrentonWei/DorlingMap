@@ -281,6 +281,28 @@ namespace AlgEMLib
             return false;
 
         }
+
+        /// <summary>
+        /// 由冲突计算外力向量
+        /// </summary>
+        /// <param name="conflictList">冲突</param>
+        /// <returns>是否成功</returns>
+        /// <param name="MaxForce">用于限制计算两个力时的最大力</param>
+        /// <param name="MaxForce_2">用于限制全力力时的最大力</param>
+        /// Size TileMap 的尺寸
+        public bool CreateForceVectorfrm_TileMap(List<ProxiNode> NodeList, List<ProxiEdge> EdgeList,double MaxForce, double MaxForce_2,double Size)
+        {
+            if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
+                return false;
+
+            // InitForceListfrmGraph(ProxiGraph);//初始化受力向量
+            this.ForceList = CalForceforProxiGraph_TileMap(NodeList,EdgeList, MaxForce, MaxForce_2,Size);
+
+            if (MakeForceVectorfrmGraphNew())
+                return true;
+            return false;
+
+        }
         
         /// <summary>
         ///依据节点计算获取的受力更新邻近图

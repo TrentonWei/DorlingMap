@@ -447,6 +447,7 @@ namespace CartoGener
             }
         }
 
+       
         /// Beams Displace
         /// </summary>
         /// <param name="pg">邻近图</param>
