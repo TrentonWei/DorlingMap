@@ -130,7 +130,7 @@ namespace CartoGener
             ProxiGraph pg = new ProxiGraph();
             pg.CreateProxiG(pFeatureClass, 0);
 
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "AREA", 1, 50, 1, 2, 0.01, 0.1);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, pg, "AREA", 1, 30, 1, 2, 0.01, 0.1);
             SMap Map = new SMap();
             List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
             Map.PolygonList = PoList;
@@ -1016,7 +1016,7 @@ namespace CartoGener
             SMap OutMap = new SMap();
             for (int i = 0; i < PgList.Count; i++)
             {
-                if (PgList[i].NodeList.Count > 1)
+                if (PgList[i].NodeList.Count > 2)
                 {
                     SMap newMap = DMS.regulation(PgList[i], Map);
                     int PNum = Map.PolygonList.Count;
@@ -1025,11 +1025,11 @@ namespace CartoGener
                         PNum = 10;
                     }
 
-                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 1, true, 0.2);//美国
+                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2*PNum, 0, 0.05, 20, 1, true, 0.2);//美国
                     //DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 1, true, 0.2);//美洲
                     //if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 1, pMap.SpatialReference); }
                     //OutMap.WriteResult2Shp(OutFilePath, "1", pMap.SpatialReference);
-                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);//美国
+                    DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2*PNum, 0, 0.05, 20, 0, true, 0.2);//美国
                     //DM.DorlingBeams(PgList[i], newMap, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 50, 0, true, 0.2);//美洲
                     //if (OutFilePath != null) { PgList[i].WriteProxiGraph2Shp(OutFilePath, "邻近图" + i.ToString() + 2, pMap.SpatialReference); }
                     //OutMap.WriteResult2Shp(OutFilePath, "2", pMap.SpatialReference);
@@ -1382,8 +1382,8 @@ namespace CartoGener
                 PNum = 10;
             }
 
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);//单用的话就是Tl=0
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 20, 3, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 20, 0, true, 0.2);//单用的话就是Tl=0
 
             //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 20, 3, true, 0.2);
             //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
@@ -1452,8 +1452,8 @@ namespace CartoGener
             {
                 PNum = 10;
             }
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2*PNum, 0, 0.05, 20, 3, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2*PNum, 0, 0.05, 20, 0, true, 0.2);
             //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 50, 3, true, 0.2);
             //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 50, 0, true, 0.2);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
