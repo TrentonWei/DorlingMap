@@ -45,4 +45,11 @@ Dataset:https://github.com/TrentonWei/DorlingMap/tree/master/Experiment%20Data%2
 Dataset:https://github.com/TrentonWei/DorlingMap/tree/master/Experiment%20Data%20for%20Efficiency%20and%20Stable%20Circular%20Cartogram
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/CTMap.tif)
 
+(4) The Grid Map 
+#The interface
+![image](https://github.com/TrentonWei/DorlingMap/blob/master/interface-4.png)
+
+#The result_1:The Grid Map Visualizing the Central China.
+![image](https://github.com/TrentonWei/DorlingMap/blob/master/GridMap.tif)
+
 
