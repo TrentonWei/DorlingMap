@@ -641,6 +641,58 @@ namespace CartoGener
         }
 
         /// <summary>
+        /// Get the initial Circles with 
+        /// ValueField+NameField+State_Name
+        /// 考虑细分类的情况
+        /// </summary>
+        /// <param name="pFeatureClass"></param>
+        /// <returns></returns>
+        public List<Circle> GetInitialCircle(IFeatureClass pFeatureClass, ProxiGraph Pg, string ValueField, string NameField,string StateNameField, double MinR, double MaxR, double scale, int RType, double CCTd, double Percent)
+        {
+            int i = 0;
+            List<Circle> InitialCircleList = new List<Circle>();
+            List<double> ValueList = new List<double>();
+
+            #region Circles without R
+            IFeatureCursor pFeatureCursor = pFeatureClass.Update(null, true);
+            IFeature pFeature = pFeatureCursor.NextFeature();
+            while (pFeature != null)
+            {
+                Circle CacheCircle = new Circle(i);
+                double Value = DMS.GetValue(pFeature, ValueField);
+                ValueList.Add(Value);
+                CacheCircle.Value = Value;
+                CacheCircle.scale = scale;
+
+                string Name = DMS.GetStringValue(pFeature, NameField);
+                CacheCircle.Name = Name;
+
+                string StateName = DMS.GetStringValue(pFeature, StateNameField);
+                CacheCircle.StateName = StateName;
+
+                IArea pArea = pFeature.Shape as IArea;
+                CacheCircle.CenterX = pArea.Centroid.X;
+                CacheCircle.CenterY = pArea.Centroid.Y;
+                InitialCircleList.Add(CacheCircle);
+
+                i++;
+                pFeature = pFeatureCursor.NextFeature();
+            }
+            #endregion
+
+            #region assign R for circles
+            List<double> RList = this.GetFinalListR(Pg, ValueList, MinR, MaxR, scale, RType, CCTd, Percent);
+
+            for (int j = 0; j < InitialCircleList.Count; j++)
+            {
+                InitialCircleList[j].Radius = RList[j];
+            }
+            #endregion
+
+            return InitialCircleList;
+        }
+
+        /// <summary>
         /// Get the initial Circles with R
         /// 阻尼振荡法
         /// ValueField
@@ -911,6 +963,7 @@ namespace CartoGener
                 pPo.R = CircleList[i].Radius;
                 pPo.Value = CircleList[i].Value;
                 pPo.Name = CircleList[i].Name;
+                pPo.StateName = CircleList[i].StateName;
 
                 PoList.Add(pPo);
             }
@@ -1110,6 +1163,8 @@ namespace CartoGener
                 //pg.DeleteLongerEdges(pg.EdgeList, pMap.PolygonList, 25);//删除长的边
                 //pg.DeleteCrossEdge(pg.EdgeList, pMap.PolygonList);//删除穿过的边                
                 //pg.PgRefined(pg.MSTEdgeList);//MSTrefine
+
+                //pMap.WriteResult2Shp("C:\\Users\\10988\\Desktop\\实验\\20230818\\04", i.ToString(), pMapControl.Map.SpatialReference);    
 
                 this.continueLable = algBeams.isContinue;
                 if (algBeams.isContinue == false)

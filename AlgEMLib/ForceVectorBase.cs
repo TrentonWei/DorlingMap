@@ -1141,6 +1141,8 @@ namespace AlgEMLib
             return rforceList;
         }
 
+
+
         /// <summary>
         ///  /// <summary>
         /// 计算邻近图上个点的最终受力-最大力做主方向的局部最大值法
@@ -1266,15 +1268,53 @@ namespace AlgEMLib
             List<ProxiNode> NeiborNodes = new List<ProxiNode>();
             foreach (ProxiEdge Pe in EdgeList)
             {
-                if (Pe.Node1.TagID == Pn.TagID && Pe.Node1.FeatureType == FeatureType.PointType && Pe.Node2.FeatureType == FeatureType.PointType)
+                if (Pe.Node1.TagID == Pn.TagID && Pe.Node1.FeatureType == FeatureType.PointType)
                 {
-                    NeiborNodes.Add(Pe.Node2);
+                    if (!NeiborNodes.Contains(Pe.Node2))
+                    {
+                        NeiborNodes.Add(Pe.Node2);
+                    }
                 }
-                if (Pe.Node2.TagID == Pn.TagID && Pe.Node1.FeatureType == FeatureType.PointType && Pe.Node2.FeatureType == FeatureType.PointType)
+                if (Pe.Node2.TagID == Pn.TagID && Pe.Node2.FeatureType == FeatureType.PointType)
                 {
-                    NeiborNodes.Add(Pe.Node1);
+                    if (!NeiborNodes.Contains(Pe.Node1))
+                    {
+                        NeiborNodes.Add(Pe.Node1);
+                    }
                 }
             }
+
+            return NeiborNodes;
+        }
+
+        /// <summary>
+        /// 获得给定节点的1阶邻近(且都是区域重心点)
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        /// <param name="Pn"></param>
+        /// PointConnect判断是否是点连接
+        /// <returns></returns>
+        public List<ProxiNode> GetNeibors2(List<ProxiEdge> EdgeList, ProxiNode Pn)
+        {
+            List<ProxiNode> NeiborNodes = new List<ProxiNode>();
+            foreach (ProxiEdge Pe in EdgeList)
+            {
+                if (Pe.Node1.TagID == Pn.TagID && Pe.Node1.FeatureType == FeatureType.PointType)
+                {
+                    if (!NeiborNodes.Contains(Pe.Node2) && Pe.Node2.FeatureType==FeatureType.PointType)
+                    {
+                        NeiborNodes.Add(Pe.Node2);
+                    }
+                }
+                if (Pe.Node2.TagID == Pn.TagID && Pe.Node2.FeatureType == FeatureType.PointType)
+                {
+                    if (!NeiborNodes.Contains(Pe.Node1) && Pe.Node1.FeatureType == FeatureType.PointType)
+                    {
+                        NeiborNodes.Add(Pe.Node1);
+                    }
+                }
+            }
+
             return NeiborNodes;
         }
 
@@ -1289,7 +1329,7 @@ namespace AlgEMLib
         public Tuple<double, double> NodeShiftXY(List<ProxiEdge> EdgeList, ProxiNode Pn, double Size)
         {
             #region MainProcess
-            List<ProxiNode> NeiborNodes = this.GetNeibors(EdgeList, Pn);//Get NeinorNodes
+            List<ProxiNode> NeiborNodes = this.GetNeibors2(EdgeList, Pn);//Get NeinorNodes
 
             double SumX = 0; double SumY = 0;
             for (int i = 0; i < NeiborNodes.Count; i++)

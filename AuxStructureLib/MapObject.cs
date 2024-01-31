@@ -307,6 +307,7 @@ namespace AuxStructureLib
         public double Value;
         public double TargetID = 0;
         public string Name;
+        public string StateName;
 
         public List<TrialPosition> TriableList = null;    //节点列表
         private double area=-1;

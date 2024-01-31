@@ -1792,18 +1792,20 @@ namespace AuxStructureLib
                             IRelationalOperator iRo = iGeo as IRelationalOperator;
                             if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
                             {
+                                ITopologicalOperator iTo = iGeo as ITopologicalOperator;
+                                IGeometry pGeo = iTo.Intersect(jGeo, esriGeometryDimension.esriGeometry1Dimension) as IGeometry;
+                                IPolyline pPolyline = pGeo as IPolyline;
+
+                                IPolygon iPo = iGeo as IPolygon; IPolygon jPo = jGeo as IPolygon;
+                                double OverlayTd = Math.Max(pPolyline.Length / iPo.Length, pPolyline.Length / jPo.Length);
 
                                 if (Td > 0)
                                 {
-                                    ITopologicalOperator iTo = iGeo as ITopologicalOperator;
-                                    IGeometry pGeo = iTo.Intersect(jGeo, esriGeometryDimension.esriGeometry1Dimension) as IGeometry;
-                                    IPolyline pPolyline = pGeo as IPolyline;
-
-                                    IPolygon iPo = iGeo as IPolygon; IPolygon jPo = jGeo as IPolygon;
-                                    if (pPolyline.Length / iPo.Length > Td || pPolyline.Length / jPo.Length > Td)
+                                    if (OverlayTd > Td)
                                     {
                                         ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
                                         CacheEdge.adajactLable = true;//表示是由邻近产生的边
+                                        CacheEdge.OverlayTd = OverlayTd;
                                         this.EdgeList.Add(CacheEdge);
                                     }
                                 }
@@ -1811,6 +1813,7 @@ namespace AuxStructureLib
                                 {
                                     ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[i], this.NodeList[j]);
                                     CacheEdge.adajactLable = true;//表示是由邻近产生的边
+                                    CacheEdge.OverlayTd = OverlayTd;
                                     this.EdgeList.Add(CacheEdge);
                                 }
 
@@ -1828,7 +1831,7 @@ namespace AuxStructureLib
         }
 
         /// <summary>
-        /// 创建ProxiG（依据三角网构图）
+        /// 依据面状图层创建ProxiG（依据三角网构图）
         /// </summary>
         /// <param name="pFeatureClass">原始图层</param>
         public void CreateProxiGByDT(IFeatureClass pFeatureClass)
@@ -1856,6 +1859,45 @@ namespace AuxStructureLib
                 
                 if (!this.repeatEdge(tE, this.EdgeList))
                 {                    
+                    ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[tE.startPoint.TagValue], this.NodeList[tE.endPoint.TagValue]);
+                    //CacheEdge.adajactLable = true;
+                    this.EdgeList.Add(CacheEdge);
+                    edgeID++;
+                }
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// 依据点状图层创建ProxiG（依据三角网构图）
+        /// </summary>
+        /// <param name="pFeatureClass">原始图层</param>
+        public void CreateProxiGByDT_Point(IFeatureClass pFeatureClass)
+        {
+            #region Create ProxiNodes
+            List<TriNode> TriNodeList = new List<TriNode>();
+            for (int i = 0; i < pFeatureClass.FeatureCount(null); i++)
+            {
+                IPoint pPoint = pFeatureClass.GetFeature(i).Shape as IPoint;
+                ProxiNode CacheNode = new ProxiNode(pPoint.X, pPoint.Y, i, i);
+                CacheNode.FeatureType = FeatureType.PointType;
+                TriNode CacheTriNode = new TriNode(pPoint.X, pPoint.Y, i, i);
+                this.NodeList.Add(CacheNode);
+                TriNodeList.Add(CacheTriNode);
+            }
+            #endregion
+
+            #region Create ProxiEdges
+            DelaunayTin dt = new DelaunayTin(TriNodeList);
+            dt.CreateDelaunayTin(AlgDelaunayType.Side_extent);
+
+            int edgeID = 0;
+            for (int i = 0; i < dt.TriEdgeList.Count; i++)
+            {
+                TriEdge tE = dt.TriEdgeList[i];
+
+                if (!this.repeatEdge(tE, this.EdgeList))
+                {
                     ProxiEdge CacheEdge = new ProxiEdge(edgeID, this.NodeList[tE.startPoint.TagValue], this.NodeList[tE.endPoint.TagValue]);
                     //CacheEdge.adajactLable = true;
                     this.EdgeList.Add(CacheEdge);
@@ -1981,6 +2023,57 @@ namespace AuxStructureLib
         /// </summary>
         /// <param name="Pe"></param>
         /// <param name="EdgeList"></param>
+        public bool repeatEdge_2(ProxiEdge Pe, List<ProxiEdge> EdgeList)
+        {
+            bool repeatLabel = false;
+            foreach (ProxiEdge CachePe in EdgeList)
+            {
+                if ((CachePe.Node1.TagID == Pe.Node1.TagID && CachePe.Node2.TagID == Pe.Node2.TagID && CachePe.Node1.FeatureType == Pe.Node1.FeatureType && CachePe.Node2.FeatureType == Pe.Node2.FeatureType) ||
+                    (CachePe.Node1.TagID == Pe.Node2.TagID && CachePe.Node2.TagID == Pe.Node1.TagID && CachePe.Node1.FeatureType == Pe.Node2.FeatureType && CachePe.Node2.FeatureType == Pe.Node1.FeatureType))
+                {
+                    repeatLabel = true;
+                    break;
+                }
+            }
+
+            return repeatLabel;
+        }
+
+        /// <summary>
+        /// 判断给定的边是否是当前邻近图中的重复边
+        /// </summary>
+        /// <param name="Pe"></param>
+        /// <param name="EdgeList"></param>
+        public bool IntesectEdge(ProxiEdge Pe, List<ProxiEdge> EdgeList)
+        {
+            bool IntersectLabel = false;
+            IPolyline pLine1 = new PolylineClass();
+            IPoint sPoint1 = new PointClass(); sPoint1.X = Pe.Node1.X; sPoint1.Y = Pe.Node1.Y;
+            IPoint ePoint1 = new PointClass(); ePoint1.X = Pe.Node2.X; ePoint1.Y = Pe.Node2.Y;
+            pLine1.FromPoint = sPoint1; pLine1.ToPoint = ePoint1;
+            IRelationalOperator IRO = pLine1 as IRelationalOperator;
+
+            foreach (ProxiEdge CachePe in EdgeList)
+            {
+                IPolyline pLine2 = new PolylineClass();
+                IPoint sPoint2 = new PointClass(); sPoint2.X = CachePe.Node1.X; sPoint2.Y = CachePe.Node1.Y;
+                IPoint ePoint2 = new PointClass(); ePoint2.X = CachePe.Node2.X; ePoint2.Y = CachePe.Node2.Y;
+                pLine2.FromPoint = sPoint2; pLine2.ToPoint = ePoint2;
+
+                if (IRO.Crosses(pLine2 as IGeometry))
+                {
+                    return true;
+                }
+            }
+
+            return IntersectLabel;
+        }
+
+        /// <summary>
+        /// 判断给定的边是否是当前邻近图中的重复边
+        /// </summary>
+        /// <param name="Pe"></param>
+        /// <param name="EdgeList"></param>
         /// true 重复；False不重复
         public bool repeatEdge(TriEdge tP, List<ProxiEdge> EdgeList)
         {
@@ -2059,6 +2152,24 @@ namespace AuxStructureLib
                 {
                     EdgeList.RemoveAt(i);
                 }
+            }
+        }
+
+        /// <summary>
+        /// /// <summary>
+        /// 删除较长的边(距离计算考虑了圆的半径)
+        /// </summary>EdgeList=邻近图的边
+        /// </summary>PoList=circles
+        /// <param name="Td">边的阈值条件</param>
+        public void DeleteLongerEdges(List<ProxiEdge> EdgeList, double Td)
+        {
+            for (int i = EdgeList.Count - 1; i >= 0; i--)
+            {
+                if (EdgeList[i].NearestEdge.NearestDistance < Td)
+                {
+                    EdgeList.RemoveAt(i);
+                }
+
             }
         }
 
@@ -2413,6 +2524,170 @@ namespace AuxStructureLib
         }
 
         /// <summary>
+        /// 删除邻近图中的重复边（最短距离较大的边被删除）另外，目前最多只处理三条重复边的情况
+        /// 依据TagID删除
+        /// </summary>
+        public void DeleteRepeatedEdge(List<ProxiEdge> PeList)
+        {
+            #region 删除一遍
+            //for (int i = 0; i < PeList.Count; i++)
+            //{
+            //    ProxiEdge Pe1 = PeList[i];
+            //    for (int j = 0; j < PeList.Count; j++)
+            //    {
+            //        if (j != i)
+            //        {
+            //            ProxiEdge Pe2 = PeList[j];
+
+            //            if ((Pe1.Node1.X == Pe2.Node1.X && Pe1.Node2.X == Pe2.Node2.X) ||
+            //                (Pe1.Node1.X == Pe2.Node2.X && Pe1.Node2.X == Pe2.Node1.X))
+            //            {
+            //                if (Pe1.NearestEdge.NearestDistance > Pe2.NearestEdge.NearestDistance)
+            //                {
+            //                    PeList.RemoveAt(i);
+            //                    break;
+            //                }
+
+            //                else
+            //                {
+            //                    PeList.RemoveAt(j);
+            //                    break;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            #endregion
+
+            #region 删除两遍
+            //for (int i = 0; i < PeList.Count; i++)
+            //{
+            //    ProxiEdge Pe1 = PeList[i];
+            //    for (int j = 0; j < PeList.Count; j++)
+            //    {
+            //        if (j != i)
+            //        {
+            //            ProxiEdge Pe2 = PeList[j];
+
+            //            if ((Pe1.Node1.X == Pe2.Node1.X && Pe1.Node2.X == Pe2.Node2.X) ||
+            //                 (Pe1.Node1.X == Pe2.Node2.X && Pe1.Node2.X == Pe2.Node1.X))
+            //            {
+            //                if (Pe1.NearestEdge.NearestDistance > Pe2.NearestEdge.NearestDistance)
+            //                {
+            //                    PeList.RemoveAt(i);
+            //                    break;
+            //                }
+
+            //                else
+            //                {
+            //                    PeList.RemoveAt(j);
+            //                    break;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            #endregion
+
+            #region 将PeList添加入Dictionary中
+            Dictionary<ProxiEdge, bool> EdgeDic = new Dictionary<ProxiEdge, bool>();
+
+            for (int i = 0; i < PeList.Count; i++)
+            {
+                EdgeDic.Add(PeList[i], false);
+            }
+            #endregion
+
+            #region 将重复的边标记为删除
+            for (int i = 0; i < PeList.Count; i++)
+            {
+                ProxiEdge Pe1 = PeList[i];
+                if (!EdgeDic[Pe1])
+                {
+                    for (int j = 0; j < PeList.Count; j++)
+                    {
+                        if (j != i)
+                        {
+                            ProxiEdge Pe2 = PeList[j];
+
+                            if (!EdgeDic[Pe2])
+                            {
+                                if ((Pe1.Node1.TagID == Pe2.Node1.TagID && Pe1.Node2.TagID == Pe2.Node2.TagID) ||
+                                    (Pe1.Node1.TagID == Pe2.Node2.TagID && Pe1.Node2.TagID == Pe2.Node1.TagID))
+                                {
+                                    EdgeDic[Pe2] = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            #region 将删除的边在PeList中删除
+            foreach (KeyValuePair<ProxiEdge, bool> kvp in EdgeDic)
+            {
+                if (kvp.Value)
+                {
+                    PeList.Remove(kvp.Key);
+                }
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// 删除邻近图中的重复边（最短距离较大的边被删除）另外，目前最多只处理三条重复边的情况
+        /// 依据坐标删除
+        /// </summary>
+        public void DeleteRepeatedEdge2(List<ProxiEdge> PeList)
+        {
+            #region 将PeList添加入Dictionary中
+            Dictionary<ProxiEdge, bool> EdgeDic = new Dictionary<ProxiEdge, bool>();
+
+            for (int i = 0; i < PeList.Count; i++)
+            {
+                EdgeDic.Add(PeList[i], false);
+            }
+            #endregion
+
+            #region 将重复的边标记为删除
+            for (int i = 0; i < PeList.Count; i++)
+            {
+                ProxiEdge Pe1 = PeList[i];
+                if (!EdgeDic[Pe1])
+                {
+                    for (int j = 0; j < PeList.Count; j++)
+                    {
+                        if (j != i)
+                        {
+                            ProxiEdge Pe2 = PeList[j];
+
+                            if (!EdgeDic[Pe2])
+                            {
+                                if ((Pe1.Node1.X == Pe2.Node1.X && Pe1.Node2.X == Pe2.Node2.X && Pe1.Node1.Y == Pe2.Node1.Y && Pe1.Node2.Y == Pe2.Node2.Y) ||
+                                    (Pe1.Node1.X == Pe2.Node2.X && Pe1.Node2.X == Pe2.Node1.X && Pe1.Node1.Y == Pe2.Node2.Y && Pe1.Node2.Y == Pe2.Node1.Y))
+                                {
+                                    EdgeDic[Pe2] = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            #region 将删除的边在PeList中删除
+            foreach (KeyValuePair<ProxiEdge, bool> kvp in EdgeDic)
+            {
+                if (kvp.Value)
+                {
+                    PeList.Remove(kvp.Key);
+                }
+            }
+            #endregion
+        }
+
+        /// <summary>
         /// 依据邻近关系refine proximity graph
         /// </summary>
         /// <param name="EdgeList"></param>
@@ -2444,6 +2719,84 @@ namespace AuxStructureLib
                     this.EdgeList.Add(cachePe);
                 }
             }
+        }
+
+        /// <summary>
+        /// 依据邻近关系refine proximity graph(添加邻近边)，且边存在权重（overlap）
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        public void PgRefined_4(List<ProxiEdge> pEdgeList)
+        {
+            pEdgeList.OrderBy(ProxiEdge => ProxiEdge.OverlayTd);//按照属性排序
+
+            foreach (ProxiEdge rPe in pEdgeList)
+            {
+                if (!this.repeatEdge(rPe, this.EdgeList))
+                {
+                    if (!this.IntesectEdge(rPe, this.EdgeList))
+                    {
+                        ProxiNode Node1 = this.ReturnCorNode(rPe.Node1.TagID, rPe.Node1.FeatureType);
+                        ProxiNode Node2 = this.ReturnCorNode(rPe.Node2.TagID, rPe.Node2.FeatureType);
+
+                        if (Node1 != null && Node2 != null)
+                        {
+                            ProxiEdge cachePe = new ProxiEdge(this.EdgeList.Count, Node1, Node2);
+                            //cachePe.MSTLable = true;//是考虑MST添加的边（即不邻近）
+                            this.EdgeList.Add(cachePe);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 依据MST来refine邻近图(MST生成的要素小于邻近图中生成的要素)
+        /// </summary>
+        /// <param name="EdgeList"></param>
+        public void PgRefined_5(List<ProxiEdge> pEdgeList)
+        {
+            foreach (ProxiEdge rPe in pEdgeList)
+            {
+                if (!this.repeatEdge_2(rPe, this.EdgeList))
+                {
+                    int TarI = 0; int TarJ = 0;
+                    for (int i = 0; i < this.NodeList.Count; i++)
+                    {
+                        if (rPe.Node1.TagID == this.NodeList[i].TagID && rPe.Node1.FeatureType == this.NodeList[i].FeatureType)
+                        {
+                            TarI = i;
+                        }
+
+                        if (rPe.Node2.TagID == this.NodeList[i].TagID && rPe.Node2.FeatureType == this.NodeList[i].FeatureType)
+                        {
+                            TarJ = i;
+                        }
+                    }
+
+                    ProxiEdge cachePe = new ProxiEdge(this.EdgeList.Count, this.NodeList[TarI], this.NodeList[TarJ]);
+                    cachePe.MSTLable = true;//是考虑MST添加的边（即不邻近）
+                    this.EdgeList.Add(cachePe);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 返回指定点
+        /// </summary>
+        /// <param name="TagValue"></param>
+        /// <param name="Fe"></param>
+        /// <returns></returns>
+        public ProxiNode ReturnCorNode(int TagValue,FeatureType Fe)
+        {
+            for (int i = 0; i < this.NodeList.Count; i++)
+            {
+                if (this.NodeList[i].FeatureType == Fe && this.NodeList[i].TagID == TagValue)
+                {
+                    return this.NodeList[i];
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

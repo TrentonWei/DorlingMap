@@ -697,6 +697,7 @@ namespace CartoGener
 
         /// <summary>
         /// 最小二乘方法
+        /// 算法流程：1.数据读取(边缘点和中点点)；2.计算中间点的最终位置；3.依据中间点最终位置调整边缘点 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

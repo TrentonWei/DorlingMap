@@ -357,7 +357,7 @@ namespace CartoGener
             return formatter.Deserialize(memoryStream);
         }
 
-        /// Beams Displace
+        /// Snake Displace
         /// </summary>
         /// <param name="pg">邻近图</param>
         /// <param name="pMap">Dorling图层</param>
@@ -395,6 +395,51 @@ namespace CartoGener
 
                 this.continueLable = algSnakes.isContinue;
                 if (algSnakes.isContinue == false)
+                {
+                    break;
+                }
+            }
+        }
+
+        /// Snake Displace
+        /// </summary>
+        /// <param name="pg">邻近图</param>
+        /// <param name="pMap">Dorling图层</param>
+        /// <param name="scale">比例尺</param>
+        /// <param name="E">弹性模量</param>
+        /// <param name="I">惯性力矩</param>
+        /// <param name="A">横切面积</param>
+        /// MinDis 起点和终点之间的距离误差
+        /// StopT 迭代终止的最大力大小
+        /// <param name="Iterations">迭代次数</param>
+        /// <param name="MaxForce">用于限制计算两个力时的最大力</param>
+        /// <param name="MaxForce_2">用于限制全力力时的最大力</param>
+        public void TileMapBeams_PgReBuiltMapIn(ProxiGraph pg, SMap sMap, double scale, double E, double I, double A, int Iterations, int algType, double Size, double StopT, string OutFilePath, IMap pMap, double MaxForce, double MaxForce_2)
+        {
+            AlgBeams algBeams = new AlgBeams(pg, sMap, E, I, A);
+            //求吸引力-2014-3-20所用
+
+            ProxiGraph CopyG = Clone((object)pg) as ProxiGraph;
+            algBeams.OriginalGraph = CopyG;
+            algBeams.Scale = scale;
+            algBeams.AlgType = algType;
+            //1- Sequence：几何算法。
+            //2-Combined：混合算法，当目标个数大于3用Snakes，否则用几何算法
+
+            for (int i = 0; i < Iterations; i++)//迭代计算
+            {
+                Console.WriteLine(i.ToString());//标识
+
+                algBeams.DoDisplaceTileMap(sMap, MaxForce, MaxForce_2, Size);//执行邻近图Beams移位算法，代表混合型
+
+                #region 邻近图重构
+                pg.WriteProxiGraph2Shp(OutFilePath, "pG_" + i.ToString(), pMap.SpatialReference);
+                //pg.WriteProxiGraph2Shp(OutFilePath, "pG_" + i.ToString(), pMap.SpatialReference);
+                sMap.WriteResult2Shp(OutFilePath, "Map_" + i.ToString(), pMap.SpatialReference);
+                #endregion
+
+                this.continueLable = algBeams.isContinue;
+                if (algBeams.isContinue == false)
                 {
                     break;
                 }

@@ -19,6 +19,7 @@ namespace AuxStructureLib
         public TriEdge doulEdge=null;
         public int tagID = -1;
         public FeatureType FeatureType = FeatureType.Unknown;
+        public bool Adj = false;
         // private double length;
         public double Length
         {

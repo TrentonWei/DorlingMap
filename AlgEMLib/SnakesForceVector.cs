@@ -400,6 +400,7 @@ namespace AlgEMLib
         /// <returns></returns>
         public bool MakeForceVectorfrmGraphNew()
         {
+            Random CacheR = new Random();   
             if (ProxiGraph == null || ProxiGraph.NodeList == null || ProxiGraph.EdgeList == null)
                 return false;
             int n = ProxiGraph.NodeList.Count;
@@ -415,6 +416,7 @@ namespace AlgEMLib
             int index0 = -1;
             int index1 = -1;
 
+            #region 遍历求解
             foreach (ProxiEdge edge in ProxiGraph.EdgeList)
             {
                 for (int i = 0; i < n - 1; i++)
@@ -446,10 +448,28 @@ namespace AlgEMLib
                         _Fx[2 * index1 + 1, 0] += -(1.0 / 12) * h * h * force1.Fx;
                         _Fy[2 * index1, 0] += 0.5 * h * force1.Fy;
                         _Fy[2 * index1 + 1, 0] += -(1.0 / 12) * h * h * force1.Fy;
-
                     }
+                }        
+            } 
+            #endregion
+
+            #region 去除异常值
+            for (int i = 0; i < _Fx.Row; i++)
+            {
+                if (double.IsNaN(_Fx[i, 0]))
+                {                                  
+                     _Fx[i, 0] = 0;
                 }
             }
+            for (int i = 0; i < _Fy.Row; i++)
+            {
+                if (double.IsNaN(_Fy[i, 0]))
+                {
+                    _Fy[i, 0] = 0;
+                }
+            }
+            #endregion
+
             return true;
         }
         #endregion

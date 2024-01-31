@@ -17,6 +17,7 @@ namespace CartoGener
         public double Value;//the Value it represents
         public double scale;
         public string Name;
+        public string StateName;
 
         public Circle(int ID)
         {

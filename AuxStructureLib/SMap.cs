@@ -1363,7 +1363,7 @@ namespace AuxStructureLib
         {
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath);
-            #region 创建一个线的shape文件
+            #region 创建一个面的shape文件
             string Folderpathstr = filePath;
             string LyrName = fileName;
             string strFolder = Folderpathstr;
@@ -1436,13 +1436,25 @@ namespace AuxStructureLib
             pFieldsEdit.AddField(pField3);
             #endregion
 
+            #region 创建属性字段Name
+            //属性字段1
+            IField pField4;
+            IFieldEdit pFieldEdit4;
+            pField4 = new FieldClass();
+            pFieldEdit4 = pField4 as IFieldEdit;
+            pFieldEdit4.Length_2 = 30;//Length_2与Length的区别是一个是只读的，一个是可写的，以下Name_2,Type_2也是一样
+            pFieldEdit4.Name_2 = "SName";
+            pFieldEdit4.Type_2 = esriFieldType.esriFieldTypeString;
+            pFieldsEdit.AddField(pField4);
+            #endregion
+
             #region 创建要素类
             IFeatureClass pFeatClass;
             pFeatClass = pFWS.CreateFeatureClass(strName, pFields, null, null, esriFeatureType.esriFTSimple, strShapeFieldName, "");
             #endregion
             #endregion
 
-            #region 向线层添加线要素
+            #region 向面层添加线要素
 
             object missing1 = Type.Missing;
             object missing2 = Type.Missing;
@@ -1475,8 +1487,6 @@ namespace AuxStructureLib
 
                 for (int i = 0; i < n; i++)
                 {
-
-
                     IFeature feature = pFeatClass.CreateFeature();
                     IGeometry shp = new PolygonClass();
                     // shp.SpatialReference = mapControl.SpatialReference;
@@ -1502,6 +1512,7 @@ namespace AuxStructureLib
                     feature.set_Value(2, this.PolygonList[i].ID);//编号 
                     feature.set_Value(3, this.PolygonList[i].Value);//数值
                     feature.set_Value(4, this.PolygonList[i].Name);//数值
+                    feature.set_Value(5, this.PolygonList[i].StateName);//数值
 
                     feature.Store();//保存IFeature对象  
                     fr.WriteFeature(feature);//将IFeature对象，添加到当前图层上     

@@ -5,6 +5,9 @@ using System.Text;
 using ESRI.ArcGIS.Geometry;
 using System.IO;
 using ESRI.ArcGIS.esriSystem;
+using ESRI.ArcGIS.Geometry;
+using ESRI.ArcGIS.Geodatabase;
+using ESRI.ArcGIS.esriSystem;
 
 namespace AuxStructureLib
 {
@@ -96,6 +99,98 @@ namespace AuxStructureLib
                 }
 
                 if (TinLine.Length < MaxLeft && TinLine.Length < MaxRight)
+                {
+                    this.RNGEdgeList.Add(TinLine);
+                }
+            }
+            #endregion
+
+            this.RNGNodeList = this.TriNodeList;
+        }
+
+
+
+        /// <summary>
+        /// 标识边连接的两个区域
+        /// </summary>
+        /// <param name="pFeatureClass"></param>
+        /// <param name="Td"></param>
+        public void LabelAdj(IFeatureClass pFeatureClass, double Td)
+        {
+            for (int i = 0; i < this.TriEdgeList.Count; i++)
+            {
+                TriEdge TinLine = this.TriEdgeList[i];
+                if (TinLine.startPoint.FeatureType == FeatureType.PointType && TinLine.endPoint.FeatureType == FeatureType.PointType)
+                {
+                    try
+                    {
+                        IGeometry iGeo = pFeatureClass.GetFeature(TinLine.startPoint.TagValue).Shape;
+                        IGeometry jGeo = pFeatureClass.GetFeature(TinLine.endPoint.TagValue).Shape;
+
+                        IRelationalOperator iRo = iGeo as IRelationalOperator;
+                        if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
+                        {
+
+                            if (Td > 0)
+                            {
+                                ITopologicalOperator iTo = iGeo as ITopologicalOperator;
+                                IGeometry pGeo = iTo.Intersect(jGeo, esriGeometryDimension.esriGeometry1Dimension) as IGeometry;
+                                IPolyline pPolyline = pGeo as IPolyline;
+
+                                IPolygon iPo = iGeo as IPolygon; IPolygon jPo = jGeo as IPolygon;
+                                if (pPolyline.Length / iPo.Length > Td || pPolyline.Length / jPo.Length > Td)
+                                {
+                                    TinLine.Adj = true;
+                                }
+                            }
+
+                            else
+                            {
+                                TinLine.Adj = true;
+                            }
+                        }
+                    }
+
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+
+
+        /// 创建点集的RNG图（最短距离）
+        ///RNG计算(找到邻近图中每一个三角形，删除三角形中的最长边)
+        ///说明：对于任意一条边，找到对应的三角形；如果是最长边，则删除（如果是一条边，保留；如果是两条边，若是最长边，删除）
+        ///若一条边是连接的两个区域邻接，则不删除该边
+        /// </summary>
+        public void CreateRefinedRNG()
+        {
+            #region 找到潜在RNG对应的每条边，判断是否是邻近图中三角形对应的最长边，如果是，删除
+            for (int i = 0; i < this.TriEdgeList.Count; i++)
+            {
+                TriEdge TinLine = this.TriEdgeList[i];
+
+                Triangle LeftTri = TinLine.leftTriangle;
+                Triangle RightTri = TinLine.rightTriangle;
+                double MaxRight = 1000000000;
+                double MaxLeft = 1000000000;
+
+                if (LeftTri != null)
+                {
+                    List<double> LeftList = new List<double>();
+                    LeftList.Add(LeftTri.edge1.Length); LeftList.Add(LeftTri.edge2.Length); LeftList.Add(LeftTri.edge3.Length);
+                    MaxLeft = LeftList.Max();
+                }
+
+                if (RightTri != null)
+                {
+                    List<double> RightList = new List<double>();
+                    RightList.Add(RightTri.edge1.Length); RightList.Add(RightTri.edge2.Length); RightList.Add(RightTri.edge3.Length);
+                    MaxRight = RightList.Max();
+                }
+
+                if ((TinLine.Length < MaxLeft && TinLine.Length < MaxRight)||TinLine.Adj)
                 {
                     this.RNGEdgeList.Add(TinLine);
                 }
@@ -342,6 +437,108 @@ namespace AuxStructureLib
             TriEdge.AmendEdgeLeftTriangle(DT.TriEdgeList);
         }
 
+
+        /// <summary>
+        /// 将建筑物转化为IPolygon
+        /// </summary>
+        /// <param name="pPolygonObject"></param>
+        /// <returns></returns>
+        public IPolygon PolygonObjectConvert(PolygonObject pPolygonObject)
+        {
+            Ring ring1 = new RingClass();
+            object missing = Type.Missing;
+
+            IPoint curResultPoint = new PointClass();
+            TriNode curPoint = null;
+            if (pPolygonObject != null)
+            {
+                for (int i = 0; i < pPolygonObject.PointList.Count; i++)
+                {
+                    curPoint = pPolygonObject.PointList[i];
+                    curResultPoint.PutCoords(curPoint.X, curPoint.Y);
+                    ring1.AddPoint(curResultPoint, ref missing, ref missing);
+                }
+            }
+
+            curPoint = pPolygonObject.PointList[0];
+            curResultPoint.PutCoords(curPoint.X, curPoint.Y);
+            ring1.AddPoint(curResultPoint, ref missing, ref missing);
+
+            IGeometryCollection pointPolygon = new PolygonClass();
+            pointPolygon.AddGeometry(ring1 as IGeometry, ref missing, ref missing);
+            IPolygon pPolygon = pointPolygon as IPolygon;
+
+            //PrDispalce.工具类.Symbolization Sb = new 工具类.Symbolization();
+            //object PolygonSymbol = Sb.PolygonSymbolization(1, 100, 100, 100, 0, 0, 20, 20);
+
+            //pMapControl.DrawShape(pPolygon, ref PolygonSymbol);
+            //pMapControl.Map.RecalcFullExtent();
+
+            pPolygon.SimplifyPreserveFromTo();
+            return pPolygon;
+        }
+
+        /// <summary>
+        /// polygon转换成polygonobject
+        /// </summary>
+        /// <param name="pPolygon"></param>
+        /// <returns></returns>
+        public PolygonObject PolygonConvert(IPolygon pPolygon)
+        {
+            int ppID = 0;//（polygonobject自己的编号，应该无用）
+            List<TriNode> trilist = new List<TriNode>();
+            //Polygon的点集
+            IPointCollection pointSet = pPolygon as IPointCollection;
+            int count = pointSet.PointCount;
+            double curX;
+            double curY;
+            //ArcGIS中，多边形的首尾点重复存储
+            for (int i = 0; i < count - 1; i++)
+            {
+                curX = pointSet.get_Point(i).X;
+                curY = pointSet.get_Point(i).Y;
+                //初始化每个点对象
+                TriNode tPoint = new TriNode(curX, curY, ppID, 1);
+                trilist.Add(tPoint);
+            }
+            //生成自己写的多边形
+            PolygonObject mPolygonObject = new PolygonObject(ppID, trilist);
+
+            return mPolygonObject;
+        }
+
+        ///删除CDT中面域外的边
+        public void DeleteEdgeOutPolygon(PolygonObject pPolygon)
+        {
+            IPolygon aPolygon = this.PolygonObjectConvert(pPolygon);
+            ITopologicalOperator iTo=aPolygon as ITopologicalOperator;
+            //IRelationalOperator iRo = aPolygon as IRelationalOperator;
+
+            for (int i = this.TriEdgeList.Count - 1; i >= 0; i--)
+            {
+                IPolyline pLine = new PolylineClass();
+
+                IPoint sPoint = new PointClass();
+                IPoint ePoint = new PointClass();
+                sPoint.X = this.TriEdgeList[i].startPoint.X; sPoint.Y = this.TriEdgeList[i].startPoint.Y;
+                sPoint.GeoNormalize();
+                ePoint.X = this.TriEdgeList[i].endPoint.X; ePoint.Y = this.TriEdgeList[i].endPoint.Y;
+                ePoint.GeoNormalize();
+                pLine.FromPoint = sPoint; pLine.ToPoint = ePoint;
+
+                IGeometry pGeo = iTo.Intersect(pLine as IGeometry, esriGeometryDimension.esriGeometry1Dimension);
+                //pGeo.GeoNormalize();
+                if (pGeo.IsEmpty)
+                {
+                    this.TriEdgeList.RemoveAt(i);
+                }
+
+                //if (!iRo.Contains(pLine as IGeometry))
+                //{
+                //    this.TriEdgeList.RemoveAt(i);
+                //}
+            }
+        }
 
         /// <summary>
         /// 创建约束CDT

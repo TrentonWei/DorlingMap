@@ -1455,7 +1455,9 @@ namespace AlgEMLib
                 this.isContinue = false;
             }
         }
+        #endregion
 
+        #region DorlingMap的移位
         /// <summary>
         /// DorlingDisplace
         /// MaxTd 吸力的作用范围
@@ -1484,8 +1486,7 @@ namespace AlgEMLib
                 PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, pMap.PolygonList);
                 if (this.ProxiGraph.EdgeList!=null)
                 {
-                    List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力
-               
+                    List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力            
 
                     #region 更新坐标
                     if (ForceList.Count > 0)
@@ -1869,7 +1870,231 @@ namespace AlgEMLib
                 this.isContinue = false;
             }
         }
+        #endregion
 
+        #region TagMap的移位
+        /// <summary>
+        /// DorlingDisplace
+        /// MaxTd 吸力的作用范围
+        /// </summary>
+        public void DoDisplacePgTagMap(SMap pMap, double StopT, double MaxTd, int ForceType, bool WeightConsi, double InterDis)
+        {
+            fV = new BeamsForceVector(this.ProxiGraph);
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.isDragForce = this.isDragF;
+            fV.CreateForceVectorForTagMap(pMap.PolygonList, MaxTd,WeightConsi, InterDis);//ForceList
+            this.F = fV.Vector_F;
+
+            double MaxD;
+            double MaxF;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            if (this.ProxiGraph.NodeList.Count <= 2)
+            {
+                #region 基本几何算法（直接移位）
+                BeamsForceVector BFV = new BeamsForceVector();
+                PolygonObject Po1 = this.GetPoByID(this.ProxiGraph.NodeList[0].TagID, pMap.PolygonList);
+                PolygonObject Po2 = this.GetPoByID(this.ProxiGraph.NodeList[1].TagID, pMap.PolygonList);
+                if (this.ProxiGraph.EdgeList != null)
+                {
+                    List<Force> ForceList = BFV.GetForce(this.ProxiGraph.NodeList[0], this.ProxiGraph.NodeList[1], Po1, Po2, 1, this.ProxiGraph.EdgeList[0].adajactLable, this.ProxiGraph.EdgeList[0].LongEdge, MaxTd, WeightConsi, this.ProxiGraph.EdgeList[0].MSTLable, InterDis);//考虑引力            
+
+                    #region 更新坐标
+                    if (ForceList.Count > 0)
+                    {
+                        for (int i = 0; i < this.ProxiGraph.NodeList.Count; i++)
+                        {
+                            int Cachei = -1;
+
+                            if (i == 0)
+                            {
+                                Cachei = 1;
+
+                            }
+                            else
+                            {
+                                Cachei = 0;
+                            }
+
+                            ProxiNode curNode = this.ProxiGraph.NodeList[Cachei];
+                            curNode.X += ForceList[Cachei].Fx;//更新邻近图
+                            curNode.Y += ForceList[Cachei].Fy;
+
+                            PolygonObject po = this.GetPoByID(curNode.TagID, this.Map.PolygonList);
+                            foreach (TriNode curPoint in po.PointList)
+                            {
+                                curPoint.X += ForceList[Cachei].Fx;
+                                curPoint.Y += ForceList[Cachei].Fy;
+                            }
+                        }
+                    }
+                    #endregion
+
+                    MaxF = 0;
+                    this.isContinue = false;
+                }
+                return;
+                #endregion
+            }
+
+            else
+            {
+                //计算刚度矩阵
+                bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                this.K = bM.Matrix_K;
+
+                this.SetBoundPointParamforPG();//设置边界条件
+                try
+                {
+                    this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                }
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.E *= k;
+                    //再次计算刚度矩阵
+                    bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                    this.K = bM.Matrix_K;
+                    SetBoundPointParamforPG();//设置边界条件
+                    try
+                    {
+                        this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                    }
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPGDorling();      //更新坐标
+            }
+
+            ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
+
+            if (MaxF <= StopT)
+            {
+                this.isContinue = false;
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// TileMap移位
+        /// </summary>
+        public void DoDisplaceTileMap(SMap sMap, double MaxForce, double MaxForce_2, double Size)
+        {
+            fV = new BeamsForceVector(this.ProxiGraph);
+            fV.OrigialProxiGraph = this.OriginalGraph;
+            fV.RMSE = this.PAT * this.Scale / 1000;
+            fV.isDragForce = this.isDragF;
+            fV.CreateForceVectorfrm_TileMap(this.ProxiGraph.NodeList, this.ProxiGraph.EdgeList, MaxForce, MaxForce_2, Size); ;//ForceList
+            this.F = fV.Vector_F;
+
+            double MaxD;
+            double MaxF;
+            double MaxDF;
+            double MaxFD;
+            int indexMaxD = -1;
+            int indexMaxF = -1;
+
+            if (this.ProxiGraph.NodeList.Count <= 2)
+            {
+                return;
+            }
+
+            else
+            {
+                //计算刚度矩阵
+                bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                this.K = bM.Matrix_K;
+
+                this.SetBoundPointParamforPG();//设置边界条件
+                try
+                {
+                    this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                }
+                catch
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+
+                StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
+
+                if (MaxF > 0)
+                {
+                    double k = 1;
+                    if (MaxD / MaxFD <= 5)
+                    {
+                        k = MaxFD / MaxF;
+                    }
+                    else
+                    {
+                        k = MaxD / MaxDF;
+                    }
+
+                    this.E *= k;
+                    //再次计算刚度矩阵
+                    bM = new BeamsStiffMatrix(this.ProxiGraph, E, I, A);
+                    this.K = bM.Matrix_K;
+                    SetBoundPointParamforPG();//设置边界条件
+                    try
+                    {
+                        this.D = this.K.Inverse() * this.F;//this.K可能不可逆，故用Try Catch来判断
+                    }
+                    catch
+                    {
+                        this.isContinue = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    this.isContinue = false;
+                    return;
+                }
+
+                UpdataCoordsforPG_CTP3();  //更新坐标
+            }
+
+            ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
+
+            if (MaxF <= 0.01)
+            {
+                this.isContinue = false;
+            }
+        }
+
+        #region 基础支持
         /// <summary>
         /// 邻近图的移位算法实现-设置边界条件
         /// </summary>
@@ -2157,7 +2382,6 @@ namespace AlgEMLib
                     this.D[3 * index + 1, 0] = curDy;
                 }
             }
-
         }
 
         /// <summary>
@@ -2202,6 +2426,64 @@ namespace AlgEMLib
                 }
             }
 
+        }
+
+        /// <summary>
+        /// 更新坐标位置(更新了Map中要素的信息)
+        /// </summary>
+        private void UpdataCoordsforPG_CTP3()
+        {         
+            foreach (ProxiNode curNode in this.ProxiGraph.NodeList)
+            {
+                int index = curNode.ID;
+                int tagID = curNode.TagID;
+                FeatureType fType = curNode.FeatureType;
+
+                double curDx0 = this.D[3 * index, 0];
+                double curDy0 = this.D[3 * index + 1, 0];
+                double curDx = this.D[3 * index, 0];
+                double curDy = this.D[3 * index + 1, 0];
+
+                if (this.IsTopCos == true)
+                {
+                    this.D[3 * index, 0] = curDx;
+                    this.D[3 * index + 1, 0] = curDy;
+                }
+
+                //纠正拓扑错误
+                curNode.X += curDx;
+                curNode.Y += curDy;
+
+                #region 更新TriNodeList
+                TriNode CacheTriNode = this.GetPointByID(curNode.ID, this.Map.TriNodeList);
+                if (CacheTriNode != null)
+                {
+                    CacheTriNode.X += curDx;
+                    CacheTriNode.Y += curDy;
+                }
+                #endregion
+            }
+        }
+
+        /// <summary>
+        /// GetPointByID
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        public TriNode GetPointByID(int ID, List<TriNode> NodeList)
+        {
+            TriNode No = null;
+            foreach (TriNode CacheNo in NodeList)
+            {
+                if (CacheNo.ID == ID)
+                {
+                    No = CacheNo;
+                    break;
+                }
+            }
+
+            return No;
         }
 
         /// <summary>
@@ -2475,6 +2757,247 @@ namespace AlgEMLib
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 求矩阵的逆
+        /// </summary>
+        /// <param name="dMatrix"></param>
+        /// <param name="Level"></param>
+        /// <returns></returns>
+        private double[,] ReverseMatrix(double[,] dMatrix, int Level)
+        {
+
+            double dMatrixValue = MatrixValue(dMatrix, Level);
+
+            if (dMatrixValue == 0) return null;
+
+
+
+            double[,] dReverseMatrix = new double[Level, 2 * Level];
+
+            double x, c;
+
+            // Init Reverse matrix
+
+            for (int i = 0; i < Level; i++)
+            {
+
+                for (int j = 0; j < 2 * Level; j++)
+                {
+
+                    if (j < Level)
+
+                        dReverseMatrix[i, j] = dMatrix[i, j];
+
+                    else
+
+                        dReverseMatrix[i, j] = 0;
+
+                }
+
+
+
+                dReverseMatrix[i, Level + i] = 1;
+
+            }
+
+
+
+            for (int i = 0, j = 0; i < Level && j < Level; i++, j++)
+            {
+
+                if (dReverseMatrix[i, j] == 0)
+                {
+
+                    int m = i;
+
+                    for (; dMatrix[m, j] == 0; m++) ;
+
+                    if (m == Level)
+
+                        return null;
+
+                    else
+                    {
+
+                        // Add i-row with m-row
+
+                        for (int n = j; n < 2 * Level; n++)
+
+                            dReverseMatrix[i, n] += dReverseMatrix[m, n];
+
+                    }
+
+                }
+
+
+
+                // Format the i-row with "1" start
+
+                x = dReverseMatrix[i, j];
+
+                if (x != 1)
+                {
+
+                    for (int n = j; n < 2 * Level; n++)
+
+                        if (dReverseMatrix[i, n] != 0)
+
+                            dReverseMatrix[i, n] /= x;
+
+                }
+
+
+
+                // Set 0 to the current column in the rows after current row
+
+                for (int s = Level - 1; s > i; s--)
+                {
+
+                    x = dReverseMatrix[s, j];
+
+                    for (int t = j; t < 2 * Level; t++)
+
+                        dReverseMatrix[s, t] -= (dReverseMatrix[i, t] * x);
+
+                }
+
+            }
+
+
+
+            // Format the first matrix into unit-matrix
+
+            for (int i = Level - 2; i >= 0; i--)
+            {
+
+                for (int j = i + 1; j < Level; j++)
+
+                    if (dReverseMatrix[i, j] != 0)
+                    {
+
+                        c = dReverseMatrix[i, j];
+
+                        for (int n = j; n < 2 * Level; n++)
+
+                            dReverseMatrix[i, n] -= (c * dReverseMatrix[j, n]);
+
+                    }
+
+            }
+
+
+
+            double[,] dReturn = new double[Level, Level];
+
+            for (int i = 0; i < Level; i++)
+
+                for (int j = 0; j < Level; j++)
+
+                    dReturn[i, j] = dReverseMatrix[i, j + Level];
+
+            return dReturn;
+
+        }
+
+        /// <summary>
+        /// 存储MatrixValue
+        /// </summary>
+        /// <param name="MatrixList"></param>
+        /// <param name="Level"></param>
+        /// <returns></returns>
+        private double MatrixValue(double[,] MatrixList, int Level)
+        {
+
+            double[,] dMatrix = new double[Level, Level];
+
+            for (int i = 0; i < Level; i++)
+
+                for (int j = 0; j < Level; j++)
+
+                    dMatrix[i, j] = MatrixList[i, j];
+
+            double c, x;
+
+            int k = 1;
+
+            for (int i = 0, j = 0; i < Level && j < Level; i++, j++)
+            {
+
+                if (dMatrix[i, j] == 0)
+                {
+
+                    int m = i;
+
+                    for (; dMatrix[m, j] == 0; m++) ;
+
+                    if (m == Level)
+
+                        return 0;
+
+                    else
+                    {
+
+                        // Row change between i-row and m-row
+
+                        for (int n = j; n < Level; n++)
+                        {
+
+                            c = dMatrix[i, n];
+
+                            dMatrix[i, n] = dMatrix[m, n];
+
+                            dMatrix[m, n] = c;
+
+                        }
+
+
+
+                        // Change value pre-value
+
+                        k *= (-1);
+
+                    }
+
+                }
+
+
+
+                // Set 0 to the current column in the rows after current row
+
+                for (int s = Level - 1; s > i; s--)
+                {
+
+                    x = dMatrix[s, j];
+
+                    for (int t = j; t < Level; t++)
+
+                        dMatrix[s, t] -= dMatrix[i, t] * (x / dMatrix[i, j]);
+
+                }
+
+            }
+
+
+
+            double sn = 1;
+
+            for (int i = 0; i < Level; i++)
+            {
+
+                if (dMatrix[i, i] != 0)
+
+                    sn *= dMatrix[i, i];
+
+                else
+
+                    return 0;
+
+            }
+
+            return k * sn;
+
         }
         #endregion
 
@@ -2960,246 +3483,5 @@ namespace AlgEMLib
             throw new NotImplementedException();
         }
         #endregion
-
-        /// <summary>
-        /// 求矩阵的逆
-        /// </summary>
-        /// <param name="dMatrix"></param>
-        /// <param name="Level"></param>
-        /// <returns></returns>
-        private double[,] ReverseMatrix(double[,] dMatrix, int Level)
-        {
-
-            double dMatrixValue = MatrixValue(dMatrix, Level);
-
-            if (dMatrixValue == 0) return null;
-
-
-
-            double[,] dReverseMatrix = new double[Level, 2 * Level];
-
-            double x, c;
-
-            // Init Reverse matrix
-
-            for (int i = 0; i < Level; i++)
-            {
-
-                for (int j = 0; j < 2 * Level; j++)
-                {
-
-                    if (j < Level)
-
-                        dReverseMatrix[i, j] = dMatrix[i, j];
-
-                    else
-
-                        dReverseMatrix[i, j] = 0;
-
-                }
-
-
-
-                dReverseMatrix[i, Level + i] = 1;
-
-            }
-
-
-
-            for (int i = 0, j = 0; i < Level && j < Level; i++, j++)
-            {
-
-                if (dReverseMatrix[i, j] == 0)
-                {
-
-                    int m = i;
-
-                    for (; dMatrix[m, j] == 0; m++) ;
-
-                    if (m == Level)
-
-                        return null;
-
-                    else
-                    {
-
-                        // Add i-row with m-row
-
-                        for (int n = j; n < 2 * Level; n++)
-
-                            dReverseMatrix[i, n] += dReverseMatrix[m, n];
-
-                    }
-
-                }
-
-
-
-                // Format the i-row with "1" start
-
-                x = dReverseMatrix[i, j];
-
-                if (x != 1)
-                {
-
-                    for (int n = j; n < 2 * Level; n++)
-
-                        if (dReverseMatrix[i, n] != 0)
-
-                            dReverseMatrix[i, n] /= x;
-
-                }
-
-
-
-                // Set 0 to the current column in the rows after current row
-
-                for (int s = Level - 1; s > i; s--)
-                {
-
-                    x = dReverseMatrix[s, j];
-
-                    for (int t = j; t < 2 * Level; t++)
-
-                        dReverseMatrix[s, t] -= (dReverseMatrix[i, t] * x);
-
-                }
-
-            }
-
-
-
-            // Format the first matrix into unit-matrix
-
-            for (int i = Level - 2; i >= 0; i--)
-            {
-
-                for (int j = i + 1; j < Level; j++)
-
-                    if (dReverseMatrix[i, j] != 0)
-                    {
-
-                        c = dReverseMatrix[i, j];
-
-                        for (int n = j; n < 2 * Level; n++)
-
-                            dReverseMatrix[i, n] -= (c * dReverseMatrix[j, n]);
-
-                    }
-
-            }
-
-
-
-            double[,] dReturn = new double[Level, Level];
-
-            for (int i = 0; i < Level; i++)
-
-                for (int j = 0; j < Level; j++)
-
-                    dReturn[i, j] = dReverseMatrix[i, j + Level];
-
-            return dReturn;
-
-        }
-        
-        /// <summary>
-        /// 存储MatrixValue
-        /// </summary>
-        /// <param name="MatrixList"></param>
-        /// <param name="Level"></param>
-        /// <returns></returns>
-        private double MatrixValue(double[,] MatrixList, int Level)
-        {
-
-            double[,] dMatrix = new double[Level, Level];
-
-            for (int i = 0; i < Level; i++)
-
-                for (int j = 0; j < Level; j++)
-
-                    dMatrix[i, j] = MatrixList[i, j];
-
-            double c, x;
-
-            int k = 1;
-
-            for (int i = 0, j = 0; i < Level && j < Level; i++, j++)
-            {
-
-                if (dMatrix[i, j] == 0)
-                {
-
-                    int m = i;
-
-                    for (; dMatrix[m, j] == 0; m++) ;
-
-                    if (m == Level)
-
-                        return 0;
-
-                    else
-                    {
-
-                        // Row change between i-row and m-row
-
-                        for (int n = j; n < Level; n++)
-                        {
-
-                            c = dMatrix[i, n];
-
-                            dMatrix[i, n] = dMatrix[m, n];
-
-                            dMatrix[m, n] = c;
-
-                        }
-
-
-
-                        // Change value pre-value
-
-                        k *= (-1);
-
-                    }
-
-                }
-
-
-
-                // Set 0 to the current column in the rows after current row
-
-                for (int s = Level - 1; s > i; s--)
-                {
-
-                    x = dMatrix[s, j];
-
-                    for (int t = j; t < Level; t++)
-
-                        dMatrix[s, t] -= dMatrix[i, t] * (x / dMatrix[i, j]);
-
-                }
-
-            }
-
-
-
-            double sn = 1;
-
-            for (int i = 0; i < Level; i++)
-            {
-
-                if (dMatrix[i, i] != 0)
-
-                    sn *= dMatrix[i, i];
-
-                else
-
-                    return 0;
-
-            }
-
-            return k * sn;
-
-        }
     }
 }

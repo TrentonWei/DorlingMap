@@ -22,3 +22,11 @@ C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AuxStructureLib.p
 C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.csprojResolveAssemblyReference.cache
 C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.dll
 C:\WorkFiles\06 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.pdb
+D:\04 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AlgEMLib.dll
+D:\04 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AlgEMLib.pdb
+D:\04 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AuxStructureLib.dll
+D:\04 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\MatrixOperation.dll
+D:\04 代码集合\DorlingMap\AlgEMLib\bin\x86\Debug\AuxStructureLib.pdb
+D:\04 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.csprojResolveAssemblyReference.cache
+D:\04 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.dll
+D:\04 代码集合\DorlingMap\AlgEMLib\obj\x86\Debug\AlgEMLib.pdb

@@ -29,6 +29,7 @@ namespace AuxStructureLib
         public bool LongEdge = false;//标识是否是距离很长的边
         public bool ShortEdge = false;//表示是否是被认为是短距离边
         public bool Visited = false;//表示该边是否已被访问
+        public double OverlayTd = 0;
 
         public Skeleton_Arc Ske_Arc = null;
 

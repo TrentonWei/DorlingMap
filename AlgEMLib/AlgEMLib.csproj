@@ -116,6 +116,9 @@
     <Reference Include="ESRI.ArcGIS.Version, Version=10.0.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\..\..\04 软件\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="MatrixOperation, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\师兄代码备份\DisplaceAlgLib-CSA-bak-2-27\RoadDisAlg\bin\Debug\MatrixOperation.dll</HintPath>

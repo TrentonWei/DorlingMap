@@ -1095,7 +1095,8 @@ namespace CartoGener
             IFeature sFeature = sFeatureCursor.NextFeature();
             while (sFeature != null)
             {
-                string Name = this.GetStringValue(sFeature, "STATE_ABBR");//美国
+                string Name = this.GetStringValue(sFeature, "Name");//For注记配置评价
+                //string Name = this.GetStringValue(sFeature, "STATE_ABBR");//美国
                 //string Name = this.GetStringValue(sFeature, "GMI_CNTRY");//美洲
                 //string Name = this.GetStringValue(sFeature, "COUNTRY");
                 IPolygon pPolygon = sFeature.Shape as IPolygon;
@@ -1130,7 +1131,7 @@ namespace CartoGener
             {
                 IPolygon tPolygon = kv.Value;
                 IPolygon mPolygon = aDic[kv.Key];
-
+               
                 IArea tArea = tPolygon as IArea;
                 IArea mArea = mPolygon as IArea;
 
@@ -1143,72 +1144,76 @@ namespace CartoGener
             #endregion
 
             #region 计算邻近关系保持比
-            #region 原始Touch关系
-            List<Tuple<string, string>> TouchedList = new List<Tuple<string, string>>();
-            for (int i = 0; i < sFeatureClass.FeatureCount(null) - 1; i++)
-            {
-                for (int j = i + 1; j < sFeatureClass.FeatureCount(null); j++)
-                {
-                    if (j != i)
-                    {
-                        try
-                        {
-                            IGeometry iGeo = sFeatureClass.GetFeature(i).Shape;
-                            IGeometry jGeo = sFeatureClass.GetFeature(j).Shape;
+            //#region 原始Touch关系
+            //List<Tuple<string, string>> TouchedList = new List<Tuple<string, string>>();
+            //for (int i = 0; i < sFeatureClass.FeatureCount(null) - 1; i++)
+            //{
+            //    for (int j = i + 1; j < sFeatureClass.FeatureCount(null); j++)
+            //    {
+            //        if (j != i)
+            //        {
+            //            try
+            //            {
+            //                IGeometry iGeo = sFeatureClass.GetFeature(i).Shape;
+            //                IGeometry jGeo = sFeatureClass.GetFeature(j).Shape;
 
-                            IRelationalOperator iRo = iGeo as IRelationalOperator;
-                            if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
-                            {
-                                string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "STATE_ABBR");//美国
-                                string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "STATE_ABBR");//美国
+            //                IRelationalOperator iRo = iGeo as IRelationalOperator;
+            //                if (iRo.Touches(jGeo) || iRo.Overlaps(jGeo))
+            //                {
+            //                    string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "STATE_ABBR");//美国
+            //                    string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "STATE_ABBR");//美国
 
-                                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "COUNTRY");
-                                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "COUNTRY");
+            //                    //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "COUNTRY");
+            //                    //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "COUNTRY");
 
-                                //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "GMI_CNTRY");//美洲
-                                //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "GMI_CNTRY");//美洲
+            //                    //string NameI = this.GetStringValue(sFeatureClass.GetFeature(i), "GMI_CNTRY");//美洲
+            //                    //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(j), "GMI_CNTRY");//美洲
 
-                                Tuple<string, string> NameMatch = new Tuple<string, string>(NameI, NameJ);
-                                TouchedList.Add(NameMatch);
-                            }
-                        }
+            //                    Tuple<string, string> NameMatch = new Tuple<string, string>(NameI, NameJ);
+            //                    TouchedList.Add(NameMatch);
+            //                }
+            //            }
 
-                        catch
-                        {
+            //            catch
+            //            {
 
-                        }
-                    }
-                }
-            }
+            //            }
+            //        }
+            //    }
+            //}
             #endregion
 
             #region Touch关系保持比
-            double Count = 0;
-            foreach (Tuple<string, string> NameMatch in TouchedList)
-            {
-                IPolygon Po1 = aDic[NameMatch.Item1];
-                IPolygon Po2 = aDic[NameMatch.Item2];
+            //double Count = 0;
+            //foreach (Tuple<string, string> NameMatch in TouchedList)
+            //{
+            //    IPolygon Po1 = aDic[NameMatch.Item1];
+            //    IPolygon Po2 = aDic[NameMatch.Item2];
 
-                IProximityOperator IPO = Po1 as IProximityOperator;
-                double Dis = IPO.ReturnDistance(Po2);
-                if (Dis <= 0.4)
-                {
-                    Count++;
-                }
-            }
-            #endregion
+            //    IProximityOperator IPO = Po1 as IProximityOperator;
+            //    double Dis = IPO.ReturnDistance(Po2);
+            //    if (Dis <= 0.4)
+            //    {
+            //        Count++;
+            //    }
+            //}
+            //#endregion
 
-            double Rate = Count / TouchedList.Count;
+            //double Rate = Count / TouchedList.Count;
             #endregion
 
             #region 邻近关系对
             List<Tuple<string, string>> NearList = new List<Tuple<string, string>>();
+            //for (int i = 0; i < pg.RNGBuildingEdgesListShortestDistance.Count; i++)
             for (int i = 0; i < pg.RNGBuildingEdgesListShortestDistance.Count; i++)
             {
                 try
                 {
-                    string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "STATE_ABBR");//美国
-                    string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "STATE_ABBR");//美国
+                    string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "Name");//针对注记计算
+                    string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "Name");//针对注记计算
+
+                    //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "STATE_ABBR");//美国
+                    //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "STATE_ABBR");//美国
 
                     //string NameI = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node1.TagID), "COUNTRY");
                     //string NameJ = this.GetStringValue(sFeatureClass.GetFeature(pg.RNGBuildingEdgesListShortestDistance[i].Node2.TagID), "COUNTRY");
@@ -1308,7 +1313,8 @@ namespace CartoGener
             }
             #endregion
 
-            MessageBox.Show("TDD=" + DisSum.ToString() + ";" + "RT=" + Count.ToString() + "/" + TouchedList.Count.ToString() + "=" + Rate.ToString() + ";" + "RMS=" + RMS.ToString() + ";" + "NumO=" + NumO.ToString() + ";");
+            //MessageBox.Show("TDD=" + DisSum.ToString() + ";" + "RT=" + Count.ToString() + "/" + TouchedList.Count.ToString() + "=" + Rate.ToString() + ";" + "RMS=" + RMS.ToString() + ";" + "NumO=" + NumO.ToString() + ";");
+            MessageBox.Show("TDD=" + DisSum.ToString() + ";" + "RMS=" + RMS.ToString() + ";" + "NumO=" + NumO.ToString() + ";");
         }
 
         /// <summary>
@@ -1614,6 +1620,7 @@ namespace CartoGener
         {
             System.Diagnostics.Stopwatch oTime = new System.Diagnostics.Stopwatch();
             oTime.Start(); //记录开始时间
+            DM.pMapControl = this.pMapControl;
 
             #region OutPutCheck
             if (OutFilePath == null)
@@ -1628,7 +1635,7 @@ namespace CartoGener
             IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
             ProxiGraph npg = new ProxiGraph();
             npg.CreateProxiG(pFeatureClass, 0);
-            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "NAME", 0.1, 10, 1, 2, 0.01, 0.1);
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "NAME", "STATE_NAME", 0.1, 10, 1, 2, 0.01, 0.1);
 
             for (int i = 0; i < CircleList.Count; i++) //输出半径
             {
@@ -1642,6 +1649,8 @@ namespace CartoGener
             //npg.CreateRNG(npg.NodeList, npg.EdgeList, PoList);
             #endregion
 
+            //Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+
             #region 构建MST+npg refine
             ProxiGraph pg = new ProxiGraph();
             pg.CreateProxiGByDT(pFeatureClass);
@@ -1652,6 +1661,8 @@ namespace CartoGener
             npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
             #endregion
 
+            //if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
+
             #region 移位
             int PNum = Map.PolygonList.Count;
             if (Map.PolygonList.Count < 10)
@@ -1660,8 +1671,8 @@ namespace CartoGener
             }
             //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 3, true, 0.2);
             //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.02, 20, 3, true, 0.05);
-            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.02, 20, 0, true, 0.05);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 30, 0, 0.02, 20, 3, true, 0.05);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 30, 0, 0.02, 20, 0, true, 0.05);
             Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
             if (OutFilePath != null) { npg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
             #endregion
@@ -1671,6 +1682,71 @@ namespace CartoGener
             //输出运行时间
             Console.WriteLine("程序的运行时间：{0} 时", oTime.Elapsed.Hours);
             Console.WriteLine("程序的运行时间：{0} 分", oTime.Elapsed.Minutes);
+            Console.WriteLine("程序的运行时间：{0} 秒", oTime.Elapsed.Seconds);
+            Console.WriteLine("程序的运行时间：{0} 毫秒", oTime.Elapsed.Milliseconds);
+        }
+
+        private void button21_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Stopwatch oTime = new System.Diagnostics.Stopwatch();
+            oTime.Start(); //记录开始时间
+
+            #region OutPutCheck
+            if (OutFilePath == null)
+            {
+                MessageBox.Show("Please give the OutPut path");
+                return;
+            }
+            #endregion
+
+            #region 构建邻近关系
+            IFeatureLayer pFeatureLayer = pFeatureHandle.GetLayer(pMap, this.comboBox1.Text);
+            IFeatureClass pFeatureClass = pFeatureLayer.FeatureClass;
+            ProxiGraph npg = new ProxiGraph();
+            npg.CreateProxiG(pFeatureClass, 0);
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "STATE_ABBR", 1, 50, 1, 2, 0.01, 0.1);//不沉比例
+            List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, "Obesity", "STATE_ABBR", 1, 1, 0);//成比例
+
+            for (int i = 0; i < CircleList.Count; i++) //输出半径
+            {
+                Console.WriteLine(CircleList[i].Radius);
+            }
+
+            //List<Circle> CircleList = DM.GetInitialCircle(pFeatureClass, npg, "POPULATION", "GMI_CNTRY", 1, 50, 1, 2, 0.01, 0.1);
+            SMap Map = new SMap();
+            List<PolygonObject> PoList = DM.GetInitialPolygonObject2(CircleList);
+            Map.PolygonList = PoList;
+            //npg.CreateRNG(npg.NodeList, npg.EdgeList, PoList);
+            #endregion
+
+            #region 构建MST+npg refine
+            ProxiGraph pg = new ProxiGraph();
+            pg.CreateProxiGByDT(pFeatureClass);
+            pg.CreateMST(pg.NodeList, pg.EdgeList, PoList);
+            npg.PgRefined(pg.EdgeList);//MSTrefine （添加非邻近的边,将所有图形构成一个整体）
+            npg.PgRefined(Map.PolygonList);//重叠边refine  （添加重叠的边）;
+            npg.LabelLongerEdges(npg.EdgeList, Map.PolygonList, 20);
+            #endregion
+
+            #region 移位
+            int PNum = Map.PolygonList.Count;
+            if (Map.PolygonList.Count < 10)
+            {
+                PNum = 10;
+            }
+
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 20, 0, true, 0.2);
+            DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 20, 0, true, 0.2);//单用的话就是Tl=0
+
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 20, 0, 0.05, 20, 3, true, 0.2);
+            //DM.DorlingBeams(npg, Map, 1, 10, 1, 1, 2 * PNum, 0, 0.05, 20, 0, true, 0.2);
+            Map.WriteResult2Shp(OutFilePath, pMap.SpatialReference);
+            if (OutFilePath != null) { pg.WriteProxiGraph2Shp(OutFilePath, "邻近图", pMap.SpatialReference); }
+            #endregion
+
+            oTime.Stop(); //记录结束时间
+
+            //输出运行时间
             Console.WriteLine("程序的运行时间：{0} 秒", oTime.Elapsed.Seconds);
             Console.WriteLine("程序的运行时间：{0} 毫秒", oTime.Elapsed.Milliseconds);
         }

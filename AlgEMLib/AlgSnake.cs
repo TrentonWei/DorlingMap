@@ -17,8 +17,8 @@ namespace AlgEMLib
         public double a=100;
         public double b=100;
         public bool isContinue=true;//是否继续迭代
-        public Matrix Fy = null;//Snake算法需要分开计算X,Y 方向的受力与移位
-        public Matrix Dy = null;
+        public MatrixOperation.Matrix Fy = null;//Snake算法需要分开计算X,Y 方向的受力与移位
+        public MatrixOperation.Matrix Dy = null;
         SnakesStiffMatrix sM=null;//用于计算刚度矩阵的类
         SnakesForceVector fV = null;//用于计算受力的类
         public SMap Map;
@@ -523,8 +523,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -626,8 +626,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce_CTP();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -757,8 +757,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce_CTP();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -882,8 +882,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce_CTP();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -1008,8 +1008,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce_CTP();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -1133,8 +1133,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce_CTP();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -1244,8 +1244,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -1288,12 +1288,13 @@ namespace AlgEMLib
         /// </summary>
         public void DoDisplaceTileMap(SMap sMap,double MaxForce, double MaxForce_2,double Size)
         {
+            Random CacheR = new Random();
             fV = new SnakesForceVector(this.ProxiGraph);
             //求吸引力-2014-3-20所用
             fV.OrigialProxiGraph = this.OriginalGraph;
             fV.RMSE = this.PAT * this.Scale / 1000;
             fV.IsDragForce = this.isDragF;
-            fV.CreateForceVectorfrm_TileMap(this.ProxiGraph.NodeList, this.ProxiGraph.EdgeList, MaxForce, MaxForce_2,Size);
+            fV.CreateForceVectorfrm_TileMap(this.ProxiGraph.NodeList, this.ProxiGraph.EdgeList, MaxForce, MaxForce_2,Size); //_Fx,_Fy,Fx,Fy的值可以都很大，与力本身无关
 
             List<double> CacheList1 = new List<double>();
             List<double> CacheList2 = new List<double>();
@@ -1302,6 +1303,23 @@ namespace AlgEMLib
                 CacheList1.Add(fV.Fx[i, 0]);
                 CacheList2.Add(fV.Fy[i, 0]);
             }
+
+            #region 消除异常值
+            for (int i = 0; i < fV.Fx.Row;i++ )
+            {
+                if (double.IsNaN(fV.Fx[i, 0]))
+                {
+                    fV.Fx[i, 0] = CacheR.Next(1, 100000) * 0.0000001;
+                }
+            }
+            for (int i = 0; i < fV.Fy.Row; i++)
+            {
+                if (double.IsNaN(fV.Fy[i, 0]))
+                {
+                   fV.Fy[i, 0] = CacheR.Next(1, 100000) * 0.0000001;
+                }
+            }
+            #endregion
 
             this.F = fV.Fx;
             this.Fy = fV.Fy;
@@ -1326,8 +1344,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce_CTP();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
@@ -1349,17 +1367,31 @@ namespace AlgEMLib
                 //this.SetBoundPointParamforPG_CTP2(SelectedIDs);//设置边界条件
                 this.SetBoundPointParamforPG_CTP();
 
+                #region 矩阵可逆
                 try
                 {
                     this.D = this.K.Inverse() * this.F;
                     this.Dy = this.K.Inverse() * this.Fy;
                 }
+                #endregion
 
+                #region 矩阵不可逆(可以求伪逆矩阵，在本阶段是不实现)
                 catch
                 {
-                    this.isContinue = false;
-                    return;
+                    for (int i = 0; i < this.K.Row; i++)
+                    {
+                        for (int j = 0; j < this.K.Col; j++)
+                        {
+                            this.K[i, j] = this.K[i, j] + CacheR.Next(1, 10000) * 0.0000001;
+                        }
+                    }
+
+                    this.D = this.K.Inverse() * this.F;
+                    this.Dy = this.K.Inverse() * this.Fy;
+                    //this.isContinue = false;
+                    //return;
                 }
+                #endregion
 
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
 
@@ -1383,16 +1415,30 @@ namespace AlgEMLib
                     //SetBoundPointParamforPG_CTP2(SelectedIDs);//设置边界条件
                     this.SetBoundPointParamforPG_CTP();
 
+                    #region 矩阵可逆
                     try
                     {
                         this.D = this.K.Inverse() * this.F;
                     }
+                    #endregion
 
+                    #region 矩阵不可逆（可以求伪逆矩阵）
                     catch
                     {
-                        this.isContinue = false;
-                        return;
+
+                        for (int i = 0; i < this.K.Row; i++)
+                        {
+                            for (int j = 0; j < this.K.Col; j++)
+                            {
+                                this.K[i, j] = this.K[i, j] + CacheR.Next(1, 10000) * 0.0000001;
+                            }
+                        }
+                        this.D = this.K.Inverse() * this.F;
+
+                        //this.isContinue = false;
+                        //return;
                     }
+                    #endregion
                 }
                 else
                 {
@@ -1858,8 +1904,8 @@ namespace AlgEMLib
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce_Group();
 
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
@@ -1944,13 +1990,12 @@ namespace AlgEMLib
             fV.Create_WriteForceVector2Shp(strPath, @"ForceVector", esriSRProjCS4Type.esriSRProjCS_Beijing1954_3_Degree_GK_CM_108E);
             this.F = fV.Fx;
             this.Fy = fV.Fy;
-            ;
 
             if ((this.ProxiGraph.PolygonCount <= 3 && this.AlgType == 2) || this.AlgType == 1)
             {
                 //基本几何算法
-                this.D = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
-                this.Dy = new Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.D = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
+                this.Dy = new MatrixOperation.Matrix(this.ProxiGraph.NodeList.Count * 2, 1);
                 this.UpdataCoordsforPGbyForce_Group();
                 StaticDisforPGNewDF(out MaxFD, out MaxD, out MaxDF, out MaxF, out indexMaxD, out indexMaxF);
                 if (MaxF > 0)
