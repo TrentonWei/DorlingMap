@@ -1478,6 +1478,7 @@ namespace AlgEMLib
             int indexMaxD = -1;
             int indexMaxF = -1;
 
+            #region 两个要素
             if (this.ProxiGraph.NodeList.Count <= 2)
             {
                 #region 基本几何算法（直接移位）
@@ -1525,7 +1526,9 @@ namespace AlgEMLib
                 return; 
                 #endregion
             }
+            #endregion
 
+            #region 多个要素
             else
             {
                 //计算刚度矩阵
@@ -1581,6 +1584,7 @@ namespace AlgEMLib
 
                 UpdataCoordsforPGDorling();      //更新坐标
             }
+            #endregion
 
             ///this.OutputDisplacementandForces(fV.ForceList);//输出移位向量和力
 
