@@ -6,7 +6,7 @@ Four automatic algorithm for generation of DorlingMap, CTS-Map and Grid Map.
 #The tools were implemented in C# on ArcGIS 10.2 software (ESRI, USA). And the tool has a separate form to set the input, output and parameters for the algorithms.
 
 # (1)The DorlingMap for static data
-- Paper infor: Wei Z, Ding S, Xu W, et al. Elastic beam algorithm for generating circular cartograms[J]. Cartography and Geographic Information Science, 2023, 50(4): 371-384.
+- **Paper infor**: Wei Z, Ding S, Xu W, et al. Elastic beam algorithm for generating circular cartograms[J]. Cartography and Geographic Information Science, 2023, 50(4): 371-384.
 
 - **The principle**: an elastic beam algorithm based on minimum energy principle. 
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/Principle-1.png)
@@ -42,7 +42,7 @@ Dataset:https://github.com/TrentonWei/DorlingMap/tree/master/Experiment%20Data%2
 - **The principle**: Central Time⁃Space Map Construction Using the Snake Model. 
 ![Z. Wei, Y. Liu, W. Xu, "Central Time-space Map Construction by Using the Snake Model(基于Snake移位方法的中心型地图构建方法)", Geomatics and Information Science of Wuhan University(武汉大学学报信息科学版)(2022)](https://mp.weixin.qq.com/s/9_4TyPiRh_qR52JWNgkuCQ)
 
-- **The interface**
+- **The interface**:parameter setting interface
 ![image](https://github.com/TrentonWei/DorlingMap/blob/master/interface-3.png)
 
 - **The result_1**:The Central Time⁃Space Map Visualizing the Railway Travel Time from Wuhan to Other cities.
